@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: net.c,v 1.8 2000/01/16 23:47:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: net.c,v 1.9 2000/01/16 23:53:41 dom Exp $";
 
 #include <config.h>
 #include <sys/types.h>
@@ -124,11 +124,11 @@ spider_read(int fd, void *data)
 	term_conn();
     }
 
-/*     if (whole_msg(SENDER_CONN)) { */
+    if (whole_msg(SENDER_CONN)) {
 /* 	conn_parse_input(SENDER_CONN); */
 /* 	receiver = find_dest(SENDER_CONN); */
-/* 	conn_send_msg(SENDER_CONN);	     */
-/*     } */
+/* 	conn_send_msg(SENDER_CONN); */
+    }
 
     return;
 }
