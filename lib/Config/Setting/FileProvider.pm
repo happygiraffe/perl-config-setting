@@ -59,14 +59,6 @@ files.
 
 It is reccomended that you specify both parameters in the constructor.
 
-=item init ( )
-
-Internal use only.
-
-=item tildesubst ( )
-
-Internal use only.
-
 =item provide ( )
 
 Return a list containing file contents.
@@ -91,8 +83,8 @@ use vars qw($rcsid $VERSION $default);
 use Carp;
 use Sys::Hostname;
 
-$rcsid = '@(#) $Id: FileProvider.pm,v 1.2 2001/07/15 12:08:03 dom Exp $ ';
-$VERSION = substr q$Revision: 1.2 $, 10, -1;
+$rcsid = '@(#) $Id: FileProvider.pm,v 1.3 2002/02/04 08:43:37 dom Exp $ ';
+$VERSION = substr q$Revision: 1.3 $, 10, -1;
 $default = "~/.settingsrc";
 
 sub new {
@@ -106,10 +98,10 @@ sub new {
 		Files => [ ],	# Must not be overridden!
 	};
         bless $self, $class;
-        return $self->init;
+        return $self->_init();
 }
 
-sub init {
+sub _init() {
 	my $self = shift;
 	my @files = @{ $self->{Paths} };
 
@@ -127,7 +119,7 @@ sub init {
 }
 
 # Utility function.
-sub tildesubst {
+sub _tildesubst {
 	my $fn = shift || $_;
 	if ($fn =~ m!^~([^/]*)!) {
 		$fn =~ s!!$1 ? (getpwnam($1))[7] :
@@ -138,7 +130,7 @@ sub tildesubst {
 
 sub provide {
 	my $self = shift;
-	my @files = map(tildesubst, @{ $self->{Files} });
+	my @files = map(_tildesubst, @{ $self->{Files} });
 	my @texts;
         my $first = 1;
 	foreach my $f (@files) {
