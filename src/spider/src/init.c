@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.4 1999/03/18 23:55:00 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.5 1999/03/22 07:50:31 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/stat.h>		/* umask, stat */
@@ -636,9 +636,8 @@ neg_cmd(char * buf, Connp mod)
 		   __FILE__);
 	    exit(1);
 	}
-	(void)sprintf(tmp, REPLY_FMT, code, reason);
+	(void)sprintf(tmp, REPLY_FMT "\n", code, reason);
 	fputs(tmp, mod->chan);
-	fputs("\n", mod->chan);
 	debug_log("-> %s", tmp);
 	free(tmp);
     }
