@@ -28,7 +28,7 @@
  */
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: mod_sed.c,v 1.2 2001/06/12 23:52:25 dom Exp $";
+static const char rcsid[] = "@(#) $Id: mod_sed.c,v 1.3 2001/06/15 07:19:48 dom Exp $";
 #endif /* lint */
 
 #include <sys/types.h>
@@ -37,13 +37,13 @@ static const char rcsid[] = "@(#) $Id: mod_sed.c,v 1.2 2001/06/12 23:52:25 dom E
 #include <stdarg.h>    
 
 /* Apache includes */
-#include <httpd.h>
-#include <http_config.h>
-#include <http_core.h>
-#include <http_log.h>
-#include <http_main.h>
-#include <http_protocol.h>
-#include <http_request.h>
+#include "httpd.h"
+#include "http_config.h"
+#include "http_core.h"
+#include "http_log.h"
+#include "http_main.h"
+#include "http_protocol.h"
+#include "http_request.h"
 
 #include "defs.h"
 #include "extern.h"
