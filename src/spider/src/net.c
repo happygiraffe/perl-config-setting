@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: net.c,v 1.4 2000/01/14 23:26:29 dom Exp $";
+static const char rcsid[]="@(#) $Id: net.c,v 1.5 2000/01/14 23:41:35 dom Exp $";
 
 #include <config.h>
 #include <sys/types.h>
@@ -71,7 +71,7 @@ getrname(int fd, struct sockaddr *addr, int *addrlen)
 }
 
 /***********************************************************************
- * spider_accept: set up a new connection.
+ * spider_accept: set up a new connection.  for a user.
  */
 void
 spider_accept(int fd, void *data)
@@ -100,6 +100,7 @@ spider_accept(int fd, void *data)
     setvbuf(SENDER_CHAN, NULL, _IOLBF, 0);
     SENDER_CONN->type = user;
     SENDER_CONN->det.usr.host = c;
+    SENDER_CONN->eol = "\r\n";
     nev_watch(fd, spider_read);
     /* XXX shouldn't do manual output. */
     fputs(INITIAL_GREETING "\r\n", SENDER_CHAN);
