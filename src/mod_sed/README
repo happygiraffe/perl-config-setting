@@ -25,8 +25,9 @@ This is all the documentation you get until I write some more, I'm
 afraid  :-)
 
 You'll need: A directory or file that you want to run sed over inside
-apache.  In my case, this is "/usr/local/www/data/sed/".  The
-httpd.conf fragment I used looked like this:
+apache.  In my case, this is "/usr/local/www/data/sed/".  Copies of
+the files are in the "eg" subirectory.  The httpd.conf fragment I used
+looked like this:
 
     <Directory /usr/local/www/data/sed>
         SetHandler sed-handler
@@ -70,4 +71,4 @@ There's bound to be a few, so please report them to
 dom+sed@happygiraffe.net.  Don't forget to include anything that shows
 up in the error log.
 
-@(#) $Id: README,v 1.1 2001/06/03 11:56:56 dom Exp $
+@(#) $Id: README,v 1.2 2001/06/14 07:06:31 dom Exp $
