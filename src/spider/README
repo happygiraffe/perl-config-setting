@@ -53,3 +53,5 @@
 	connects you to the server.  It expects you know the protocol.
 	It is reccomended that you get a better client, such as
 	tkspider.
+
+@(#) $Id: README,v 1.3 2000/01/05 07:42:46 dom Exp $
