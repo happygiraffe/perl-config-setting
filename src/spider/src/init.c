@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.9 2000/01/06 23:37:17 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.10 2000/01/14 23:47:00 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -83,7 +83,7 @@ spider_init(void)
 
     /* Now, we must open a syslog connection, as we are blind & dumb */
     openlog(basename(fullname), LOG_NDELAY, facility);
-    syslog(LOG_INFO, "Starting");
+    syslog(LOG_INFO, "Starting v%s", VERSION);
 
     if(chdir(spool_dir) < 0) {
         syslog(LOG_ERR, "Couldn't change to %s: %m", spool_dir);
