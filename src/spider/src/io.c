@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.5 1999/04/14 22:14:38 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.6 1999/04/14 22:18:43 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <stdio.h>
@@ -164,7 +164,7 @@ input_data(Connp c)
 	ok = false;
     } else {
 	ok = true;
-	c->bufhwm += bytes	    
+	c->bufhwm += bytes;
     }
 
     return ok;
