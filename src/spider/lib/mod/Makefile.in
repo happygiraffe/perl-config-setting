@@ -1,0 +1,96 @@
+# -*- makefile -*-
+#
+# Makefile for libmod.a, the Spider Module Library
+#
+
+@SET_MAKE@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+mandir = @mandir@
+includedir = @includedir@
+top_srcdir = @top_srcdir@
+
+CC	 = @CC@
+CFLAGS   = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+ALL_CFLAGS = -I../.. -I@top_srcdir@/src $(CFLAGS)
+RANLIB   = @RANLIB@
+
+pkglibexecdir = $(libexecdir)/spider
+pkgspooldir = $(libdir)/spider
+
+#-----------------------------------------------------------------------
+
+OBJECTS	= mod_ds.o mod_utils.o mod_io.o mod.o
+
+INSTFILES =			\
+	$(includedir)/mod.h	\
+	$(libdir)/libmod.a
+
+#-----------------------------------------------------------------------
+
+.c.o:
+	$(CC) -o $@ $(CPPFLAGS) $(ALL_CFLAGS) -c $<
+
+#-----------------------------------------------------------------------
+
+all: libmod.a
+
+install: $(includedir) $(libdir) $(INSTFILES)
+
+#-----------------------------------------------------------------------
+
+libmod.a: $(OBJECTS) 
+	rm -f $@
+	$(AR) rc $@ $(OBJECTS)
+	$(RANLIB) $@
+
+$(OBJECTS): $(top_srcdir)/lib/mod/mod.h ../../config.h
+
+# Explicit dependencies listed for the benefit of Solaris make.
+
+mod_ds.o: mod_ds.c
+
+mod_utils.o: mod_utils.c
+
+mod_io.o: mod_io.c
+
+mod.o: mod.c
+
+#-----------------------------------------------------------------------
+
+$(includedir):
+	@$(mkinstalldirs) $@
+
+$(libdir):
+	@$(mkinstalldirs) $@
+
+$(includedir)/mod.h: $(top_srcdir)/lib/mod/mod.h
+	$(INSTALL_DATA) $? $@
+
+$(libdir)/libmod.a: libmod.a
+	$(INSTALL_PROGRAM) $? $@
+
+#-----------------------------------------------------------------------
+
+.PHONY: clean all
+
+clean:
+	-rm -f core libmod.a $(OBJECTS)
