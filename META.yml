@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name: Config-Setting
-version: 0.03
+version: 0.04
 author:
   - Dominic Mitchell, E<lt>cpan@happygiraffe.netE<gt>
 abstract: Perl extension for configuration files.
@@ -10,7 +10,7 @@ requires:
 provides:
   Config::Setting:
     file: lib/Config/Setting.pm
-    version: 0.03
+    version: 0.04
   Config::Setting::Chunk:
     file: lib/Config/Setting/Chunk.pm
     version: 552
