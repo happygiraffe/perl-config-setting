@@ -1,4 +1,4 @@
-.\" @(#) $Id: debug_client.1,v 1.2 2000/01/06 08:07:36 dom Exp $
+.\" @(#) $Id: debug_client.man,v 1.1 2000/01/06 08:14:03 dom Exp $
 .TH debug_client 1 "4 Jan 2000" "Local Software"
 .SH NAME
 debug_client \- connect to the spider daemon.
