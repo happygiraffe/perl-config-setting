@@ -3,12 +3,13 @@
 # Produce a generated procmail.rc file.  Basically just a wrapper around
 # m4, but it makes life easier.
 #
-# @(#) $Id: pgen.in,v 1.1 2001/06/16 20:30:41 dom Exp $
+# @(#) $Id: pgen.in,v 1.2 2001/06/16 21:32:35 dom Exp $
 #
 
 me=`basename $0`
-prefix=/home/dom/work/pgen			# For testing.
-M4DEFN="${prefix}/share/pgen/procmail-defn.m4"
+prefix="@prefix@"
+PGENDIR=${PGENDIR:-@datadir@/pgen}
+M4DEFN="${PGENDIR}/procmail-defn.m4"
 MH=""
 
 # We don't explicitly set the PATH on the assumption that the user may
@@ -46,6 +47,7 @@ fi
 
 if [ ! -f "$1" ] ; then
     echo "$me: file $1 not found" >&2
+    exit 1
 fi
 m4 $MH "$M4DEFN" "$1"
 
