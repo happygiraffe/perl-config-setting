@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: mod_utils.c,v 1.1 2000/01/05 08:09:57 dom Exp $";
+static const char rcsid[]="@(#) $Id: mod_utils.c,v 1.2 2000/01/06 21:57:57 dom Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -141,7 +141,9 @@ iserror(char *s)
     int 	i = 0;
 
     if (s != NULL) {
-        if (!isdigit(s[0])||!isdigit(s[1])||!isdigit(s[2])) {
+        if (!isdigit((int)s[0])||
+	    !isdigit((int)s[1])||
+	    !isdigit((int)s[2])) {
             i = atoi(s);
             /* Make sure it's a response code */
             if (i > 999) {
@@ -162,7 +164,7 @@ static char *
 skip_ws(char * p)
 {
     if (p != NULL) {
-        while (isspace(*p))
+        while (isspace((int)*p))
             p++;
     }
     return p;
@@ -178,7 +180,7 @@ static char *
 skip_until_ws(char * p)
 {
     if (p != NULL) {
-        while (!isspace(*p) && (*p != '\0'))
+        while (!isspace((int)*p) && (*p != '\0'))
             p++;
     }
     return p;
@@ -198,7 +200,7 @@ len_token(char * tok)
     size_t 	i = 0;
 
     if (tok != (char *)NULL) {
-	while(!isspace(*c) && (*c != '\0')) {
+	while(!isspace((int)*c) && (*c != '\0')) {
 	    i++;
 	    c++;
 	}
@@ -222,7 +224,7 @@ find_token(char * buf, int n)
         if (num_tokens(buf) > n)
         {
             /* Avoid preceding ws */
-            if (isspace(*c))
+            if (isspace((int)*c))
                 c = skip_ws(c);
 	
             for(i = 0; i < n; ++i)
@@ -280,7 +282,7 @@ num_tokens(char * buf)
 
     if (buf != NULL) {
         c = buf;
-        if (isspace(*c))
+        if (isspace((int)*c))
             c = skip_ws(c);
         for(i = 0; *c != '\0'; i++)
         {

@@ -8,7 +8,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: mod.c,v 1.1 2000/01/05 08:09:57 dom Exp $";
+static const char rcsid[]="@(#) $Id: mod.c,v 1.2 2000/01/06 21:57:57 dom Exp $";
 
 #include <ctype.h>
 #include <stdio.h>
@@ -106,7 +106,7 @@ mod_reg_cmd(char * name, Reply (*func)(char ** input),
 	i = atoi(c);
 	if (i != OK_CMD) {
 	    char * d = c;
-	    while (!isspace(*d))
+	    while (!isspace((int)*d))
                 d++;
 	    d++;
 	    syslog(LOG_WARNING, "reg_cmd(%s) failed: %s", name, d);
