@@ -1,0 +1,8 @@
+
+1) Have an option for whihc area to start on.
+
+2) Have a filter for which areas are selected from the server.
+
+3) Check that the loginname is not {} and if it is then prompt for it.
+
+4) Make all listboxes single selection only.
