@@ -104,6 +104,11 @@ variables.
 
 =back
 
+=head1 TODO
+
+It would be useful to know where each setting derived from, in order to
+help debugging.
+
 =head1 AUTHOR
 
 Dominic Mitchell, E<lt>cpan@happygiraffe.netE<gt>
