@@ -4,8 +4,8 @@
 Perform a ripe query.
 """
 
-__rcs_id__='$Id: ripe.py,v 1.3 2000/07/04 10:44:30 dom Exp $'
-__version__='$Revision: 1.3 $'[11:-2]
+__rcs_id__='$Id: ripe.py,v 1.4 2000/07/04 10:59:18 dom Exp $'
+__version__='$Revision: 1.4 $'[11:-2]
 
 import sys
 import string
@@ -37,7 +37,7 @@ class RipeObj:
     def __getattr__(self, val):
         res = []
         for o, a in self.data:
-            if o == val: res.append(val)
+            if o == val: res.append(a)
         return res
 
     def __str__(self):
@@ -46,8 +46,31 @@ class RipeObj:
             res = res + '%-13s %s\n' % (o+':', a)
         return res[:-1]                 # Strip trailing NL.
 
-    def id(self):
+    def dbid(self):
         return self.data[0][1]
+
+class inetnum(RipeObj):
+    def dbid(self):
+        return self.netname
+
+class person(RipeObj):
+    def dbid(self):
+        return getattr(self, 'nic-hdl')[0]
+
+class role(RipeObj):
+    def dbid(self):
+        return getattr(self, 'nic-hdl')[0]
+
+class mntner(RipeObj):
+    def id(self):
+        return self.mntner
+
+def RipeObjFactory(data):
+    if   data[0][0] == 'inetnum': return inetnum(data)
+    elif data[0][0] == 'person':  return person(data)
+    elif data[0][0] == 'role':    return role(data)
+    elif data[0][0] == 'mntner':  return mntner(data)
+    else:                         return RipeObj(data)
 
 def RipeQuery(query):
     """Perform a ripe query and return the result as a list of tuples."""
@@ -60,7 +83,7 @@ def RipeQuery(query):
     for line in data:
         if not line:
             if len(currec) > 0:
-                currec = RipeObj(currec)
+                currec = RipeObjFactory(currec)
                 res.append(currec)
             currec = []
             continue
@@ -75,7 +98,7 @@ if __name__ == '__main__':
     try:
         objs = RipeQuery(sys.argv[1])
         for o in objs:
-            print o
+            print o.dbid()
             print
     except IndexError:
         print "usage: ripe query"
