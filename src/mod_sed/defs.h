@@ -155,3 +155,10 @@ struct s_flist {
 	char *fname;
 	struct s_flist *next;
 };
+
+/*
+ * remap the error functions to my (useful) versions...
+ */
+#define warnx	sed_warnx
+#define errx	sed_errx
+#define err	sed_err

@@ -23,7 +23,7 @@
   Right now, we're throwing everything back to the client, no matter
   what they ask for.
 
-* Redefine err() and errx() to be useful within apache.
+* [DONE] Redefine err() and errx() to be useful within apache.
 
   They should abort the current transaction, not exit.  They do this
   with setjmp()/longjmp() around compile().  If there's been an error,
@@ -63,4 +63,4 @@
 # mode: outline
 # End:
 #
-# @(#) $Id: TODO,v 1.1 2001/06/03 11:56:56 dom Exp $
+# @(#) $Id: TODO,v 1.2 2001/06/12 23:52:25 dom Exp $

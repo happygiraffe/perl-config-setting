@@ -28,11 +28,13 @@
  */
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: mod_sed.c,v 1.1 2001/06/03 11:56:56 dom Exp $";
+static const char rcsid[] = "@(#) $Id: mod_sed.c,v 1.2 2001/06/12 23:52:25 dom Exp $";
 #endif /* lint */
 
 #include <sys/types.h>
 #include <sys/stat.h>    
+#include <setjmp.h>    
+#include <stdarg.h>    
 
 /* Apache includes */
 #include <httpd.h>
@@ -51,6 +53,9 @@ module MODULE_VAR_EXPORT sed_module;
 
 /* For use elsewhere in this program */
 request_rec *s_r;
+
+/* For use by err{x,}. */
+jmp_buf	err_jmp_buf;
 
 /*------------------------------------------------------------------
  * Configuration implementation.
@@ -252,6 +257,60 @@ sed_reinit(void)
 	lastline = 0;
 }
 
+/* Remap BSD function to apache function */
+void
+sed_warnx(const char *fmt, ...)
+{
+	va_list ap;
+	char *str;
+	
+	va_start(ap, fmt);
+	/* Thank $DEITY they got one useful function in the API... */
+	str = ap_pvsprintf(s_r->pool, fmt, ap);
+	str = ap_pstrcat(s_r->pool, "mod_sed: ", str);
+	ap_log_rerror(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING, s_r, str);
+	va_end(ap);
+}
+
+/*
+ * Remap BSD function to apache function.  We ignore retval because
+ * it's not terribly useful.
+ */
+void
+sed_errx(int retval, const char *fmt, ...)
+{
+	va_list ap;
+	char *str;
+	
+	va_start(ap, fmt);
+	str = ap_pvsprintf(s_r->pool, fmt, ap);
+	str = ap_pstrcat(s_r->pool, "mod_sed: ", str);
+	ap_log_rerror(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, s_r, str);
+	va_end(ap);
+	longjmp(err_jmp_buf, 1);
+}
+
+/*
+ * Remap BSD function to apache function.  We ignore retval because
+ * it's not terribly useful.  This version appends strerror(errno).
+ */
+void
+sed_err(int retval, const char *fmt, ...)
+{
+	va_list ap;
+	char *str;
+	int errno_sv = errno;
+	
+	va_start(ap, fmt);
+	str = ap_pvsprintf(s_r->pool, fmt, ap);
+	/* XXX Is this order of evaluation guaranteed? */
+	str = ap_pstrcat(s_r->pool, "mod_sed: ", str, ": ", 
+			 strerror(errno_sv), NULL);
+	ap_log_rerror(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, s_r, str);
+	va_end(ap);
+	longjmp(err_jmp_buf, 1);
+}
+
 /*------------------------------------------------------------------
  * Main handler.
  */
@@ -268,9 +327,6 @@ sed_handler(request_rec *r)
 
 	/* clean up globals */
 	sed_reinit();
-
-	ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_DEBUG, r->server,
-		     "Entered sed_handler");
 
 	/* nobody told us what to do */
 	if (cf->program == NULL) {
@@ -335,16 +391,20 @@ sed_handler(request_rec *r)
 
 	/* XXX Should do caching of compiled bits... */
 	/* XXX This lot needs to be watched for thrown errors. */
-	compile();
+	if (setjmp(err_jmp_buf)) {
+		return SERVER_ERROR;
+	} else {
+		compile();
 
-	ap_chdir_file(r->filename);
+		ap_chdir_file(r->filename);
 
- 	add_file(r->filename);
-	if (!r->header_only)	/* cater for a HEAD request. */
-		process();
- 	cfclose(prog, NULL);
+		add_file(r->filename);
+		if (!r->header_only)	/* cater for a HEAD request. */
+			process();
+		cfclose(prog, NULL);
 
-	return OK;
+		return OK;
+	}
 }
 
 /* list of handlers we wish to publish */
