@@ -30,11 +30,11 @@
 
 #include "nev.h"
 
-static const char rcsid[]="@(#) $Id: nev.c,v 1.5 2000/01/13 01:16:23 dom Exp $";
+static const char rcsid[]="@(#) $Id: nev.c,v 1.6 2000/01/13 01:17:15 dom Exp $";
 
 /* PROTOTYPES */
 
-static void nev_accept();
+static void nev_accept(int, void *);
 
 /* GLOBALS */
 
