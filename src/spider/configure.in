@@ -38,6 +38,8 @@ AC_CHECK_FUNCS(memcpy mkdir select socket strchr strdup)
 AC_OUTPUT(Makefile
 	  src/Makefile
 	  lib/Makefile
+	  lib/ds/Makefile
+	  lib/mod/Makefile
 	  modules/Makefile
 	  modules/motd/Makefile
 	  modules/page/Makefile
