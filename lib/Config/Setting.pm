@@ -147,22 +147,22 @@ sub _init {
 sub _merge {
         my $self = shift;
         my @configs = @_;
-        my $cf = { };           # Combined config.
-        my $sections = [ ];
+        my %cf;           # Combined config.
+        my @sections;
 
         foreach my $c (@configs) {
                 foreach my $s ($c->sections) {
-                        unless (exists $cf->{$s}) {
-                                $cf->{$s} = {};
-                                push @$sections, $s;
+                        unless (exists $cf{$s}) {
+                                $cf{$s} = {};
+                                push @sections, $s;
                         }
                         foreach my $k ($c->keylist($s)) {
-                                $cf->{$s}{$k} = $c->get($s, $k);
+                                $cf{$s}{$k} = $c->get($s, $k);
                         }
                 }
         }
-        $self->{Sections} = $sections;
-        $self->{Config} = $cf;
+        $self->{Sections} = \@sections;
+        $self->{Config} = \%cf;
         return $self;
 }
 
