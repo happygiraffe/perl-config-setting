@@ -37,12 +37,11 @@ Config::Setting::FileProvider - return the contents of files.
 
 =head1 DESCRIPTION
 
-The Config::Setting::FileProvider module presents an interface to file
-contents.  It returns the contents of various files, in order to the
-application that requests it.
+This class presents an interface to file contents.  It returns the
+contents of various files, in order to the application that requests it.
 
 It is not intended that this class be used standalone, rather that it
-be used as part of the Config::Setting module.
+be used as part of the L<Config::Setting> module.
 
 =head1 METHODS
 
@@ -50,21 +49,17 @@ be used as part of the Config::Setting module.
 
 =item new ( ARGS )
 
-Create a new Config::Setting::FileProvider object.  ARGS is a set of
-keyword / value pairs.  Recognised options are:
+Create a new object.  ARGS is a set of keyword / value pairs.
+Recognised options are:
 
 =over 4
 
-=item o
-
-Env
+=item Env
 
 The name of an environment variable to look at.  If it exists, it will
 contain a colon separated list of paths to settings files.
 
-=item o
-
-Paths
+=item Paths
 
 A list of file paths to be used, in order, for settings files.
 
@@ -90,7 +85,7 @@ Dominic Mitchell, E<lt>dom@happygiraffe.netE<gt>
 
 =head1 SEE ALSO
 
-Config::Setting(3).
+L<Config::Setting>.
 
 =cut
 

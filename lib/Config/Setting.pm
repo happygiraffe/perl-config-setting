@@ -56,15 +56,16 @@ The constructor.  Takes no arguments.
 =item provider ( )
 
 Returns an object which can be used to collect the contents of files.
-The default returns a Setting::FileProvider object.  You probably want
-to override this method when you set up your subclass, in order to set
-the policy for file locations.
+The default returns a L<Config::Setting::FileProvider> object.  You
+probably want to override this method when you set up your subclass, in
+order to set the policy for file locations.
 
-=item parser ( STRING )
+=item parser ( )
 
-Returns an object which can parse the contents of STRING.  The default
-is the Setting::IniParser object.  You may want to override this in a
-subclass if you wish to use an alternative layout.
+Returns a parser object.  The default is the
+L<Config::Setting::IniParser> object.  You may want to override this in
+a subclass if you wish to use an alternative format for your
+configuration files..
 
 =item sections ( )
 
@@ -104,9 +105,9 @@ Dominic Mitchell, E<lt>dom@happygiraffe.netE<gt>
 
 =head1 SEE ALSO
 
-Config::Setting::FileProvider(3),
-Config::Setting::IniParser(3),
-Config::Setting::XMLParser(3).
+L<Config::Setting::FileProvider>,
+L<Config::Setting::IniParser>,
+L<Config::Setting::XMLParser>.
 
 =cut
 

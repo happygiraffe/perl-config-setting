@@ -43,8 +43,8 @@ Config::Setting::XMLParser - parse XML settings file.
 
 =head1 DESCRIPTION
 
-Config::Setting::XMLParser provides access to settings stored in an
-XML File.  The XML File is expected to have the following structure:
+This class provides access to settings stored in an XML File.  The XML
+File is expected to have the following structure:
 
   <settings>
     <section name="SECTION">
@@ -79,7 +79,7 @@ the disk.
 =back
 
 One of Filename or String is required.  Any remaining arguments will
-be passed to the XML::Parser constructor.
+be passed to the L<XML::Parser> constructor.
 
 =item sections ( )
 
@@ -99,7 +99,8 @@ Return the value of KEY in SECTION.
 =head1 SEE ALSO
 
 perl(1),
-Config::Setting::IniParser(3).
+L<Config::Setting::IniParser>,
+L<XML::Parser>.
 
 =head1 AUTHOR
 

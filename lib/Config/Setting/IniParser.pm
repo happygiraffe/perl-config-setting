@@ -43,8 +43,8 @@ Config::Setting::IniParser - parse windows .ini style files.
 
 =head1 DESCRIPTION
 
-Config::Setting::IniParser provides OO access to windows .ini style
-files.  At present, it only provides read access, not writing.
+This class provides OO access to windows .ini style files.  At present,
+it only provides read access, not writing.
 
 =head1 METHODS
 
