@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: utils.c,v 1.5 2000/01/06 23:37:17 dom Exp $";
+static const char rcsid[]="@(#) $Id: utils.c,v 1.6 2000/01/06 23:55:57 dom Exp $";
 
 #include <config.h>
 #include <ctype.h>
@@ -455,18 +455,19 @@ cmp_token(char * buf, int n, char * s)
 void
 debug_log(char *msg, ...)
 {
-    va_list args;
+    va_list	args;
 
-    if (debug) {
-	va_start (args, msg);
-	if (am_daemon) {
-	    (void)vsyslog (LOG_DEBUG, msg, args);
-	} else {
-	    vfprintf(stderr, msg, args);
-	    fprintf(stderr, "\n");
-	}
-	va_end (args);
+    if (!debug)
+	return;
+	
+    va_start (args, msg);
+    if (am_daemon) {
+	(void)vsyslog (LOG_DEBUG, msg, args);
+    } else {
+	vfprintf(stderr, msg, args);
+	fprintf(stderr, "\n");
     }
+    va_end (args);
 }
 
 /*
