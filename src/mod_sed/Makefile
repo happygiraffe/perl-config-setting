@@ -1,7 +1,7 @@
 #
 # build mod_sed using apxs.
 #
-# @(#) $Id: Makefile,v 1.3 2001/06/14 07:12:49 dom Exp $
+# @(#) $Id: Makefile,v 1.4 2001/06/15 06:40:56 dom Exp $
 #
 
 #---------------------------------------------------------------------
@@ -32,6 +32,18 @@ test:
 	echo "break sed_handler" > .gdbinit
 	LD_BIND_NOW=1 httpd -X -f $(PWD)/httpd.conf -DSED & echo $$!
 #	gdb /usr/local/sbin/httpd $$!
+
+SED_SRC=	/usr/src/usr.bin/sed
+DIFF_FLAGS=	-u
+# XXX In BSD make, if you take the "-" away from the beginning of the
+# line, the damned thing stops after the first diff!  It's obviously
+# picking up the exit code from the diff directly, somehow... 
+diff:
+	@-for f in $(SRCS) $(HDRS) ; do \
+		if [ -f $(SED_SRC)/$$f ] ; then \
+			diff $(DIFF_FLAGS) $(SED_SRC)/$$f $$f ; \
+		fi ; \
+	done ; true
 
 dist:
 	mkdir $(DISTNAME)
