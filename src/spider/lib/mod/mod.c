@@ -8,7 +8,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: mod.c,v 1.2 2000/01/06 21:57:57 dom Exp $";
+static const char rcsid[]="@(#) $Id: mod.c,v 1.3 2000/01/15 11:05:27 dom Exp $";
 
 #include <ctype.h>
 #include <stdio.h>
@@ -47,13 +47,8 @@ mod_init(char * name)
 	}
     }
 
-#ifdef SETVBUF_REVERSED
-    setvbuf(stdin, _IOLBF, NULL, 0);
-    setvbuf(stdout, _IOLBF, NULL, 0);
-#else 
     setvbuf(stdin, NULL, _IOLBF, 0);
     setvbuf(stdout, NULL, _IOLBF, 0);
-#endif
 #ifndef DEBUG
     /* Shouldn't be using stderr. */
     freopen("/dev/null", "r+", stderr);

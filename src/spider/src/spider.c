@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.7 2000/01/15 00:04:21 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.8 2000/01/15 11:05:27 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -262,11 +262,7 @@ new_conn(int l_sock)
             exit(1);
         }
         SENDER_CHAN = fdopen(sender, "r+");
-#ifdef SETVBUF_REVERSED
-        setvbuf(SENDER_CHAN, _IOLBF, NULL, 0);
-#else
         setvbuf(SENDER_CHAN, NULL, _IOLBF, 0);
-#endif
         SENDER_CONN->type = user;
         SENDER_CONN->det.usr.host = c;
         FD_SET(sender, &wait_on);

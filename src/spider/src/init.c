@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.10 2000/01/14 23:47:00 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.11 2000/01/15 11:05:27 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -614,11 +614,7 @@ activate_module(char * path)
 	    thisone->state = s_conn;
 	    thisone->det.mod.pid = pid;
 	    /* Make sure that any writes don't wait */
-#ifdef SETVBUF_REVERSED
-	    setvbuf(thisone->chan, _IOLBF, NULL, 0);
-#else 
 	    setvbuf(thisone->chan, NULL, _IOLBF, 0);
-#endif
 
 	    /* Add into the array of connections. */
 	    open_conns[fd[0]] = thisone;
