@@ -1,0 +1,13 @@
+Config::Setting                                                    -*- text -*-
+
+This is a small perl module, which enables you to to have per project
+settings file, which are easily overridable.  The present
+implementation provides for overrides on the basis of environment
+variables and hostname, but this is easily customizable by
+subclassing.
+
+Copyright (C) 2001 Dominic Mitchell.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+@(#) $Id: README,v 1.1 2001/06/24 15:21:58 dom Exp $

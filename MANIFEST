@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Config/Setting.pm
+lib/Config/Setting/IniParser.pm
+lib/Config/Setting/FileProvider.pm
+lib/Config/Setting/XMLParser.pm
+t/01basic.t
+t/02simple.t
+t/03xml.t
+t/test.ini
+t/test.xml
