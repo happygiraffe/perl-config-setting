@@ -132,19 +132,10 @@ sub _init() {
         return $self;
 }
 
-# Utility function.
-sub _tildesubst {
-        my $fn = shift || $_;
-        if ($fn =~ m!^~([^/]*)!) {
-                $fn =~ s!!$1 ? (getpwnam($1))[7] :
-                        ($ENV{HOME} || $ENV{LOGDIR})!ex;
-        }
-        return $fn;
-}
-
 sub provide {
         my $self = shift;
-        my @files = map(_tildesubst, @{ $self->{Files} });
+        # Allow tilde notation for home directory.
+        my @files = map(glob, @{ $self->{Files} });
         my @texts;
         my $first = 1;
         foreach my $f (@files) {
