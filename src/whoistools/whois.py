@@ -7,6 +7,9 @@ Server(domain)	- Return an appropriate whois server for a domain.
 Whois(domain, server=None)	- Return whois output for domain.
 """
 
+__rcs_id__='$Id: whois.py,v 1.3 2000/07/04 10:12:35 dom Exp $'
+__version__='$Revision: 1.3 $'[11:-2]
+
 import os
 import sys
 import string

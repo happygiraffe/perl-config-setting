@@ -4,6 +4,9 @@
 Perform a ripe query.
 """
 
+__rcs_id__='$Id: ripe.py,v 1.2 2000/07/04 10:11:55 dom Exp $'
+__version__='$Revision: 1.2 $'[11:-2]
+
 import sys
 import string
 import whois
