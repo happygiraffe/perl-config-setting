@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.10 2000/01/16 23:04:22 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.11 2000/01/16 23:47:43 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -88,12 +88,7 @@ get_line(FILE * fp)
     if (fp != NULL) {
         size = LARGE_BUF;
         start = 0;
-        c = malloc(size);
-        if (c == NULL) {
-            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-            exit(1);
-        }
+        c = emalloc (size);
         input = fgets(c, size, fp);
         if (input == NULL) {
             if (!feof(fp)) {
@@ -105,7 +100,7 @@ get_line(FILE * fp)
             /* More input available */
             size += LARGE_BUF;
             start += LARGE_BUF;
-            c = realloc(c, size);
+            c = erealloc (c, size);
             fgets(&c[start], LARGE_BUF, fp);
             if (input == NULL) {
                 if (!feof(fp)) {
@@ -116,7 +111,7 @@ get_line(FILE * fp)
         }
         /* Trim off any excess memory used */
         if (ok) {
-            input = strdup(c);
+            input = estrdup (c);
         }
         free(c);
     }
@@ -139,24 +134,14 @@ input_data(Connp c)
 
     /* If we don't already have a buffer, create one. */
     if (c->buf == NULL) {
-	c->buf = malloc(LARGE_BUF);
-	if (c->buf == NULL) {
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-            exit(1);
-        }
+	c->buf = emalloc (LARGE_BUF);
 	c->buflen = LARGE_BUF;
 	c->bufhwm = 0;
     }
 
     /* Check that we actually have some buffer left... */
     if (c->bufhwm == c->buflen) {
-	cp = realloc (c->buf, c->buflen + LARGE_BUF);
-	if (cp == NULL){
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-            exit(1);
-        }
+	cp = erealloc (c->buf, c->buflen + LARGE_BUF);
 	c->buf = cp;
     }
     

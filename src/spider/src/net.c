@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: net.c,v 1.7 2000/01/16 23:04:22 dom Exp $";
+static const char rcsid[]="@(#) $Id: net.c,v 1.8 2000/01/16 23:47:43 dom Exp $";
 
 #include <config.h>
 #include <sys/types.h>
@@ -74,7 +74,7 @@ getrname(int fd, struct sockaddr *addr, int *addrlen)
     getpeername (fd, addr, addrlen);
     hp = gethostbyaddr ((char *)&so->sin_addr.s_addr,
 			sizeof so->sin_addr.s_addr, AF_INET);
-    return strdup (hp ? hp->h_name : inet_ntoa(so->sin_addr));
+    return estrdup (hp ? hp->h_name : inet_ntoa(so->sin_addr));
 }
 
 /***********************************************************************
@@ -97,12 +97,7 @@ spider_accept(int fd, void *data)
     sender = receiver = fd;
 
     /* XXX make creator function for Conn */
-    SENDER_CONN = malloc (sizeof(Conn));
-    if (SENDER_CONN == NULL) {
-	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	     __FILE__);
-	exit(1);
-    }
+    SENDER_CONN = emalloc (sizeof(Conn));
     SENDER_CHAN = fdopen (sender, "r+");
     setvbuf(SENDER_CHAN, NULL, _IOLBF, 0);
     SENDER_CONN->type = user;

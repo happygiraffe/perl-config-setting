@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.17 2000/01/16 23:04:22 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.18 2000/01/16 23:47:43 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -404,12 +404,7 @@ void
 init_data(void)
 {
     maxfd = get_max_fds();
-    open_conns = malloc(maxfd * sizeof(Connp));
-    if (open_conns == NULL) {
-	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	     __FILE__);
-	exit(1);
-    }
+    open_conns = emalloc (maxfd * sizeof(Connp));
     (void)memset(open_conns, '\0', (size_t)(maxfd * sizeof(Connp)));
     Usr_init();
     Cmd_init();
@@ -431,48 +426,28 @@ init_internal_cmds(void)
 
     log (LOG_DEBUG, "start init_internal_commands");
 
-    tmp = malloc(sizeof(Cmd));
-    if (tmp == NULL) {
-	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	     __FILE__);
-	exit(1);
-    }
+    tmp = emalloc (sizeof(Cmd));
     tmp->name = "LOGIN";
     tmp->type = internal;
     tmp->det.in.fn = cmd_login;
     Cmd_add(tmp->name, tmp);
     log (LOG_DEBUG, "cmd %s ok", tmp->name);
 
-    tmp = malloc(sizeof(Cmd));
-    if (tmp == NULL) {
-	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	     __FILE__);
-	exit(1);
-    }
+    tmp = emalloc (sizeof(Cmd));
     tmp->name = "HELP";
     tmp->type = internal;
     tmp->det.in.fn = cmd_help;
     Cmd_add(tmp->name, tmp);
     log (LOG_DEBUG, "cmd %s ok", tmp->name);
 
-    tmp = malloc(sizeof(Cmd));
-    if (tmp == NULL) {
-	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	     __FILE__);
-	exit(1);
-    }
+    tmp = emalloc (sizeof(Cmd));
     tmp->name = "WHO";
     tmp->type = internal;
     tmp->det.in.fn = cmd_who;
     Cmd_add(tmp->name, tmp);
     log (LOG_DEBUG, "cmd %s ok", tmp->name);
 
-    tmp = malloc(sizeof(Cmd));
-    if (tmp == NULL) {
-	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	     __FILE__);
-	exit(1);
-    }
+    tmp = emalloc (sizeof(Cmd));
     tmp->name = "QUIT";
     tmp->type = internal;
     tmp->det.in.fn = cmd_quit;
@@ -502,12 +477,7 @@ find_module(char * name)
 	for (i = 0 ; module_path[i] != (char*)NULL; i++)
 	{
 	    len = strlen(module_path[i]) + 1 + strlen(name) + 1;
-	    abs_name = malloc((size_t)len);
-	    if (abs_name == NULL) {
-		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		     __FILE__);
-		exit(1);
-	    }
+	    abs_name = emalloc ((size_t)len);
 	    strcpy(abs_name, module_path[i]);
 	    strcat(abs_name, "/");
 	    strcat(abs_name, name);
@@ -593,12 +563,7 @@ activate_module(char * path)
 	} else {
 	    /* Parent */
 	    close(fd[1]);
-	    thisone = malloc(sizeof(Conn));
-	    if (thisone == NULL) {
-		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		     __FILE__);
-		exit(1);
-	    }
+	    thisone = emalloc (sizeof(Conn));
 	    thisone->eol = "\n";
 	    thisone->chan = fdopen(fd[0], "r+");
 	    thisone->name = basename(path);
@@ -638,12 +603,7 @@ neg_cmd(char * buf, Connp mod)
 
     if ((buf != NULL) && (mod != NULL)) {
 	/* Setup a new command structure */
-	cmd = malloc(sizeof(Cmd));
-	if (cmd == NULL) {
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-	    exit(1);
-	}
+	cmd = emalloc(sizeof(Cmd));
 	cmd->name = NULL;
 	cmd->type = external;
 	cmd->det.ex.mod = mod;
@@ -682,12 +642,7 @@ neg_cmd(char * buf, Connp mod)
 	    code = OK_CMD;
 	    reason = OK_CMD_MSG;
 	}
-	tmp = malloc(strlen(REPLY_FMT)+strlen(reason)+6);
-	if (tmp == NULL) {
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-	    exit(1);
-	}
+	tmp = emalloc (strlen(REPLY_FMT)+strlen(reason)+6);
 	(void)sprintf(tmp, REPLY_FMT "\n", code, reason);
 	fputs(tmp, mod->chan);
 	log (LOG_DEBUG, "[%d] -> %s", fileno(mod->chan), tmp);
@@ -808,12 +763,7 @@ init_users(void)
 	    lineno++;
 	    continue;
 	}
-	usr = malloc(sizeof(Conn));
-	if (usr == NULL) {
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-	    exit(1);
-	}
+	usr = emalloc (sizeof(Conn));
 	/* Assume that name has already been scanned for valid
 	   entries, before being entered into this file. */
 	usr->chan = NULL;

@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.11 2000/01/16 23:04:22 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.12 2000/01/16 23:47:43 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -98,7 +98,7 @@ main(int argc, char **argv)
 	switch(opt)
 	{
 	case 'c':
-	    conf_file = strdup(optarg);
+	    conf_file = estrdup (optarg);
 	    break;
 	case 'd':
 	    debug = true;
@@ -243,9 +243,9 @@ new_conn(int l_sock)
         hp = gethostbyaddr((char *) &client.sin_addr.s_addr,
                            sizeof(client.sin_addr.s_addr), AF_INET);
         if (hp == NULL) {
-            c = strdup(inet_ntoa(client.sin_addr));
+            c = estrdup (inet_ntoa(client.sin_addr));
         } else {
-            c = strdup(hp->h_name);
+            c = estrdup (hp->h_name);
         }
         if (SENDER_CONN != NULL) {
             log (LOG_WARNING, "socket %d already occupied!",
@@ -257,12 +257,7 @@ new_conn(int l_sock)
     }
     if (ok) {
 	log (LOG_INFO, "connect from %s fd %d", c, sender);
-        SENDER_CONN = malloc(sizeof(Conn));
-        if (open_conns == NULL) {
-            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-            exit(1);
-        }
+        SENDER_CONN = emalloc (sizeof(Conn));
         SENDER_CHAN = fdopen(sender, "r+");
         setvbuf(SENDER_CHAN, NULL, _IOLBF, 0);
         SENDER_CONN->type = user;
@@ -386,7 +381,7 @@ validate_mod(char ** input)
         if (usr == NULL) {
             tmp = arr_add(tmp, make_repline(ERR_BADUSR, ERR_BADUSR_MSG));
             tmp = arr_add(tmp, c);
-            tmp = arr_add(tmp, strdup(END_OF_DATA));
+            tmp = arr_add(tmp, estrdup (END_OF_DATA));
             ok = false;
         } else {
             free(c);
@@ -409,12 +404,7 @@ add_username(char ** msg)
 
     if (msg != NULL) {
         i = strlen(SENDER_NAME) + 1 + strlen(msg[0]) + 1;
-        c = malloc((size_t)i);
-        if (c == NULL) {
-            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-            exit(1);
-        }
+        c = emalloc ((size_t)i);
         c = strcpy(c, SENDER_NAME);
         c = strcat(c, " ");
         c = strcat(c, msg[0]);
@@ -438,12 +428,7 @@ del_username(char ** msg)
 
     if (msg != NULL) {
         d = find_token(msg[0], 1);
-        c = malloc(strlen(d) + 1);
-        if (c == NULL) {
-            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-            exit(1);
-        }
+        c = emalloc (strlen(d) + 1);
         c = strcpy(c, d);
         free(msg[0]);
         msg[0] = c;

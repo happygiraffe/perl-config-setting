@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: ds.c,v 1.6 2000/01/16 23:04:21 dom Exp $";
+static const char rcsid[]="@(#) $Id: ds.c,v 1.7 2000/01/16 23:47:43 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/types.h>
@@ -160,17 +160,12 @@ arr_add(char ** arr, char * str)
 
     if (str != NULL) {
 	if (arr == NULL) {
-	    tmp_arr = malloc(2 * sizeof(char *));
-	    if (tmp_arr == NULL) {
-		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		     __FILE__);
-		exit(1);
-	    }
+	    tmp_arr = emalloc (2 * sizeof(char *));
 	    tmp_arr[0] = str;
 	    tmp_arr[1] = NULL;
 	} else {
 	    i = arr_count(arr);
-	    tmp_arr = realloc(arr, (i+2)*sizeof(char *));
+	    tmp_arr = erealloc (arr, (i+2)*sizeof(char *));
 	    tmp_arr[i] = str;
 	    tmp_arr[i+1] = NULL;
 	}
@@ -302,12 +297,7 @@ hash_insert(char * name, void * data, Hashp h)
         if (np == NULL)
         {
             /* This entry doesn't already exist */
-            np = malloc(sizeof(Node));
-	    if (np == NULL) {
-		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		     __FILE__);
-		exit(1);
-	    }
+            np = emalloc (sizeof(Node));
             np->name = copy_token(name, 0);
 	    if (h->ignore_case)
 	    {
@@ -626,12 +616,7 @@ conn_init_buf(Connp c)
 
     if (c->buf == NULL) {
 	/* create buf if we don't already have one */
-	c->buf = malloc(size);
-	if (c->buf == NULL) {
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-            exit(1);
-	}
+	c->buf = emalloc (size);
 	c->buflen = size;	/* the allocated size of buf */
 	c->bufhwm = 0;		/* the point up to which data is in buf */
     }
@@ -650,12 +635,7 @@ conn_grow_buf(Connp c, int size)
 	conn_init_buf(c);
     else {
 	newsize = c->buflen + size;
-	newbuf = realloc(c->buf, newsize);
-	if (newbuf == NULL) {
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-            exit(1);
-	}
+	newbuf = erealloc (c->buf, newsize);
 	c->buf = newbuf;
 	c->buflen = newsize;
     }

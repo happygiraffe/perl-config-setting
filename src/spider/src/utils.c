@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: utils.c,v 1.7 2000/01/16 23:04:22 dom Exp $";
+static const char rcsid[]="@(#) $Id: utils.c,v 1.8 2000/01/16 23:47:43 dom Exp $";
 
 #include <config.h>
 #include <sys/types.h>
@@ -34,6 +34,10 @@ static const char rcsid[]="@(#) $Id: utils.c,v 1.7 2000/01/16 23:04:22 dom Exp $
 
 #include "spider.h"
 
+/* PROTOTYPES */
+
+static void vlog (int priority, char *msg, va_list args);
+
 /*********************************************************************
  * mk_a_dir
  *
@@ -52,7 +56,7 @@ mk_a_dir(char * name, int mode)
 #ifdef HAVE_MKDIR
     mkdir(name, mode);
 #else
-    foo = malloc(LARGE_BUF);
+    foo = emalloc (LARGE_BUF);
     sprintf (foo, "mkdir %s", name);
     system(foo);
     free(foo);
@@ -70,7 +74,7 @@ strdup(char * s)
 {
     char * new;
 
-    new = malloc(strlen(s) + 1);
+    new = malloc (strlen(s) + 1);
     if (new != NULL)
 	    strcpy(new, s);
     return new;
@@ -217,12 +221,7 @@ make_repline(int code, char * msg)
 
     if (msg!= NULL) {
         i = REPLY_CODE_LEN + strlen(msg) + 1;
-        c = malloc((size_t)i);
-        if (c == NULL) {
-            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-            exit(1);
-        }
+        c = emalloc ((size_t)i);
         sprintf(c, REPLY_FMT, code, msg);
     }
     return c;
@@ -240,7 +239,7 @@ make_error(int code, char * msg)
 
     if (msg != NULL) {
         tmp = arr_add(tmp, make_repline(code, msg));
-        tmp = arr_add(tmp, strdup(END_OF_DATA));
+        tmp = arr_add(tmp, estrdup (END_OF_DATA));
     }
     return tmp;
 }
@@ -381,12 +380,7 @@ copy_token(char * buf, int n)
 	if (num_tokens(buf) > n) { /* num_tokens retval is +1 */
 	    c = find_token(buf, n);
 	    len = len_token(c);
-	    word = malloc((size_t)len+1);
-	    if (word == NULL) {
-		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		     __FILE__);
-		exit(1);
-	    }
+	    word = emalloc ((size_t)len+1);
 	    strncpy(word, c, len);
 	    word[len]='\0';
 	} else {
@@ -455,20 +449,89 @@ cmp_token(char * buf, int n, char * s)
 void
 log (int priority, char *msg, ...)
 {
-    int		saved_errno = errno;
-    va_list	args;
-	
+    va_list args;
+
     va_start (args, msg);
+    vlog (priority, msg, args);
+    va_end (args);
+    return;
+}
+
+/***********************************************************************
+ * vlog: log a message with syslog, or maybe stdout.  stdarg version.
+ */
+static void
+vlog (int priority, char *msg, va_list args)
+{
+    int		saved_errno = errno;
+	
     if (am_daemon) {
-	(void)vsyslog (priority, msg, args);
+	(void) vsyslog (priority, msg, args);
     } else if (priority != LOG_DEBUG || debug) {
 	vfprintf (stderr, msg, args);
 	if (strstr (msg, "%m"))
 	    fprintf (stderr, " (errno=%d)", saved_errno);
 	fprintf (stderr, "\n");
     }
-    va_end (args);
     return;
+}
+
+/***********************************************************************
+ * err: log an error and exit.
+ */
+void
+err (char *msg, ...)
+{
+    va_list args;
+
+    va_start (args, msg);
+    vlog (LOG_ERR, msg, args);
+    exit (1);
+    /* NOTREACHED */
+    va_end (args);
+}
+
+/***********************************************************************
+ * emalloc: malloc, and warn if error.  from TPOP.
+ */
+void *
+emalloc (size_t n)
+{
+    void *p;
+
+    p = malloc(n);
+    if (p == NULL)
+	err ("malloc of %u bytes failed: %m", n);
+    return p;
+}
+
+/***********************************************************************
+ * erealloc: realloc and warn if error.
+ */
+void *
+erealloc (void *oldp, size_t n)
+{
+    void *newp;
+
+    newp = realloc (oldp, n);
+    if (newp == NULL)
+	err ("realloc of %u bytes failed: %m", n);
+    return newp;
+}
+
+/***********************************************************************
+ * estrdup: strdup, and warn of error. from TPOP.
+ */
+char *
+estrdup (char *s)
+{
+    char *t;
+
+    t = (char *) malloc (strlen(s)+1);
+    if (t == NULL)
+	err ("estrdup(\"%.20s\") failed: %m", s);
+    strcpy (t, s);
+    return t;
 }
 
 /*

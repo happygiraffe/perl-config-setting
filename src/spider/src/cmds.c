@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: cmds.c,v 1.3 2000/01/16 23:04:21 dom Exp $";
+static const char rcsid[]="@(#) $Id: cmds.c,v 1.4 2000/01/16 23:47:43 dom Exp $";
 
 /*
  * The following commands are implemented here:
@@ -105,7 +105,7 @@ help_helper(void * cur)
     Cmdp	foo;
 
     foo = (Cmdp)cur;
-    c = strdup(foo->name);
+    c = estrdup (foo->name);
     help_reply = arr_add(help_reply, c);
 }
 
@@ -128,7 +128,7 @@ cmd_help(char ** input)
     Cmd_visit(help_helper);
 
     /* And finish with the EOD mark */
-    help_reply = arr_add(help_reply, strdup(END_OF_DATA));
+    help_reply = arr_add(help_reply, estrdup (END_OF_DATA));
 
     /* Now, send it out */
     send_reply(help_reply);
@@ -234,24 +234,9 @@ who_helper(Connp usr)
     int		mins;
 
     time(&now);
-    login_time = malloc(6);	/* HH:MM\0 */
-    if (login_time == NULL) {
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-	    exit(1);
-    }
-    idle_time = malloc(6);	/* HH:MM\0 */
-    if (idle_time == NULL) {
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-	    exit(1);
-    }
-    reply = malloc((size_t)line_len+1);
-    if (reply == NULL) {
-	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		 __FILE__);
-	    exit(1);
-    }
+    login_time = emalloc (6);	/* HH:MM\0 */
+    idle_time = emalloc (6);	/* HH:MM\0 */
+    reply = emalloc ((size_t)line_len+1);
 
     tmp = localtime(&usr->det.usr.login_time);
     sprintf(login_time, "%02d:%02d", tmp->tm_hour, tmp->tm_min);
@@ -290,7 +275,7 @@ cmd_who(char ** input)
     reply = arr_add(reply, make_repline(OK_CMD, OK_CMD_MSG));
 
     /* Print a header */
-    reply = arr_add(reply, strdup(header));
+    reply = arr_add(reply, estrdup (header));
 
     /* Flush out the active users */
     for(i = 0; i < maxfd; ++i) {
@@ -303,7 +288,7 @@ cmd_who(char ** input)
     }
 
     /* And finish with the EOD mark */
-    reply = arr_add(reply, strdup(END_OF_DATA));
+    reply = arr_add(reply, estrdup (END_OF_DATA));
 
     /* Now, send it out */
     send_reply(reply);
