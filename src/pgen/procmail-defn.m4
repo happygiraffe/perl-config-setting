@@ -1,10 +1,10 @@
 ########################################################################
 # procmail-defn.m4 - definitions for building a procmailrc file.
 #
-# $Id: procmail-defn.m4,v 1.2 1997/06/29 21:01:47 dom Exp $
+# $Id: procmail-defn.m4,v 1.3 1997/06/30 01:13:09 dom Exp $
 ########################################################################
 
-`# built on' syscmd(date)dnl
+`# This procmail.rc was built on' syscmd(date)dnl
 
 divert(-1)
 
@@ -13,9 +13,12 @@ divert(-1)
 #----------------------------------------------------------------------
 
 # def. "MH-USER", if you are using MH type folders.
+divert(0)dnl
 ifdef(MH-USER, 
 `# MH-USER was defined.', 
 `# MH-USER not defined, defaulting to mbox.')
+
+divert(-1)
 
 # LIST(listname, folder [, type]) ; foldername w/o the "+".
 define(LIST,
@@ -25,7 +28,7 @@ ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
 				$3, `RCVSTORE', `| rcvstore +$2',
 				$3, `MH', `$2/.',
 				$3, `MBOX', `$2',
-				ifdef(`MH-USER', `|rcvstore +')$2)'
+				ifdef(`MH-USER', `| rcvstore +')$2)'
 )dnl
 
 # SUBJ(subject, folder [, type]) ; foldername w/o the "+".
@@ -36,7 +39,7 @@ ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
 				$3, `RCVSTORE', `| rcvstore +$2',
 				$3, `MH', `$2/.',
 				$3, `MBOX', `$2',
-				ifdef(`MH-USER', `|rcvstore +')$2)'
+				ifdef(`MH-USER', `| rcvstore +')$2)'
 )dnl
 
 # FROM(from, folder [, type]) ; foldername w/o the "+".
@@ -47,7 +50,7 @@ ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
 				$3, `RCVSTORE', `| rcvstore +$2',
 				$3, `MH', `$2/.',
 				$3, `MBOX', `$2',
-				ifdef(`MH-USER', `|rcvstore +')$2)'
+				ifdef(`MH-USER', `| rcvstore +')$2)'
 )dnl
 
 # START a blocked section.
