@@ -95,6 +95,7 @@ use strict;
 use vars qw($rcsid $VERSION $default);
 
 use Carp;
+use File::Spec;
 use Sys::Hostname;
 
 $rcsid = '@(#) $Id$ ';
@@ -116,8 +117,8 @@ sub new {
 }
 
 sub _init() {
-        my $self = shift;
-        my @files = @{ $self->{Paths} };
+        my $self  = shift;
+        my @files = @{ $self->{ Paths } };
 
         # Allow listed files to be overridden by a hostname-specific
         # one.
@@ -125,10 +126,11 @@ sub _init() {
         @files = map { $_, "$_.$hn" } @files;
 
         # Always allow the environment to override previous choices.
-        if ($ENV{$self->{Env}}) {
-                push @files, split(":", $ENV{$self->{Env}});
+        my $envvar = $self->{ Env };
+        if ( $envvar && $ENV{ $envvar } ) {
+                push @files, split /:/, $ENV{ $envvar };
         }
-        push @{ $self->{Files} }, @files;
+        push @{ $self->{ Files } }, @files;
         return $self;
 }
 
