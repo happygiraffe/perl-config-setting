@@ -5,15 +5,15 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.2 2000/01/06 23:37:15 dom Exp $
+ * @(#) $Id: spider.h,v 1.3 2000/01/13 01:27:09 dom Exp $
  */
 
 #ifndef _SPIDER_H_
 #define _SPIDER_H_
 
 #include <config.h>             /* autoconf */
-#include <stdio.h>              /* For FILE */
 #include <sys/types.h>          /* For fd_set */
+#include <stdio.h>              /* For FILE */
 
 /* All of this, just for time_t */
 #if TIME_WITH_SYS_TIME
