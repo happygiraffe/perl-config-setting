@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: mod.h,v 1.1 2000/01/05 08:09:57 dom Exp $
+ * @(#) $Id: mod.h,v 1.1 2000/01/06 21:56:07 dom Exp $
  */
 
 #ifndef _MOD_H_
