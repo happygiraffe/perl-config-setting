@@ -73,19 +73,6 @@ Parse FILENAME as XML.
 
 Parse the string as XML.
 
-=item sections ( )
-
-Return a list of all sections that occurred in the data.  They are
-returned in the order in which they originally occurred.
-
-=item keylist ( SECTION )
-
-Return a list of all keys in SECTION.
-
-=item get ( SECTION, KEY )
-
-Return the value of KEY in SECTION.
-
 =back
 
 =head1 SEE ALSO
