@@ -43,7 +43,7 @@ Spool_Dir       !PKGSPOOLDIR!
 ######################################################################
 # If uncommented, every single command by every user will be logged.
 #
-# Log_All_Cmds
+# Log_All_Cmds	true
 
 ######################################################################
 # You can change where the syslog messages go.  Defaults to local0.
