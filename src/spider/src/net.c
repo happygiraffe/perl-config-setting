@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: net.c,v 1.5 2000/01/14 23:41:35 dom Exp $";
+static const char rcsid[]="@(#) $Id: net.c,v 1.6 2000/01/16 12:54:43 dom Exp $";
 
 #include <config.h>
 #include <sys/types.h>
@@ -25,21 +25,28 @@ static const char rcsid[]="@(#) $Id: net.c,v 1.5 2000/01/14 23:41:35 dom Exp $";
 
 #include "spider.h"
 
+/* PROTOTYPES */
+static char * getrname(int, struct sockaddr *, int *);
+
 /*********************************************************************
  * spider_listen()
  *
  * Return a listening socket on the correct port number.
  */
 int
-spider_listen(int port)
+spider_listen(void)
 {
+    char *		c;
     int			l_sock;
+    int			port;
     Bool		reuse = true;
     struct sockaddr_in	server;
 
+    c = config_get ("Port");
+    port = atoi(c);
     l_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (l_sock < 0) {
-        syslog(LOG_ERR, "socket(2): %m");
+        syslog(LOG_ERR, "socket: %m");
         exit(1);
     }
     setsockopt(l_sock, SOL_SOCKET, SO_REUSEADDR, (void *)&reuse,
@@ -48,7 +55,7 @@ spider_listen(int port)
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = ntohs(port);
     if (bind(l_sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
-        syslog(LOG_ERR, "bind(2): %m");
+        syslog(LOG_ERR, "bind: %m");
         exit(1);
     }
     listen(l_sock, 5);
@@ -58,7 +65,7 @@ spider_listen(int port)
 /***********************************************************************
  * getrname: return remote host name.  also fills in addr.
  */
-char *
+static char *
 getrname(int fd, struct sockaddr *addr, int *addrlen)
 {
     struct hostent *hp;

@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: term.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[]="@(#) $Id: term.c,v 1.2 2000/01/16 12:54:43 dom Exp $";
 
 #include <sys/types.h>
 #include <config.h>
@@ -203,6 +203,9 @@ do_stats(int i)
 void
 rm_pid_file(void)
 {
+    char *pid_file;
+
+    pid_file = config_get("Pid_File");
     /* Don't worry if it fails; there's probably a good reason for it */
     unlink(pid_file);
     syslog (LOG_INFO, "Stopping");

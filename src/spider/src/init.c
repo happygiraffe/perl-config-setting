@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.14 2000/01/15 12:19:10 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.15 2000/01/16 12:54:43 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -53,15 +53,20 @@ static const char rcsid[]="@(#) $Id: init.c,v 1.14 2000/01/15 12:19:10 dom Exp $
 char *	conf_file;		/* config file name */
 Bool	want_to_fork;
 Bool	am_daemon = false;	/* true when we've forked */
-char *  pid_file;       
-char *  user_file;      
-char ** module_path;  
-char ** modules;      
 int	maxfd;
-unsigned short	port;
-char *	spool_dir;
-Bool	log_all_cmds = false;   /* default value */
-int	facility = LOG_LOCAL0;
+
+/* a list of valid keywords that can appear in the config file */
+config_item config[] = {
+    { "Facility",	text,	NULL,	NULL },
+    { "Log_All_Cmds",	text,	NULL,	NULL },
+    { "Module",		ary,	NULL,	NULL },
+    { "Module_Dir",	ary,	NULL,	NULL },
+    { "Pid_File",	text,	NULL,	NULL },
+    { "Port",		text,	NULL,	NULL },
+    { "Spool_Dir",	text,	NULL,	NULL },
+    { "User_File",	text,	NULL,	NULL },
+    { NULL,		text,	NULL,	NULL }
+};
 
 /* textual representation of syslog facilities */
 static struct
@@ -137,7 +142,9 @@ static struct
 void
 spider_init(void)
 {
-    /* Parse the config_file into the global variables */
+    char *spool_dir;
+
+    /* parse the config_file into a structure */
     parse_cfg_file();
 
     if (want_to_fork)
@@ -146,9 +153,10 @@ spider_init(void)
     }
 
     /* Now, we must open a syslog connection, as we are blind & dumb */
-    openlog(basename(fullname), LOG_NDELAY, facility);
+    openlog(basename(fullname), LOG_NDELAY, get_facility());
     syslog(LOG_INFO, "Starting v%s", VERSION);
 
+    spool_dir = config_get("Spool_Dir");
     if(chdir(spool_dir) < 0) {
         syslog(LOG_ERR, "Couldn't change to %s: %m", spool_dir);
         exit(1);
@@ -235,46 +243,46 @@ go_daemon(void)
 void
 ck_config(void)
 {
-    /* Sanity check, again */
-    if (module_path == NULL) {
-	syslog(LOG_ERR, "No Module_Path defined");
-	exit(1);
-    }
-    if (modules == NULL) {
-	syslog(LOG_ERR, "No Modules defined");
-	exit(1);
-    }
-    if (pid_file == NULL) {
-	syslog(LOG_ERR, "No Pid_File defined");
-	exit(1);
-    }
-    if (port == 0) {
-	syslog(LOG_ERR, "No Port defined");
-	exit(1);
-    }
-    if (user_file == NULL) {
-	syslog(LOG_ERR, "No User_File defined");
-	exit(1);
+    char *tocheck[] = {
+	"Module_Dir",
+	"Module",
+	"Pid_File",
+	"Port",
+	"User_File",
+	NULL
+    };
+    int i;
+    void *val;
+
+    for (i = 0; tocheck[i]; ++i) {
+	val = config_get(tocheck[i]);
+	if (val == NULL) {
+	    syslog (LOG_ERR, "no value for %s defined in config file",
+		    tocheck[i]);
+	    exit (1);
+	}
     }
 }
 
 /*********************************************************************
- * set_facility
+ * get_facility
  *
- * Set the syslog facility from a string.
+ * Get the syslog facility from a string.
  */
-void
-set_facility(char *fac)
+int
+get_facility(void)
 {
+    char *fac;
     int i;
+    int val = LOG_LOCAL0;	/* a sane default */
 
-    if (fac != NULL)
-	for (i = 0; facilities[i].name != NULL; i++)
-	    if (strcasecmp(facilities[i].name, fac) == 0) {
-		facility = facilities[i].val;
-		break;
-	    }
-    return;
+    fac = config_get("Facility");
+    for (i = 0; facilities[i].name != NULL; i++)
+	if (strcasecmp(facilities[i].name, fac) == 0) {
+	    val = facilities[i].val;
+	    break;
+	}
+    return val;
 }
 
 
@@ -289,20 +297,12 @@ void
 parse_cfg_file(void)
 {
     FILE *	cfg;
+    char *	buf;
     char *	keyw;
-    char * 	buf;
-    char *	name;
-    int 	i,
-    		lineno = 1;
-
-    /* Initialize variables to sane values */
-    pid_file = NULL;
-    user_file = NULL;
-    module_path = NULL;
-    modules = NULL;
-    port = NULL;
-    spool_dir = NULL;
-    log_all_cmds = false;
+    char *	val;
+    int		i;
+    int		lineno = 1;
+    config_item	*ci;
 
     cfg = fopen(conf_file, "r");
     if(cfg == NULL) {
@@ -312,68 +312,37 @@ parse_cfg_file(void)
 
     buf = get_line(cfg);
     while (!feof(cfg)) {
-	/* Skip over comment only / blank lines */
+	/* Skip over comment only / blank / invalid lines */
 	kill_comment(buf);
 	i = num_tokens(buf);
-	if (i == 0)
+	if (i < 2)
 	{
-            free(buf);
-            buf = get_line(cfg);
+	    if (i)
+		syslog (LOG_WARNING, "invalid line (%d): %s", lineno, buf);
+	    free(buf);
+	    buf = get_line(cfg);
 	    lineno++;
 	    continue;
 	}
 
-	/*
-         * Parse it!  Remember that tokens are specified as zero-based
-         * integers, like strings subscripts.  However, also like
-         * string subscripts strlen/len_token returns a 1-based
-         * value.
-         */
-
-	/* Please excuse the horrid indentation. */
-
-	if (cmp_token(buf, 0, "Module_Dir") == true) {
-	    name = copy_token(buf, 1);
-	    debug_log("Module_Dir %s", name);
-	    module_path = arr_add(module_path, name);
-	} else if (cmp_token(buf, 0, "Module") == true) {
-	    name = copy_token(buf, 1);
-	    debug_log("Module %s", name);
-	    modules = arr_add(modules, name);
-	} else if (cmp_token(buf, 0, "Pid_File") == true) {
-	    name = copy_token(buf, 1);
-	    debug_log("Pid_File %s", name);
-	    pid_file = name;
-	} else if (cmp_token(buf, 0, "User_File") == true) {
-	    name = copy_token(buf, 1);
-	    debug_log("User_File %s", name);
-	    user_file = name;
-	} else if (cmp_token(buf, 0, "Port") == true) {
-	    name = find_token(buf, 1);
-	    debug_log("Port %s", name);
-	    port = atoi(name);
-	} else if (cmp_token(buf, 0, "Spool_Dir") == true) {
-	    name = copy_token(buf, 1);
-	    debug_log("Spool_Dir %s", name);
-	    spool_dir = name;
-	} else if (cmp_token(buf, 0, "Log_All_Cmds") == true) {
-	    debug_log("Log_All_Cmds");
-	    log_all_cmds = true;
-	} else if (cmp_token(buf, 0, "Facility") == true) {
-	    name = find_token(buf, 1);
-	    debug_log("Facility %s", name);
-	    set_facility(name);
+	/* XXX should use strtok? */
+	keyw = copy_token (buf, 0);
+	val  = copy_token (buf, 1);
+	ci   = config_find (keyw);
+	if (ci) {
+	    config_set(ci, val);
+	    debug_log("config: %s %s", keyw, val);
 	} else {
-            keyw = copy_token(buf, 0);
-	    syslog(LOG_WARNING, "Unknown keyword \"%s\" on line %d", 
-                   keyw, lineno);
-            free(keyw);
+	    syslog(LOG_WARNING, "unknown keyword \"%s\" on line %d", 
+		   keyw, lineno);
+	    free (val);
 	}
 
-        free(buf);
-        buf = get_line(cfg);
+	free (keyw);
+	free (buf);
+	buf = get_line(cfg);
 	lineno++;
-    } /* End of "while(!feof(cfg)) {" */
+    }
 
     /* We need all the fd's we can get... */
     fclose(cfg);
@@ -388,11 +357,13 @@ parse_cfg_file(void)
 void
 write_pid_file(void)
 {
+    char *	pid_file;
     FILE *	pf;
     int		i;
     pid_t	old_pid;
     struct stat	statbuf;
 
+    pid_file = config_get("Pid_File");
     i = stat(pid_file, &statbuf);
     if (i < 0) {
         /* If file doesn't exist */
@@ -408,7 +379,6 @@ write_pid_file(void)
         pf = fopen(pid_file, "r+");
         if (pf == NULL)
             syslog(LOG_WARNING, "Error opening pid file %s: %m", pid_file);
-	/* Not sure if the cast is the correct thing... */
         fscanf(pf, "%ld", (long *)&old_pid);
         if ((old_pid > 0) && (kill(old_pid, 0) == 0)) {
             /* Eeek, spider is already running */
@@ -421,6 +391,7 @@ write_pid_file(void)
 	fprintf(pf, "%ld\n", (long)getpid());
 	fclose(pf);
     }
+    return;
 }
 
 /*********************************************************************
@@ -523,9 +494,11 @@ find_module(char * name)
     int 	len;
     int		retval;
     char * 	abs_name = NULL;
+    char **	module_path;
     struct stat	st;
 
     if (name != NULL) {
+	module_path = config_get("Module_Dir");
 	for (i = 0 ; module_path[i] != (char*)NULL; i++)
 	{
 	    len = strlen(module_path[i]) + 1 + strlen(name) + 1;
@@ -769,7 +742,9 @@ init_modules(void)
 {
     int 	i;
     char * 	mod;		/* Absolute name of the module */
+    char **	modules;
 
+    modules = config_get ("Module");
     for (i = 0; modules[i] != NULL; i++)
     {
 	mod = find_module(modules[i]);
@@ -796,11 +771,13 @@ init_users(void)
 {
     FILE * 	usrf;
     char *	buf;
+    char *	user_file;
     int		lineno;
     int		len;
     Connp	usr;
     struct stat	st;
 
+    user_file = config_get("User_File");
     if (stat(user_file, &st) == -1)
     {
 	syslog(LOG_ERR, "Could not find user file %s.", user_file);

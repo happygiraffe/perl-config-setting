@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: ds.c,v 1.4 2000/01/15 00:00:11 dom Exp $";
+static const char rcsid[]="@(#) $Id: ds.c,v 1.5 2000/01/16 12:54:43 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/types.h>
@@ -659,6 +659,96 @@ conn_grow_buf(Connp c, int size)
 	c->buf = newbuf;
 	c->buflen = newsize;
     }
+}
+
+/*
+ * Functions pertaining to configuration.
+ */
+
+/***********************************************************************
+ * config_find: return the config item with name
+ */
+config_item *
+config_find(const char *name)
+{
+    int i;
+
+    for (i = 0; config[i].name; i++)
+	if (strcasecmp(config[i].name, name) == 0)
+	    return &config[i];
+    return NULL;
+}
+
+/***********************************************************************
+ * config_get: return the appropriate value from the config item.
+ * returns NULL if not found.
+ */
+void *
+config_get(const char *name)
+{
+    config_item *ci;
+    void * ptr = NULL;
+
+    ci = config_find(name);
+    if (ci)
+	switch (ci->type) {
+	case text:
+	    ptr = ci->text;
+	    break;
+	case ary:
+	    ptr = ci->ary;
+	    break;
+	}
+    return ptr;
+}
+
+/***********************************************************************
+ * config_set: set the value of the config item, appropriately.
+ */
+void
+config_set(config_item *ci, char *val)
+{
+    switch (ci->type) {
+    case text:
+	config_set_text(ci, val);
+	break;
+    case ary:
+	config_append_ary(ci, val);
+	break;
+    }
+    return;
+}
+
+/***********************************************************************
+ * config_set_text: set the text value of the config item.
+ */
+void
+config_set_text(config_item *ci, char *val)
+{
+    if (ci == NULL || ci->type != text) {
+	free (val);
+	return;
+    }
+    if (ci->text)
+	free (ci->text);
+    ci->text = val;
+    return;
+}
+
+/***********************************************************************
+ * config_append_ary: append the value to ci's array.
+ */
+void
+config_append_ary(config_item *ci, char *text)
+{
+    char **newary;
+
+    if (ci == NULL)
+	return;
+    newary = arr_add(ci->ary, text);
+    if (newary)
+	ci->ary = newary;
+    return;
 }
 
 /*

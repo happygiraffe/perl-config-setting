@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.6 2000/01/15 00:00:05 dom Exp $
+ * @(#) $Id: spider.h,v 1.7 2000/01/16 12:54:42 dom Exp $
  */
 
 #ifndef _SPIDER_H_
@@ -63,6 +63,17 @@ typedef enum {
     false = 0,
     true = 1
 } Bool;
+
+/*
+ * Configuration items can either be a string or and array of strings.
+ */
+typedef enum {text, ary} config_type;
+typedef struct {
+    const char *name;
+    config_type type;
+    char *text;
+    char **ary;
+} config_item;
 
 /*
  * Events are used to say what has happened in the main loop.
@@ -177,14 +188,8 @@ extern int	caught_sig;
 extern char *	conf_file;
 extern Bool	want_to_fork;
 extern Bool	am_daemon;
-extern char * 	pid_file;
-extern char * 	user_file;
-extern char **  module_path;
-extern char **  modules;
 extern int	maxfd;
-extern unsigned short	port;
-extern char *	spool_dir; 
-extern Bool	log_all_cmds;
+extern config_item config[];
 
 /* term.c */
 int	child_status;
@@ -232,12 +237,17 @@ void	Usr_visit(void (*func)(void *));
 Bool	whole_msg(Connp);
 void	conn_init_buf(Connp);
 void	conn_grow_buf(Connp, int);
+config_item * config_find(const char *name);
+void *	config_get(const char *name);
+void	config_set(config_item *ci, char *val);
+void	config_set_text(config_item *ci, char *val);
+void	config_append_ary(config_item *ci, char *text);
 
 /* init.c */
 void 	spider_init(void);
 void 	go_daemon(void);
 void 	ck_config(void);
-void	set_facility(char *);
+int	get_facility(void);
 void 	parse_cfg_file(void);
 void	init_data(void);
 void	init_internal_cmds(void);
@@ -258,7 +268,7 @@ int	conn_single_read(Connp c);
 int	conn_read(Connp c);
 
 /* net.c */
-int	spider_listen(int port);
+int	spider_listen(void);
 void	spider_accept(int fd, void *data);
 void	spider_read(int fd, void *data);
 

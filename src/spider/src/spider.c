@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.9 2000/01/16 11:51:29 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.10 2000/01/16 12:54:43 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -84,6 +84,7 @@ main(int argc, char **argv)
     int 	sel_val;	/* return value from select() */
     Event	ev;
     char *	c;
+    char *	log_all_cmds;
 
     /* Initialize variables */
     fullname = argv[0];
@@ -113,9 +114,10 @@ main(int argc, char **argv)
 
     /* General initialization */
     spider_init();
+    log_all_cmds = config_get("Log_All_Cmds");
 
     /* Socket initialization */
-    l_sock = spider_listen (port);
+    l_sock = spider_listen ();
     FD_SET(l_sock, &wait_on);
     SET_WAIT_MAX(l_sock);
 
