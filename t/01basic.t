@@ -13,11 +13,4 @@ use Config::Setting;
 $loaded = 1;
 print "ok 1\n";
 
-# Local Variables:
-# mode: cperl
-# cperl-indent-level: 8
-# indent-tabs-mode: nil
-# cperl-continued-statement-offset: 8
-# End:
-#
-# vim: ai et sw=8
+# vim: set ai et sw=8 syntax=perl :

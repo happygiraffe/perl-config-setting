@@ -65,11 +65,4 @@ ok( $v eq "bar, The Engine", "'bar' key has correct value" );
 $v = $stg->get("settings", "combined");
 ok($v eq "bar, The Engine quux ", "'combined' key has the right value");
 
-# Local Variables:
-# mode: cperl
-# cperl-indent-level: 8
-# indent-tabs-mode: nil
-# cperl-continued-statement-offset: 8
-# End:
-#
-# vim: ai et sw=8
+# vim: set ai et sw=8 syntax=perl :
