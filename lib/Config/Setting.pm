@@ -170,19 +170,17 @@ sub _merge {
         my %cf;           # Combined config.
         my @sections;
 
+        my $chunk = Config::Setting::Chunk->new;
         foreach my $c (@configs) {
                 foreach my $s ($c->sections) {
-                        unless (exists $cf{$s}) {
-                                $cf{$s} = {};
-                                push @sections, $s;
-                        }
+                        $chunk->add_section( $s );
                         foreach my $k ($c->section_keys($s)) {
-                                $cf{$s}{$k} = $c->get_item($s, $k);
+                                my $v = $c->get_item($s, $k);
+                                $chunk->set_item( $s, $k, $v );
                         }
                 }
         }
-        $self->{Sections} = \@sections;
-        $self->{Config} = \%cf;
+        $self->_chunk( $chunk );
         return $self;
 }
 
@@ -191,7 +189,7 @@ sub _merge {
 
 sub sections {
         my $self = shift;
-        return @{ $self->{Sections} };
+        return $self->_chunk->sections;
 }
 
 sub keylist {
@@ -199,7 +197,7 @@ sub keylist {
         my ($section) = @_;
         croak "usage: Config::Setting->keylist(section)"
                 unless $section;
-        return keys %{ $self->{Config}{$section} };
+        return $self->_chunk->section_keys( $section );
 }
 
 sub has {
@@ -208,7 +206,7 @@ sub has {
         croak "usage: Config::Setting->get(section,key)"
                 unless $section && $key;
 
-        return exists $self->{Config}{$section}{$key};
+        return defined $self->_chunk->get_item( $section, $key );
 }
 
 # Get the value of a setting, searching all sections, but starting in
@@ -241,13 +239,19 @@ sub get {
         croak "usage: Config::Setting->get(section,key)"
                 unless $section && $key;
 
-        my $val = $self->{Config}{$section}{$key};
+        my $val = $self->_chunk->get_item( $section, $key );
         while ($val && $val =~ m/\$/) {
                 $val =~ s{ \$ \{ (\w+) \} }{
                         $self->expand($section, $1, $key) || "";
                 }exg;
         }
         return $val;
+}
+
+sub _chunk {
+        my $self = shift;
+        $self->{ _chunk } = $_[0] if @_;
+        return $self->{ _chunk };
 }
 
 1;
