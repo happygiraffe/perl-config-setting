@@ -62,14 +62,6 @@ the disk.
 One of Filename or String is required.  Any remaining arguments will
 be passed to the XML::Parser constructor.
 
-=item init ( )
-
-Internal.  Do not use.
-
-=item parse ( )
-
-Internal.  Do not use.
-
 =item sections ( )
 
 Return a list of all sections that occurred in the data.  They are
@@ -105,8 +97,8 @@ use Carp;
 
 use XML::Parser;
 
-$rcsid = '@(#) $Id: XMLParser.pm,v 1.1 2001/06/24 15:21:58 dom Exp $ ';
-$VERSION = substr q$Revision: 1.1 $, 10, -1;
+$rcsid = '@(#) $Id: XMLParser.pm,v 1.2 2002/02/04 08:49:06 dom Exp $ ';
+$VERSION = substr q$Revision: 1.2 $, 10, -1;
 
 # Pass in either a Filename parameter or a String parameter.
 sub new {
@@ -123,11 +115,11 @@ sub new {
                 String => delete $args{String},
         };
         bless($self, $class);
-        return $self->init->parse(%args);
+        return $self->_init->_parse(%args);
 }
 
 # Read in the file that we have been asked to and parse it.
-sub init {
+sub _init {
         my $self = shift;
 
         my $txt;
@@ -147,7 +139,7 @@ sub init {
         my $me;                 # Copy of $self during parse.
 
         # Parse the stuff we hold.
-        sub parse {
+        sub _parse {
                 my $self = shift;
                 my %args = @_;
                 my $p = XML::Parser->new(

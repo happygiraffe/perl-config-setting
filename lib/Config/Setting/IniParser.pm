@@ -24,7 +24,7 @@ Config::Setting::IniParser - parse windows .ini style files.
 
 =head1 DESCRIPTION
 
-Config::Setting::IniParser provides  OO  access to windows  .ini style
+Config::Setting::IniParser provides OO access to windows .ini style
 files.  At present, it only provides read access, not writing.
 
 =head1 METHODS
@@ -55,14 +55,6 @@ defaults to "#", but is also commonly ";".
 =back
 
 One of Filename or String is required.
-
-=item init ( )
-
-Internal.  Do not use.
-
-=item parse ( )
-
-Internal.  Do not use.
 
 =item sections ( )
 
@@ -102,8 +94,8 @@ use vars qw($rcsid $VERSION);
 
 use Carp;
 
-$rcsid = '@(#) $Id: IniParser.pm,v 1.1 2001/06/24 15:21:58 dom Exp $ ';
-$VERSION = substr q$Revision: 1.1 $, 10, -1;
+$rcsid = '@(#) $Id: IniParser.pm,v 1.2 2002/02/04 08:45:50 dom Exp $ ';
+$VERSION = substr q$Revision: 1.2 $, 10, -1;
 
 # Pass in either a Filename parameter or a String parameter.
 sub new {
@@ -114,19 +106,19 @@ sub new {
 
         my $class = ref($proto) || $proto;
         my $self = {
-                Contents => {},
-                Sections => [],
-                Filename => "",
-                String => "",
+                Contents    => {},
+                Sections    => [],
+                Filename    => "",
+                String      => "",
                 CommentChar => "#",
                 %args,
         };
         bless($self, $class);
-        return $self->init->parse;
+        return $self->_init->_parse;
 }
 
 # Read in the file that we have been asked to and parse it.
-sub init {
+sub _init {
         my $self = shift;
 
         my $txt;
@@ -141,7 +133,7 @@ sub init {
 }
 
 # Parse the stuff we hold.
-sub parse {
+sub _parse {
         my $self = shift;
         my $section = "";
         my $cc = $self->{CommentChar};
