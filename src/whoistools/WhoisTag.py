@@ -29,13 +29,13 @@
 Implementation of <dtml-whois>.
 """
 
-__rcs_id__='$Id: WhoisTag.py,v 1.2 2000/09/05 11:05:33 dom Exp $'
-__version__='$Revision: 1.2 $'[11:-2]
+__rcs_id__='$Id: WhoisTag.py,v 1.3 2000/09/05 20:40:56 dom Exp $'
+__version__='$Revision: 1.3 $'[11:-2]
 
 from sys import stderr
 from DocumentTemplate.DT_Util import *
 from DocumentTemplate.DT_String import String
-from whois import INTERNIC, Whois
+from whois import Whois
 
 class WhoisTag:
     """The whois tag, used like this:
@@ -51,10 +51,12 @@ class WhoisTag:
 
     def __init__(self, args):
         # Parse the tags parameters.
-        args = parse_params(args, name='', expr='', server=INTERNIC)
+        args = parse_params(args, name='', expr='', server=None)
 
         if args.has_key('server'):
             self.server = args['server']
+        else:
+            server = None
 
         # Try to sort out whether we have an expression to be
         # evaluated, or a simple name...
