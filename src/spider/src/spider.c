@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.8 2000/01/15 11:05:27 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.9 2000/01/16 11:51:29 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -498,7 +498,7 @@ figure_out_event_type(int sel_val, fd_set * tmp_set, int listener, int sig)
 		what.type = module_death;
 		break;
 	    default:
-		/* ignore */
+		break;
 	    }
 	} else {
 	    /* file a complaint */
