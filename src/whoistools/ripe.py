@@ -4,14 +4,14 @@
 Perform a ripe query.
 """
 
-__rcs_id__='$Id: ripe.py,v 1.4 2000/07/04 10:59:18 dom Exp $'
-__version__='$Revision: 1.4 $'[11:-2]
+__rcs_id__='$Id: ripe.py,v 1.5 2000/07/04 11:37:17 dom Exp $'
+__version__='$Revision: 1.5 $'[11:-2]
 
 import sys
 import string
 import whois
 
-from types import ListType, TupleType
+from types import ListType, TupleType, StringType
 
 #WHOISHOST = 'whois.ripe.net'
 WHOISHOST = 'localhost'
@@ -27,12 +27,14 @@ class RipeObj:
         """
 
         # Check that what we have is formatted correctly.
+        self.__checkdata(data)
+        self.data = data
+        return
+
+    def __checkdata(self, data):
         assert type(data) == ListType
         for rec in data:
             assert len(rec) == 2
-
-        self.data = data
-        return
 
     def __getattr__(self, val):
         res = []
@@ -40,25 +42,54 @@ class RipeObj:
             if o == val: res.append(a)
         return res
 
+    def __setattr__(self, key, val):
+        if key == "data":               # Special case.
+            self.__checkdata(val)
+            self.__dict__[key] = val
+            return
+
+        # We walk through our list of data and replace all the old
+        # keys with the new one(s).  That means that multiple keys
+        # will be replaced by a single one if that's what is given to
+        # us.
+
+        # For consistency
+        if type(val) == StringType: val = [val]
+        
+        done=0
+        newdata = []
+        for o, a in self.data:
+            if o != key:
+                newdata.append( (o, a) )
+                continue
+            if val:
+                done=1
+                newdata.append( (o, val[0]) )
+                del val[0]
+        if not done:
+            newdata.append( (key, val[0]) )
+        self.data = newdata
+        return
+
     def __str__(self):
         res = ''
         for o, a in self.data:
             res = res + '%-13s %s\n' % (o+':', a)
         return res[:-1]                 # Strip trailing NL.
 
-    def dbid(self):
+    def name(self):
         return self.data[0][1]
 
 class inetnum(RipeObj):
-    def dbid(self):
+    def name(self):
         return self.netname
 
 class person(RipeObj):
-    def dbid(self):
+    def name(self):
         return getattr(self, 'nic-hdl')[0]
 
 class role(RipeObj):
-    def dbid(self):
+    def name(self):
         return getattr(self, 'nic-hdl')[0]
 
 class mntner(RipeObj):
@@ -98,7 +129,10 @@ if __name__ == '__main__':
     try:
         objs = RipeQuery(sys.argv[1])
         for o in objs:
-            print o.dbid()
+            o.remarks = 'This is a comment.'
+            setattr(o, 'admin-c', 'SOMEBODY-ELSE')
+            setattr(o, 'tech-c', ['FOO', 'BAR', 'BAZ'])
+            print o
             print
     except IndexError:
         print "usage: ripe query"
