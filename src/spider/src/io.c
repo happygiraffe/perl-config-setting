@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.3 1999/03/18 23:54:04 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.4 1999/03/22 23:37:14 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <stdio.h>
@@ -46,7 +46,7 @@ get_mesg(FILE *fp)
 
     while (ok) {
         c = get_line(fp);
-	debug_log("<- %s", c);
+	debug_log("[%d] <- %s", fileno(fp), c);
         if (c == NULL) {
             /* EOF */
             arr_del(tmp);
@@ -59,6 +59,9 @@ get_mesg(FILE *fp)
             ok = false;
         }
     }
+
+    /* Solaris requires this. */
+    fflush(fp);
 
     return tmp;
 }
@@ -136,13 +139,13 @@ put_mesg(FILE *fp, char **msg)
         for (tmp = msg; *tmp != NULL; tmp++) {
             fputs(*tmp, fp);
             fputs(eol, fp);
-	    debug_log("-> %s", *tmp);
+	    debug_log("[%d] -> %s", fileno(fp), *tmp);
         }
         /* If the line before last is not a "." */
         if (!eot(*(tmp-1))) {
             fputs(END_OF_DATA, fp);
             fputs(eol, fp);
-	    debug_log("-> .");
+	    debug_log("[%d] -> .", fileno(fp));
         }
     }
 }

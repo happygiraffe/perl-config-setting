@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.3 1999/03/18 23:44:45 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.4 1999/03/22 23:37:14 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -146,6 +146,17 @@ main(int argc, char **argv)
          * it's the signal number instead */
 	receiver = sender = ev.fd;
 
+	/*
+	 * What we shold be doing here:
+	 *
+	 * 1) Find out where our input is coming from, and take input
+	 * from there.  We do that using a function which returns the
+	 * number of whole messages that have been input.
+	 *
+	 * 2) After reading all possible input, at the bottom of the
+	 * loop, we output it where needed.
+	 */
+
 	switch (ev.type) {
 	case new_connect:
 	    new_conn(ev.fd);
@@ -253,6 +264,7 @@ new_conn(int l_sock)
         }
     }
     if (ok) {
+	syslog(LOG_INFO, "connect from %s fd %d", c, sender);
         SENDER_CONN = malloc(sizeof(Conn));
         if (open_conns == NULL) {
             syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,

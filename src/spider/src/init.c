@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.5 1999/03/22 07:50:31 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.6 1999/03/22 23:37:14 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/stat.h>		/* umask, stat */
@@ -563,8 +563,8 @@ activate_module(char * path)
             FD_SET(fd[0], &wait_on);
             SET_WAIT_MAX(fd[0]);
 	    
-	    syslog(LOG_INFO, "module %s is pid %d", thisone->name,
-		   thisone->det.mod.pid);
+	    syslog(LOG_INFO, "module %s is pid %d fd %d", thisone->name,
+		   thisone->det.mod.pid, fd[0]);
 	}
     }
 }
@@ -630,7 +630,7 @@ neg_cmd(char * buf, Connp mod)
 	    code = OK_CMD;
 	    reason = OK_CMD_MSG;
 	}
-	tmp = malloc(strlen(REPLY_FMT)+strlen(reason)+5);
+	tmp = malloc(strlen(REPLY_FMT)+strlen(reason)+6);
 	if (tmp == NULL) {
 	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
 		   __FILE__);
@@ -638,7 +638,7 @@ neg_cmd(char * buf, Connp mod)
 	}
 	(void)sprintf(tmp, REPLY_FMT "\n", code, reason);
 	fputs(tmp, mod->chan);
-	debug_log("-> %s", tmp);
+	debug_log("[%d] -> %s", fileno(mod->chan), tmp);
 	free(tmp);
     }
 }
@@ -666,7 +666,11 @@ proc_new_cmds(char *modname)
                 free(buf);
             }
             buf = get_line(mod->chan);
-	    debug_log("<- %s", buf);
+	    debug_log("[%d] <- %s", fileno(mod->chan), buf);
+	    /* Solaris stdio needs this; probably others, too.  If it
+             * doesn't get it, then we end up writing our last input
+             * back out! */
+	    fflush(mod->chan);
 	    if ((buf == NULL) || ((buf[0] == '.') && (strlen(buf) == 1)))
 		ok = false;
 	    else
