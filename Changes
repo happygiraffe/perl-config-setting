@@ -1,7 +1,10 @@
 Revision history for Perl extension Config::Setting.
 
-0.03  Mon Feb 21 12:27:52 GMT 2005
-	- Switch to Module::Build and subversion.
+0.03  Tue Feb 22 12:46:02 GMT 2005
+        - Introduce Config::Setting::Chunk as an abstract representation
+          instead of repeating the same idea throughout the code.
+        - Relicense as BSD.
+	- Switch to Module::Build, Test::More and subversion.
 
 0.02  Mon Feb  4 08:37:44 GMT 2002
 	- Move to Test::Simple.
