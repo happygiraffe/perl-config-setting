@@ -6,7 +6,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: codes.h,v 1.1 1999/03/11 15:39:48 dom Exp $
+ * @(#) $Id: codes.h,v 1.1 2000/01/06 21:55:19 dom Exp $
  */
 
 #ifndef _CODES_H_
