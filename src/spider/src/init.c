@@ -7,9 +7,11 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.7 2000/01/06 22:00:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.8 2000/01/06 22:10:44 dom Exp $";
 
 #include <config.h>             /* autoconf */
+
+#include <sys/types.h>
 #include <sys/stat.h>		/* umask, stat */
 /* This ugliness recommended by autoconf for portability */
 #if TIME_WITH_SYS_TIME
