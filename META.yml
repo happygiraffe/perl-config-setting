@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name: Config-Setting
+version: 0.03
+author:
+  - Dominic Mitchell, E<lt>dom@happygiraffe.netE<gt>
+abstract: Perl extension for configuration files.
+license: bsd
+requires:
+  Test::Simple: 0
+provides:
+  Config::Setting:
+    file: lib/Config/Setting.pm
+    version: 0.03
+  Config::Setting::FileProvider:
+    file: lib/Config/Setting/FileProvider.pm
+    version: 1.3
+  Config::Setting::IniParser:
+    file: lib/Config/Setting/IniParser.pm
+    version: 1.2
+  Config::Setting::XMLParser:
+    file: lib/Config/Setting/XMLParser.pm
+    version: 1.2
+generated_by: Module::Build version 0.2608

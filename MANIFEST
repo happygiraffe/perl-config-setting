@@ -1,11 +1,13 @@
+Build.PL
 Changes
-MANIFEST
-Makefile.PL
-README
 lib/Config/Setting.pm
-lib/Config/Setting/IniParser.pm
 lib/Config/Setting/FileProvider.pm
+lib/Config/Setting/IniParser.pm
 lib/Config/Setting/XMLParser.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
 t/01basic.t
 t/02simple.t
 t/03xml.t
