@@ -530,11 +530,24 @@ regexec_e(preg, string, eflags, nomatch, slen)
 	/* Set anchors, discounting trailing newline (if any). */
 	if (slen > 0 && string[slen - 1] == '\n')
 		slen--;
+#ifdef REG_STARTEND
 	match[0].rm_so = 0;
 	match[0].rm_eo = slen;
 
 	eval = regexec(defpreg, string,
 	    nomatch ? 0 : maxnsub + 1, match, eflags | REG_STARTEND);
+#else  /* ! REG_STARTEND */
+	/*
+	 * Without REG_STARTEND, we cannot be sure if we're allowed to
+	 * modify string, so we copy and take an alternative.
+	 */
+	{
+		char *altstr = strdup(string);
+		altstr[slen] = '\0';
+		eval = regexec(defpreg, altstr,
+			       nomatch ? 0 : maxnsub + 1, match, eflags);
+	}
+#endif /* REG_STARTEND */
 	switch(eval) {
 	case 0:
 		return (1);
