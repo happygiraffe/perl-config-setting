@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[] = "@(#) $Id: io.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[] = "@(#) $Id: io.c,v 1.2 1999/03/18 23:37:36 dom Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +33,7 @@ get_mesg(FILE *fp)
 
     while (ok) {
         c = get_line(fp);
+	debug_log("<- %s", c);
         if (c == NULL) {
             /* EOF */
             arr_del(tmp);
@@ -110,11 +111,13 @@ put_mesg(FILE *fp, char **msg)
         for (tmp = msg; *tmp != NULL; tmp++) {
             fputs(*tmp, fp);
             fputs("\n", fp);
+	    debug_log("-> %s", *tmp);
         }
         /* If the line before last is not a "." */
         if (!eot(*(tmp-1))) {
             fputs(END_OF_DATA, fp);
             fputs("\n", fp);
+	    debug_log("-> .");
         }
     }
 }

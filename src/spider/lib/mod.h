@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: mod.h,v 1.1 1999/03/11 15:39:49 dom Exp $
+ * @(#) $Id: mod.h,v 1.2 1999/03/18 23:37:37 dom Exp $
  */
 
 #ifndef _MOD_H_
@@ -40,6 +40,10 @@ typedef struct {
     void	(*errfunc)(char ** input);
 } Cmd;
 typedef Cmd * Cmdp;
+
+/*GLOBALS*/
+
+extern Bool	debug;
 
 /*********************************************************************
  * Prototypes
@@ -76,6 +80,7 @@ char * 	find_token(char * buf, int n);
 char * 	copy_token(char * buf, int n);
 int 	num_tokens(char * buf);
 Bool 	cmp_token(char * buf, int n, char * s);
+void	debug_log(char * msg, ...);
 
 #endif /* _MOD_H_ */
 

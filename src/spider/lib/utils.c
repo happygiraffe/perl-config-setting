@@ -6,13 +6,19 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: utils.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[]="@(#) $Id: utils.c,v 1.2 1999/03/18 23:37:37 dom Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdarg.h>
+#include <syslog.h>
 #include "mod.h"
+
+/*GLOBALS*/
+
+Bool	debug;
 
 /* static functions */
 static char * 	skip_ws(char * p);
@@ -312,6 +318,23 @@ cmp_token(char * buf, int n, char * s)
 	}
     }
     return ok;
+}
+
+/*********************************************************************
+ * debug_log
+ *
+ * Log a message if in debugging mode.
+ */
+void
+debug_log(char *msg, ...)
+{
+    va_list args;
+
+    if (debug) {
+	va_start (args, msg);
+	(void)vsyslog (LOG_DEBUG, msg, args);
+	va_end (args);
+    }
 }
 
 /*

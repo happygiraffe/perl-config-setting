@@ -8,7 +8,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: mod.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[]="@(#) $Id: mod.c,v 1.2 1999/03/18 23:37:37 dom Exp $";
 
 #include <ctype.h>
 #include <stdio.h>
@@ -36,13 +36,17 @@ void
 mod_init(char * name)
 {
 
-#ifndef DEBUG
-    if (isatty(STDIN_FILENO)) {
-	fprintf(stderr, "%s: Spider module, not an interactive program\n",
-		name);
-	exit(1);
+    if (getenv("DEBUG")) {
+	debug = true;
     }
-#endif
+    if (debug) {
+	if (isatty(STDIN_FILENO)) {
+	    fprintf(stderr, "%s: Spider module, not an interactive program\n",
+		    name);
+	    exit(1);
+	}
+    }
+
 #ifdef SETVBUF_REVERSED
     setvbuf(stdin, _IOLBF, NULL, 0);
     setvbuf(stdout, _IOLBF, NULL, 0);
@@ -56,6 +60,12 @@ mod_init(char * name)
 #endif /* DEBUG */
 
     openlog(name, LOG_PID, SPIDER_FACIL);
+    debug_log("mod_init(%s) complete", name);
+
+    /* If you need to attach a debugger to a module, best uncomment
+     * these two lines. */
+/*     if (debug) */
+/* 	(void)sleep(10); */
 }
 
 /*********************************************************************
@@ -80,15 +90,19 @@ mod_reg_cmd(char * name, Reply (*func)(char ** input),
 	/* This is a kludge to finish doing command registers */
 	puts(END_OF_DATA);
 	ok = true;
+	debug_log("mod_reg_cmd: end");
     } else {
 	/* Really register the command */
-	puts(name);
+	fputs(name, stdout);
+	fputs("\n", stdout);
+	debug_log("-> %s", name);
         c = get_line(stdin);
 	if (c == NULL) {
 	    syslog(LOG_WARNING, "reg_cmd(%s) error with fgets: %m",
 		   name);
 	    exit(1);
 	}
+	debug_log("<- %s", c);
 	i = atoi(c);
 	if (i != OK_CMD) {
 	    char * d = c;
@@ -108,6 +122,7 @@ mod_reg_cmd(char * name, Reply (*func)(char ** input),
 		exit(1);
 	    }
 	    ok = true;
+	    debug_log("reg_cmd(%s) succeeded", name);
 	}
     }
     return ok;
@@ -128,6 +143,8 @@ mod_main_loop(void)
     Cmdp	lastcmd = NULL; /* Last cmd processed */
     Cmdp *	cp;
     int		i;
+
+    debug_log("mod_main_loop started");
 
     while(true) {
 	inp = NULL;
@@ -170,7 +187,7 @@ mod_main_loop(void)
             for (i = 0; (out.text[i] != NULL) && (i < out.num); i++) {
                 put_mesg(stdout, out.text[i]);
                 arr_del(out.text[i]);
-                /* Should provide a slight pause between outputs */
+                /* XXX Should provide a slight pause between outputs */
                 sleep(1);
             }
         }
