@@ -1,4 +1,4 @@
-.\" @(#) $Id: kill_spider.8,v 1.1 2000/01/05 07:45:57 dom Exp $
+.\" @(#) $Id: kill_spider.man,v 1.1 2000/01/06 08:14:12 dom Exp $
 .TH kill_spider 1 "4 Jan 2000" "Local Software"
 .SH NAME
 kill_spider \- stop the spider daemon.
