@@ -81,7 +81,7 @@ Return a list containing file contents.
 
 =head1 AUTHOR
 
-Dominic Mitchell, E<lt>dom@happygiraffe.netE<gt>
+Dominic Mitchell, E<lt>cpan@happygiraffe.netE<gt>
 
 =head1 SEE ALSO
 
