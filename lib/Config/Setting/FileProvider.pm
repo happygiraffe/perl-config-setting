@@ -83,8 +83,8 @@ use vars qw($rcsid $VERSION $default);
 use Carp;
 use Sys::Hostname;
 
-$rcsid = '@(#) $Id: FileProvider.pm,v 1.3 2002/02/04 08:43:37 dom Exp $ ';
-$VERSION = substr q$Revision: 1.3 $, 10, -1;
+$rcsid = '@(#) $Id$ ';
+$VERSION = substr q$Revision$, 10, -1;
 $default = "~/.settingsrc";
 
 sub new {

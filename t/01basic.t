@@ -2,6 +2,8 @@
 # program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
+# @(#) $Id$
+
 # Check that module loads ok.  This pulls in all the other modules so
 # this is all that we need to test for right now.
 

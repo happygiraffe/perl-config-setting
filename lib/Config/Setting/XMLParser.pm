@@ -97,8 +97,8 @@ use Carp;
 
 use XML::Parser;
 
-$rcsid = '@(#) $Id: XMLParser.pm,v 1.2 2002/02/04 08:49:06 dom Exp $ ';
-$VERSION = substr q$Revision: 1.2 $, 10, -1;
+$rcsid = '@(#) $Id$ ';
+$VERSION = substr q$Revision$, 10, -1;
 
 # Pass in either a Filename parameter or a String parameter.
 sub new {

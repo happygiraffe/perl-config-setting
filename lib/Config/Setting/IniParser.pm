@@ -94,8 +94,8 @@ use vars qw($rcsid $VERSION);
 
 use Carp;
 
-$rcsid = '@(#) $Id: IniParser.pm,v 1.2 2002/02/04 08:45:50 dom Exp $ ';
-$VERSION = substr q$Revision: 1.2 $, 10, -1;
+$rcsid = '@(#) $Id$ ';
+$VERSION = substr q$Revision$, 10, -1;
 
 # Pass in either a Filename parameter or a String parameter.
 sub new {

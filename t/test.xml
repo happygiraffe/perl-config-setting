@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!-- This is a test settings file. -->
-<!-- @(#) $Id: test.xml,v 1.1 2001/06/24 15:21:58 dom Exp $ -->
+<!-- @(#) $Id$ -->
 <settings>
   <section name="settings">
     <item name="foo">
