@@ -42,7 +42,7 @@ TBL   = tbl
 
 all: text
 
-text: extend.txt ipr.txt protocol.txt
+text: extend.txt protocol.txt
 
 ps: extend.ps ipr.ps protocol.ps
 
