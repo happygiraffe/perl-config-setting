@@ -30,7 +30,7 @@
 
 #include "nev.h"
 
-static const char rcsid[]="@(#) $Id: nev.c,v 1.4 2000/01/13 01:06:17 dom Exp $";
+static const char rcsid[]="@(#) $Id: nev.c,v 1.5 2000/01/13 01:16:23 dom Exp $";
 
 /* PROTOTYPES */
 
@@ -172,7 +172,8 @@ nev_main_loop(void)
 
     while (1) {
 	memmove (&readers, &Nev.rset, sizeof Nev.rset);
-	i = select (Nev.nfds+1, &readers, NULL, NULL, NULL);
+	i = select (Nev.nfds+1, &readers, (fd_set *)NULL, (fd_set *)NULL,
+		    (struct timeval *)NULL);
 	if (i < 0) {
 	    ;			/* XXX panic properly */
 	}
