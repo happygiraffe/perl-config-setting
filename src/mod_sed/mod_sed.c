@@ -28,7 +28,7 @@
  */
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: mod_sed.c,v 1.3 2001/06/15 07:19:48 dom Exp $";
+static const char rcsid[] = "@(#) $Id: mod_sed.c,v 1.4 2001/06/15 11:51:23 dom Exp $";
 #endif /* lint */
 
 #include <sys/types.h>
@@ -132,7 +132,7 @@ static command_rec sed_cmds[] = {
 		NULL,			/* argument to include in call */
 		OR_ALL,			/* where available */
 		TAKE1,			/* arguments */
-		"Sed programram expression or file"	/* description */
+		"Sed program expression or file"	/* description */
 	},
 	{
 		"SedDefaultOutput",	/* directive name */
@@ -148,7 +148,7 @@ static command_rec sed_cmds[] = {
 		NULL,			/* argument to include in call */
 		OR_ALL,			/* where available */
 		FLAG,			/* arguments */
-		"Should sed use Extended regex?"	/* description */
+		"Should sed use Extended regexes?"	/* description */
 	},
 	{
 		"SedPathMap",		/* directive name */
@@ -156,7 +156,7 @@ static command_rec sed_cmds[] = {
 		NULL,			/* argument to include in call */
 		OR_ALL,			/* where available */
 		TAKE2,			/* arguments */
-		"Map PATH_INFO to a sed expr"	/* description */
+		"Map PATH_INFO to a SedProgram"	/* description */
 	},
 	{NULL}
 };
