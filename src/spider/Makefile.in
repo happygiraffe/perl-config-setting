@@ -3,7 +3,7 @@
 # instead.  Some make programs appear to have problems with my use of
 # VPATHs.
 #
-# @(#) $Id: Makefile.in,v 1.2 2000/01/06 08:17:49 dom Exp $
+# @(#) $Id: Makefile.in,v 1.3 2000/01/06 21:36:58 dom Exp $
 #
 
 #-----------------------------------------------------------------------
@@ -38,13 +38,15 @@ INSTALL_SCRIPT	= @INSTALL_SCRIPT@
 AWK		= @AWK@
 CC		= @CC@
 CFLAGS		= @CFLAGS@
-CPPFLAGS	= -I. @CPPFLAGS@ @DEFS@ -DCONFIG_FILE=\"$(configfile)\"
+CPPFLAGS	= $(MYINCS) @CPPFLAGS@ @DEFS@ -DCONFIG_FILE=\"$(configfile)\"
 LDFLAGS		= @LDFLAGS@
 LIBS		= @LIBS@
 RANLIB		= @RANLIB@
 
 #-----------------------------------------------------------------------
 # Separate configuration.
+
+MYINCS		= -I. -I$(top_srcdir)/include
 
 mkinstalldirs	= $(SHELL) $(top_srcdir)/mkinstalldirs
 # Nobody in their right minds is going to change these...
@@ -97,6 +99,7 @@ ALL_DOC		=				\
 
 INSTFILES	=				\
 	$(bindir)/debug_client			\
+	$(includedir)/codes.h			\
 	$(includedir)/ds.h			\
 	$(includedir)/mod.h			\
 	$(libdir)/libds.a			\
@@ -191,7 +194,9 @@ dirs: 						\
 	$(libdir)				\
 	$(mandir)/man1				\
 	$(mandir)/man8				\
+	$(pkgetcdir)				\
 	$(pkglibexecdir)			\
+	$(pkgspooldir)				\
 	$(sbindir)
 
 $(bindir):
@@ -209,7 +214,13 @@ $(mandir)/man1:
 $(mandir)/man8:
 	@$(mkinstalldirs) $@
 
+$(pkgetcdir):
+	@$(mkinstalldirs) $@
+
 $(pkglibexecdir):
+	@$(mkinstalldirs) $@
+
+$(pkgspooldir):
 	@$(mkinstalldirs) $@
 
 $(sbindir):
@@ -339,11 +350,11 @@ modules/motd/motd: $(MOTD_OBJS) lib/mod/libmod.a
 #---------------------------------------
 ## page
 
-PAGE_OBJS	=				\
+PAGE_OBJS	= 				\
 	modules/page/page.o
 PAGE_SRCS	= $(PAGE_OBJS:.o=.c)
 
-modules/message/page: $(PAGE_OBJS) lib/mod/libmod.a
+modules/page/page: $(PAGE_OBJS) lib/mod/libmod.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -Llib/mod -o $@ $(PAGE_OBJS) $(LIBS) -lmod
 
 #---------------------------------------
@@ -398,10 +409,13 @@ doc/spider.8: doc/spider.man
 $(bindir)/debug_client: src/debug_client
 	$(INSTALL_SCRIPT) $? $@
 
-$(includedir)/ds.h: lib/ds/ds.h
+$(includedir)/codes.h: include/codes.h
 	$(INSTALL_DATA) $? $@
 
-$(includedir)/mod.h: lib/mod/mod.h
+$(includedir)/ds.h: include/ds.h
+	$(INSTALL_DATA) $? $@
+
+$(includedir)/mod.h: include/mod.h
 	$(INSTALL_DATA) $? $@
 
 $(libdir)/libds.a: lib/ds/libds.a
