@@ -28,10 +28,10 @@
  */
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: fgetln.c,v 1.1 2001/06/15 11:35:54 dom Exp $";
+static const char rcsid[] = "@(#) $Id: fgetln.c,v 1.2 2001/06/15 11:47:57 dom Exp $";
 #endif /* lint */
 
-#include "lukemftp.h"
+#include <stdio.h>
 
 #define BUFCHUNKS	BUFSIZ
 
