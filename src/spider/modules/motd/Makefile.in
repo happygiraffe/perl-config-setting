@@ -38,6 +38,8 @@ LDFLAGS = -L../../lib -lmod
 
 #-----------------------------------------------------------------------
 
+LIBMOD=../../lib/libmod.a
+
 OBJS = motd.o
 
 INSTFILES =			\

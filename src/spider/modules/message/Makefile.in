@@ -38,6 +38,8 @@ LDFLAGS = -L../../lib -lmod
 
 #-----------------------------------------------------------------------
 
+LIBMOD=../../lib/libmod.a
+
 OBJS = command.o error.o main.o parse.o posts.o util.o
 
 INSTFILES =			\
@@ -63,7 +65,7 @@ $(LIBMOD):
 	@cd ../../lib && echo "===> Making all in lib" && make all
 
 message: $(OBJS) $(LIBMOD)
-	$(CC) -o $@ $? $(LDFLAGS)
+	$(CC) -o $@ $(OBJS) $(LDFLAGS)
 
 #-----------------------------------------------------------------------
 # Must explicitly list dependencies...
