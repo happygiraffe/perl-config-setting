@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.5 1999/03/28 01:24:01 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.6 2000/01/06 22:02:07 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -370,7 +370,9 @@ validate_mod(char ** input)
     /* Check for a reply code in 2nd place */
     if (ok) {
         c = find_token(input[0], 1);
-        if (!isdigit(c[0]) || !isdigit(c[1]) || !isdigit(c[2])) {
+        if (!isdigit((int)c[0]) ||
+	    !isdigit((int)c[1]) ||
+	    !isdigit((int)c[2])) {
             tmp = make_error(ERR_SYNTAX, ERR_SYNTAX_MSG);
             put_mesg(SENDER_CHAN, tmp);
             ok = false;

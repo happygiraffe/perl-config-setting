@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: utils.c,v 1.3 1999/03/18 23:44:45 dom Exp $";
+static const char rcsid[]="@(#) $Id: utils.c,v 1.4 2000/01/06 22:02:07 dom Exp $";
 
 #include <config.h>
 #include <ctype.h>
@@ -176,7 +176,7 @@ valid_chars(char * s)
     }
     for(c = s; (*c != '\0') && ok; c++)
     {
-	if(!isalnum(*c))
+	if(!isalnum((int)*c))
 	    ok = false;
     }
     return ok;
@@ -282,7 +282,7 @@ char *
 skip_ws(char * p)
 {
     if (p != NULL) {
-	while (isspace(*p)) {
+	while (isspace((int)*p)) {
 	    p++;
 	}
     }
@@ -299,7 +299,7 @@ char *
 skip_until_ws(char * p)
 {
     if (p != NULL) {
-	while (!isspace(*p) && (*p != '\0')) {
+	while (!isspace((int)*p) && (*p != '\0')) {
 	    p++;
 	}
     }
@@ -321,7 +321,7 @@ len_token(char * tok)
 
     if (tok != NULL) {
 	c = tok;
-	while(!isspace(*c) && (*c != '\0')) {
+	while(!isspace((int)*c) && (*c != '\0')) {
 	    i++;
 	    c++;
 	}
@@ -344,7 +344,7 @@ find_token(char * buf, int n)
     if (buf != NULL) {
 	if (num_tokens(buf) > n) {
 	    /* Avoid preceding ws */
-	    if (isspace(*c)) {
+	    if (isspace((int)*c)) {
 		c = skip_ws(c);
 	    }
 	
@@ -407,7 +407,7 @@ num_tokens(char * buf)
 
     if (buf != NULL) {
 	c = buf;
-	if (isspace(*c))
+	if (isspace((int)*c))
 	    c = skip_ws(c);
 	for(i = 0; *c != '\0'; i++) {
 	    c = skip_until_ws(c);
