@@ -41,19 +41,11 @@ The default returns a Setting::FileProvider object.  You probably want
 to override this method when you set up your subclass, in order to set
 the policy for file locations.
 
-=item parser ( String, STRING )
+=item parser ( STRING )
 
 Returns an object which can parse the contents of STRING.  The default
 is the Setting::IniParser object.  You may want to override this in a
 subclass if you wish to use an alternative layout.
-
-=item init ( )
-
-Internal use only.
-
-=item merge ( )
-
-Internal use only.
 
 =item sections ( )
 
@@ -109,7 +101,7 @@ use Config::Setting::IniParser;
 use Config::Setting::FileProvider;
 
 $VERSION = '0.02';
-$rcsid = '@(#) $Id: Setting.pm,v 1.3 2001/06/24 15:25:06 dom Exp $ ';
+$rcsid = '@(#) $Id: Setting.pm,v 1.4 2002/02/04 08:41:09 dom Exp $ ';
 
 sub new {
         my ($proto) = @_;
@@ -120,7 +112,7 @@ sub new {
         };
 
         bless $self, $class;
-        return $self->init;
+        return $self->_init;
 }
 
 #---------------------------------------------------------------------
@@ -138,7 +130,7 @@ sub parser {
 
 #---------------------------------------------------------------------
 
-sub init {
+sub _init {
         my $self = shift;
         my $provider = $self->provider;
 
@@ -149,12 +141,12 @@ sub init {
                 push @configs, $p;
         }
 
-        return $self->merge(@configs);
+        return $self->_merge(@configs);
 }
 
 # Make up a combined configuration from all the ones provided.
 # NB: Must maintain order of sections!
-sub merge {
+sub _merge {
         my $self = shift;
         my @configs = @_;
         my $cf = { };           # Combined config.
