@@ -84,7 +84,7 @@ use Carp;
 use Sys::Hostname;
 
 $rcsid = '@(#) $Id$ ';
-$VERSION = substr q$Revision$, 10, -1;
+$VERSION = (qw( $Revision$ ))[1];
 $default = "~/.settingsrc";
 
 sub new {

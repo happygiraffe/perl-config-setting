@@ -98,7 +98,7 @@ use Carp;
 use XML::Parser;
 
 $rcsid = '@(#) $Id$ ';
-$VERSION = substr q$Revision$, 10, -1;
+$VERSION = (qw( $Revision$ ))[1];
 
 # Pass in either a Filename parameter or a String parameter.
 sub new {
