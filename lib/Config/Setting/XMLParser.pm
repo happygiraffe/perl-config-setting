@@ -125,17 +125,6 @@ sub new {
         return $self;
 }
 
-# Read in the file that we have been asked to and parse it.
-sub _init {
-        my $self = shift;
-
-        my $txt;
-        if ($self->{Filename}) {
-        }
-
-        return $self;
-}
-
 sub parse_file {
         my $self = shift;
         my ( $filename ) = @_;
