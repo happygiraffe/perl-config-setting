@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.11 2000/01/15 11:05:27 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.12 2000/01/15 11:35:27 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -62,6 +62,70 @@ unsigned short	port;
 char *	spool_dir;
 Bool	log_all_cmds = false;   /* default value */
 int	facility = LOG_LOCAL0;
+
+/* textual representation of syslog facilities */
+static struct
+{
+    const char *name;
+    int val;
+} facilities[] = {
+#ifdef LOG_USER
+    { "user",	LOG_USER },
+#endif
+#ifdef LOG_MAIL
+    { "mail",	LOG_MAIL },
+#endif
+#ifdef LOG_DAEMON
+    { "daemon",	LOG_DAEMON },
+#endif
+#ifdef LOG_AUTH
+    { "auth",	LOG_AUTH },
+#endif
+#ifdef LOG_LPR
+    { "lpr",	LOG_LPR },
+#endif
+#ifdef LOG_NEWS
+    { "news",	LOG_NEWS },
+#endif
+#ifdef LOG_UUCP
+    { "uucp",	LOG_UUCP },
+#endif
+#ifdef LOG_CRON
+    { "cron",	LOG_CRON },
+#endif
+#ifdef LOG_FTP
+    { "ftp",	LOG_FTP },
+#endif
+#ifdef LOG_NTP
+    { "ntp",	LOG_NTP },
+#endif
+#ifdef LOG_LOCAL0
+    { "local0",	LOG_LOCAL0 },
+#endif
+#ifdef LOG_LOCAL1
+    { "local1",	LOG_LOCAL1 },
+#endif
+#ifdef LOG_LOCAL2
+    { "local2",	LOG_LOCAL2 },
+#endif
+#ifdef LOG_LOCAL3
+    { "local3",	LOG_LOCAL3 },
+#endif
+#ifdef LOG_LOCAL4
+    { "local4",	LOG_LOCAL4 },
+#endif
+#ifdef LOG_LOCAL5
+    { "local5",	LOG_LOCAL5 },
+#endif
+#ifdef LOG_LOCAL6
+    { "local6",	LOG_LOCAL6 },
+#endif
+#ifdef LOG_LOCAL7
+    { "local7",	LOG_LOCAL7 },
+#endif
+    { NULL, 0}
+};
+
 
 /*********************************************************************
  * spider_init()
@@ -202,62 +266,15 @@ ck_config(void)
 void
 set_facility(char *fac)
 {
-    /* Don't use LOG_KERN. */
+    int i;
 
-#ifdef LOG_USER
-    if (strcmp(fac, "user") == 0) facility = LOG_USER;
-#endif /* LOG_USER */
-#ifdef LOG_MAIL
-    if (strcmp(fac, "mail") == 0) facility = LOG_MAIL;
-#endif /* LOG_MAIL */
-#ifdef LOG_DAEMON
-    if (strcmp(fac, "daemon") == 0) facility = LOG_DAEMON;
-#endif /* LOG_DAEMON */
-#ifdef LOG_AUTH
-    if (strcmp(fac, "auth") == 0) facility = LOG_AUTH;
-#endif /* LOG_AUTH */
-#ifdef LOG_LPR
-    if (strcmp(fac, "lpr") == 0) facility = LOG_LPR;
-#endif /* LOG_LPR */
-#ifdef LOG_NEWS
-    if (strcmp(fac, "news") == 0) facility = LOG_NEWS;
-#endif /* LOG_NEWS */
-#ifdef LOG_UUCP
-    if (strcmp(fac, "uucp") == 0) facility = LOG_UUCP;
-#endif /* LOG_UUCP */
-#ifdef LOG_CRON
-    if (strcmp(fac, "cron") == 0) facility = LOG_CRON;
-#endif /* LOG_CRON */
-#ifdef LOG_FTP
-    if (strcmp(fac, "ftp") == 0) facility = LOG_FTP;
-#endif /* LOG_FTP */
-#ifdef LOG_NTP
-    if (strcmp(fac, "ntp") == 0) facility = LOG_NTP;
-#endif /* LOG_NTP */
-#ifdef LOG_LOCAL0
-    if (strcmp(fac, "local0") == 0) facility = LOG_LOCAL0;
-#endif /* LOG_LOCAL0 */
-#ifdef LOG_LOCAL1
-    if (strcmp(fac, "local1") == 0) facility = LOG_LOCAL1;
-#endif /* LOG_LOCAL1 */
-#ifdef LOG_LOCAL2
-    if (strcmp(fac, "local2") == 0) facility = LOG_LOCAL2;
-#endif /* LOG_LOCAL2 */
-#ifdef LOG_LOCAL3
-    if (strcmp(fac, "local3") == 0) facility = LOG_LOCAL3;
-#endif /* LOG_LOCAL3 */
-#ifdef LOG_LOCAL4
-    if (strcmp(fac, "local4") == 0) facility = LOG_LOCAL4;
-#endif /* LOG_LOCAL4 */
-#ifdef LOG_LOCAL5
-    if (strcmp(fac, "local5") == 0) facility = LOG_LOCAL5;
-#endif /* LOG_LOCAL5 */
-#ifdef LOG_LOCAL6
-    if (strcmp(fac, "local6") == 0) facility = LOG_LOCAL6;
-#endif /* LOG_LOCAL6 */
-#ifdef LOG_LOCAL7
-    if (strcmp(fac, "local7") == 0) facility = LOG_LOCAL7;
-#endif /* LOG_LOCAL7 */
+    if (fac != NULL)
+	for (i = 0; facilities[i].name != NULL; i++)
+	    if (strcasecmp(facilities[i].name, fac) == 0) {
+		facility = facilities[i].val;
+		break;
+	    }
+    return;
 }
 
 
