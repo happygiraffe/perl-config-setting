@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.3 1999/03/18 23:44:45 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.4 1999/03/18 23:55:00 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/stat.h>		/* umask, stat */
@@ -533,9 +533,6 @@ activate_module(char * path)
 		    chdir(name);
 		}
 	    }
-	    /* Activate debugging if we are debugging */
-	    if (debug)
-		putenv("DEBUG=1");
 	    execl(path, basename(path), NULL);
 	    syslog(LOG_WARNING, "exec failed; reason %m");
 	} else {
