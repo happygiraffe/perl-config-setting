@@ -7,8 +7,8 @@ Server(domain)	- Return an appropriate whois server for a domain.
 Whois(domain, server=None)	- Return whois output for domain.
 """
 
-__rcs_id__='$Id: whois.py,v 1.3 2000/07/04 10:12:35 dom Exp $'
-__version__='$Revision: 1.3 $'[11:-2]
+__rcs_id__='$Id: whois.py,v 1.4 2000/09/05 11:02:36 dom Exp $'
+__version__='$Revision: 1.4 $'[11:-2]
 
 import os
 import sys
@@ -82,15 +82,10 @@ def _init():
     """Initialise the servers dict from a file."""
     global servers
 
-    if os.path.exists(whoislist):
-        for line in open(whoislist).readlines():
-            line = string.rstrip(line)
-            fields = string.split(line, '|')
-            if fields[1] == 'NONE': fields[1] = None
-            if fields[1] == 'WEB': fields[1] = None
-            tld = "." + fields[0]
-            servers[tld] = fields[1]
-    else:
+    try:
+        # To create this module, run listmgr.py
+        from whoislist import servers
+    except ImportError:
         servers = defaultservers
 
 # Call when module is first imported.
