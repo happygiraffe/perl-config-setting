@@ -139,14 +139,7 @@ sub provide {
         # Allow tilde notation for home directory.
         my @files = map(glob, @{ $self->{Files} });
         my @texts;
-        my $first = 1;
         foreach my $f (@files) {
-                # First file in the list is considered "important".
-                unless (-f $f) {
-                        next unless $first;
-                        croak "can't stat $f";
-                }
-                $first = 0;
                 next unless -f $f;
                 open my $fh, $f
                         or croak "open($f): $!";
