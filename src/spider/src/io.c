@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.11 2000/01/16 23:47:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.12 2000/01/18 07:49:01 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -190,56 +190,6 @@ put_mesg(FILE *fp, char **msg)
 	    log (LOG_DEBUG, "[%d] -> .", fileno(fp));
         }
     }
-}
-
-/***********************************************************************
- * single_read_conn: read in data from conn into it's buffer.  once
- * only.
- */
-int
-conn_single_read(Connp c)
-{
-    int bytes;
-    size_t bufspace;
-
-    if (c->buf == NULL)
-	conn_init_buf(c);
-
-    bufspace = c->buflen - c->bufhwm;
-    bytes = read(c->fd, c->buf, bufspace);
-    if (bytes >= 0)
-	c->bufhwm += bytes;
-    else if (bytes == -1 && errno == EINTR) {
-/* 	apres_sig(); */
-	/* restart the read */
-	bytes = conn_single_read(c);
-    }
-
-    return bytes;
-}
-
-/***********************************************************************
- * read_conn: read in data from fd into a buffer.
- * XXX must be careful to avoid blocking at all costs.  */
-int
-conn_read(Connp c)
-{
-    int bytes, totbytes = 0;
-    size_t bufspace;
-
-    do {
-	bufspace = c->buflen - c->bufhwm;
-	if (bufspace == 0) {
-	    conn_grow_buf(c, LARGE_BUF);
-	    bufspace += LARGE_BUF;
-	}
-	bytes = conn_single_read(c);
-	if (bytes == 0)
-	    return 0;		/* EOF */
-	totbytes += bytes;
-    } while (bytes == bufspace);
-
-    return totbytes;
 }
 
 /*

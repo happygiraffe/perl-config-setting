@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.9 2000/01/16 23:47:41 dom Exp $
+ * @(#) $Id: spider.h,v 1.10 2000/01/18 07:49:00 dom Exp $
  */
 
 #ifndef _SPIDER_H_
@@ -189,7 +189,6 @@ extern char *	conf_file;
 extern Bool	want_to_fork;
 extern Bool	am_daemon;
 extern int	maxfd;
-extern config_item config[];
 
 /* term.c */
 int	child_status;
@@ -208,6 +207,23 @@ void 	cmd_help(char ** input);
 void 	cmd_login(char ** input);
 void 	cmd_who(char ** input);
 void 	cmd_quit(char ** input);
+
+/* config.c */
+void	ck_config(void);
+int	get_facility(void);
+void	config_parse_file(void);
+config_item * config_find(const char *name);
+void *	config_get(const char *name);
+void	config_set(config_item *ci, char *val);
+void	config_set_text(config_item *ci, char *val);
+void	config_append_ary(config_item *ci, char *text);
+
+/* conn.c */
+void	conn_init_buf(Connp);
+void	conn_grow_buf(Connp, int);
+char **	conn_parse_buf(Connp);
+int	conn_single_read(Connp c);
+int	conn_read(Connp c);
 
 /* ds.c */
 Connp 	carr_find(char * name, Conntype type);
@@ -235,20 +251,10 @@ Bool	Usr_add(char *name, Connp data);
 void 	Usr_stat(void);
 void	Usr_visit(void (*func)(void *));
 Bool	whole_msg(Connp);
-void	conn_init_buf(Connp);
-void	conn_grow_buf(Connp, int);
-config_item * config_find(const char *name);
-void *	config_get(const char *name);
-void	config_set(config_item *ci, char *val);
-void	config_set_text(config_item *ci, char *val);
-void	config_append_ary(config_item *ci, char *text);
 
 /* init.c */
 void 	spider_init(void);
 void 	go_daemon(void);
-void 	ck_config(void);
-int	get_facility(void);
-void 	parse_cfg_file(void);
 void	init_data(void);
 void	init_internal_cmds(void);
 char * 	find_module(char * name);
@@ -264,8 +270,6 @@ void	put_mesg(FILE *fp, char **msg);
 char **	get_mesg(FILE *fp);
 Bool	input_data(Connp c);
 char *	get_line(FILE * fp);
-int	conn_single_read(Connp c);
-int	conn_read(Connp c);
 
 /* net.c */
 int	spider_listen(void);

@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.18 2000/01/16 23:47:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.19 2000/01/18 07:49:01 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -50,87 +50,9 @@ static const char rcsid[]="@(#) $Id: init.c,v 1.18 2000/01/16 23:47:43 dom Exp $
 #include "spider.h"		/* local definitions */
 
 /* Globals */
-char *	conf_file;		/* config file name */
 Bool	want_to_fork;
 Bool	am_daemon = false;	/* true when we've forked */
 int	maxfd;
-
-/* a list of valid keywords that can appear in the config file */
-config_item config[] = {
-    { "Facility",	text,	NULL,	NULL },
-    { "Log_All_Cmds",	text,	NULL,	NULL },
-    { "Module",		ary,	NULL,	NULL },
-    { "Module_Dir",	ary,	NULL,	NULL },
-    { "Pid_File",	text,	NULL,	NULL },
-    { "Port",		text,	NULL,	NULL },
-    { "Spool_Dir",	text,	NULL,	NULL },
-    { "User_File",	text,	NULL,	NULL },
-    { NULL,		text,	NULL,	NULL }
-};
-
-/* textual representation of syslog facilities */
-static struct
-{
-    const char *name;
-    int val;
-} facilities[] = {
-#ifdef LOG_USER
-    { "user",	LOG_USER },
-#endif
-#ifdef LOG_MAIL
-    { "mail",	LOG_MAIL },
-#endif
-#ifdef LOG_DAEMON
-    { "daemon",	LOG_DAEMON },
-#endif
-#ifdef LOG_AUTH
-    { "auth",	LOG_AUTH },
-#endif
-#ifdef LOG_LPR
-    { "lpr",	LOG_LPR },
-#endif
-#ifdef LOG_NEWS
-    { "news",	LOG_NEWS },
-#endif
-#ifdef LOG_UUCP
-    { "uucp",	LOG_UUCP },
-#endif
-#ifdef LOG_CRON
-    { "cron",	LOG_CRON },
-#endif
-#ifdef LOG_FTP
-    { "ftp",	LOG_FTP },
-#endif
-#ifdef LOG_NTP
-    { "ntp",	LOG_NTP },
-#endif
-#ifdef LOG_LOCAL0
-    { "local0",	LOG_LOCAL0 },
-#endif
-#ifdef LOG_LOCAL1
-    { "local1",	LOG_LOCAL1 },
-#endif
-#ifdef LOG_LOCAL2
-    { "local2",	LOG_LOCAL2 },
-#endif
-#ifdef LOG_LOCAL3
-    { "local3",	LOG_LOCAL3 },
-#endif
-#ifdef LOG_LOCAL4
-    { "local4",	LOG_LOCAL4 },
-#endif
-#ifdef LOG_LOCAL5
-    { "local5",	LOG_LOCAL5 },
-#endif
-#ifdef LOG_LOCAL6
-    { "local6",	LOG_LOCAL6 },
-#endif
-#ifdef LOG_LOCAL7
-    { "local7",	LOG_LOCAL7 },
-#endif
-    { NULL, 0}
-};
-
 
 /*********************************************************************
  * spider_init()
@@ -145,7 +67,7 @@ spider_init(void)
     char *spool_dir;
 
     /* parse the config_file into a structure */
-    parse_cfg_file();
+    config_parse_file();
 
     if (want_to_fork)
     {
@@ -232,121 +154,6 @@ go_daemon(void)
     }
 
     am_daemon = true;
-}
-
-/*********************************************************************
- * ck_config
- *
- * Checks that all the configuration variables are set, so that we may
- * proceed correctly.
- */
-void
-ck_config(void)
-{
-    char *tocheck[] = {
-	"Module_Dir",
-	"Module",
-	"Pid_File",
-	"Port",
-	"User_File",
-	NULL
-    };
-    int i;
-    void *val;
-
-    for (i = 0; tocheck[i]; ++i) {
-	val = config_get(tocheck[i]);
-	if (val == NULL) {
-	    log (LOG_ERR, "no value for %s defined in config file",
-		    tocheck[i]);
-	    exit (1);
-	}
-    }
-}
-
-/*********************************************************************
- * get_facility
- *
- * Get the syslog facility from a string.
- */
-int
-get_facility(void)
-{
-    char *fac;
-    int i;
-    int val = LOG_LOCAL0;	/* a sane default */
-
-    fac = config_get("Facility");
-    for (i = 0; facilities[i].name != NULL; i++)
-	if (strcasecmp(facilities[i].name, fac) == 0) {
-	    val = facilities[i].val;
-	    break;
-	}
-    return val;
-}
-
-
-/*********************************************************************
- * parse_cfg_file
- *
- * Reads in the file as specified by conf_file (and it's default,
- * CONFIG_FILE) and places the values contained therein into global
- * variables.
- */
-void
-parse_cfg_file(void)
-{
-    FILE *	cfg;
-    char *	buf;
-    char *	keyw;
-    char *	val;
-    int		i;
-    int		lineno = 1;
-    config_item	*ci;
-
-    cfg = fopen(conf_file, "r");
-    if(cfg == NULL) {
-	perror("fopen");
-	exit(1);
-    }
-
-    buf = get_line(cfg);
-    while (!feof(cfg)) {
-	/* Skip over comment only / blank / invalid lines */
-	kill_comment(buf);
-	i = num_tokens(buf);
-	if (i < 2)
-	{
-	    if (i)
-		log (LOG_WARNING, "invalid line (%d): %s", lineno, buf);
-	    free(buf);
-	    buf = get_line(cfg);
-	    lineno++;
-	    continue;
-	}
-
-	/* XXX should use strtok? */
-	keyw = copy_token (buf, 0);
-	val  = copy_token (buf, 1);
-	ci   = config_find (keyw);
-	if (ci) {
-	    config_set(ci, val);
-	    log (LOG_DEBUG, "config: %s %s", keyw, val);
-	} else {
-	    log (LOG_WARNING, "unknown keyword \"%s\" on line %d", 
-		 keyw, lineno);
-	    free (val);
-	}
-
-	free (keyw);
-	free (buf);
-	buf = get_line(cfg);
-	lineno++;
-    }
-
-    /* We need all the fd's we can get... */
-    fclose(cfg);
-    ck_config();
 }
 
 /*********************************************************************

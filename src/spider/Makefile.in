@@ -7,7 +7,7 @@
 # Peter Miller's paper, "Recursive Make Considered Harmful".
 # http://www.canb.auug.org.au/~millerp/rmch/recu-make-cons-harm.html
 #
-# @(#) $Id: Makefile.in,v 1.10 2000/01/16 13:33:24 dom Exp $
+# @(#) $Id: Makefile.in,v 1.11 2000/01/18 07:48:59 dom Exp $
 #
 
 #-----------------------------------------------------------------------
@@ -328,6 +328,8 @@ lib/nev/libnev.a: $(LIBNEV_OBJS)
 
 SPIDER_OBJS	=				\
 	src/cmds.o				\
+	src/config.o				\
+	src/conn.o				\
 	src/ds.o				\
 	src/init.o				\
 	src/io.o				\
