@@ -5,7 +5,7 @@
  *
  * Copyright 2000 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: nev.h,v 1.2 2000/01/13 00:21:59 dom Exp $
+ * @(#) $Id: nev.h,v 1.3 2000/01/13 01:03:25 dom Exp $
  */
 
 #ifndef _NEV_H_
@@ -26,11 +26,9 @@ int	nev_init(void *data);
 int	nev_listen(char *addr, char *port,
 		   nev_cbfn newconn_fn,
 		   void *data);
-/* nev_watch_fd: start looking for input (or close) on an fd.
+/* nev_watch_fd: start looking for input on an fd.
  * returns -1 on error. */
-int	nev_watch(int fd,
-		  nev_cbfn read_fn,
-		  nev_cbfn close_fn);
+int	nev_watch(int fd, nev_cbfn read_fn);
 /* nev_main_loop: iterate over the list of fd's we know about. */
 void	nev_main_loop(void);
 /* nev_unwatch_fd: stop looking at fd.  will close it. */
