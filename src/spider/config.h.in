@@ -9,7 +9,7 @@
 #define SPIDER_FACIL LOG_LOCAL0
 
 /* A standard limit throughout this program  */
-#define LARGE_BUF 	2048	
+#define LARGE_BUF 	2048
 
 /* XXX Fix this, to be determined from RCS versions instead */
 #define VERSION		"1.0.2"
