@@ -88,9 +88,9 @@ $VERSION = substr q$Revision$, 10, -1;
 $default = "~/.settingsrc";
 
 sub new {
-        my ($proto, %args) = @_;
+        my $class = shift;
+        my (%args) = @_;
 
-        my $class = ref($proto) || $proto;
         my $self = {
 		Env => "SETTINGS_FILES",
 		Paths => [ $default ],

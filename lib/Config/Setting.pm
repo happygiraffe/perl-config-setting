@@ -104,9 +104,7 @@ $VERSION = '0.03';
 $rcsid = '@(#) $Id$ ';
 
 sub new {
-        my ($proto) = @_;
-
-        my $class = ref($proto) || $proto;
+        my $class = shift;
         my $self = {
                 Config => { },
         };

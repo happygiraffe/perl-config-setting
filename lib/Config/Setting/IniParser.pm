@@ -99,12 +99,12 @@ $VERSION = substr q$Revision$, 10, -1;
 
 # Pass in either a Filename parameter or a String parameter.
 sub new {
-	my ($proto, %args) = @_;
+        my $class = shift;
+	my (%args) = @_;
 
         croak "IniParser->new() requires Filename or String parameter."
                 unless exists($args{Filename}) || exists($args{String});
 
-        my $class = ref($proto) || $proto;
         my $self = {
                 Contents    => {},
                 Sections    => [],
