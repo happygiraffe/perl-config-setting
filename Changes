@@ -1,4 +1,8 @@
 Revision history for Perl extension Config::Setting.
 
+0.02  Mon Feb  4 08:37:44 GMT 2002
+	- Move to Test::Simple.
+	- Make some methods private.
+
 0.01  Sun Jun 24 16:23:36 BST 2001
 	- original version; created by h2xs 1.19
