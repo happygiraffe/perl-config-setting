@@ -3,7 +3,7 @@
 # instead.  Some make programs appear to have problems with my use of
 # VPATHs.
 #
-# @(#) $Id: Makefile.in,v 1.5 2000/01/12 21:19:27 dom Exp $
+# @(#) $Id: Makefile.in,v 1.6 2000/01/12 21:25:11 dom Exp $
 #
 
 #-----------------------------------------------------------------------
@@ -94,6 +94,7 @@ ALL_DOC		=				\
 	doc/debug_client.1			\
 	doc/extend.txt				\
 	doc/kill_spider.8			\
+	doc/libnev.3				\
 	doc/protocol.txt			\
 	doc/spider.8
 
@@ -105,6 +106,7 @@ INSTFILES	=				\
 	$(libdir)/libds.a			\
 	$(libdir)/libmod.a			\
 	$(mandir)/man1/debug_client.1		\
+	$(mandir)/man3/libnev.3			\
 	$(mandir)/man8/kill_spider.8		\
 	$(mandir)/man8/spider.8			\
 	$(pkgetcdir)/spider.conf		\
@@ -196,6 +198,7 @@ dirs: 						\
 	$(includedir)				\
 	$(libdir)				\
 	$(mandir)/man1				\
+	$(mandir)/man3				\
 	$(mandir)/man8				\
 	$(pkgetcdir)				\
 	$(pkglibexecdir)			\
@@ -212,6 +215,9 @@ $(libdir):
 	@$(mkinstalldirs) $@
 
 $(mandir)/man1:
+	@$(mkinstalldirs) $@
+
+$(mandir)/man3:
 	@$(mkinstalldirs) $@
 
 $(mandir)/man8:
@@ -416,6 +422,9 @@ doc/debug_client.1: doc/debug_client.man
 doc/kill_spider.8: doc/kill_spider.man
 	$(SUBSTFILE) $? > $@
 
+doc/libnev.3: doc/libnev.man
+	$(SUBSTFILE) $? > $@
+
 doc/spider.8: doc/spider.man
 	$(SUBSTFILE) $? > $@
 
@@ -441,6 +450,9 @@ $(libdir)/libmod.a: lib/mod/libmod.a
 	$(INSTALL_DATA) $? $@
 
 $(mandir)/man1/debug_client.1: doc/debug_client.1
+	$(INSTALL_DATA) $? $@
+
+$(mandir)/man3/libnev.3: doc/libnev.3
 	$(INSTALL_DATA) $? $@
 
 $(mandir)/man8/kill_spider.8: doc/kill_spider.8
