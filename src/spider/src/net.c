@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: net.c,v 1.6 2000/01/16 12:54:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: net.c,v 1.7 2000/01/16 23:04:22 dom Exp $";
 
 #include <config.h>
 #include <sys/types.h>
@@ -46,7 +46,7 @@ spider_listen(void)
     port = atoi(c);
     l_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (l_sock < 0) {
-        syslog(LOG_ERR, "socket: %m");
+        log (LOG_ERR, "socket: %m");
         exit(1);
     }
     setsockopt(l_sock, SOL_SOCKET, SO_REUSEADDR, (void *)&reuse,
@@ -55,7 +55,7 @@ spider_listen(void)
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = ntohs(port);
     if (bind(l_sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
-        syslog(LOG_ERR, "bind: %m");
+        log (LOG_ERR, "bind: %m");
         exit(1);
     }
     listen(l_sock, 5);
@@ -91,7 +91,7 @@ spider_accept(int fd, void *data)
 
     /* XXX Check for existing connection? */
 
-    syslog (LOG_INFO, "connect from %s fd %d", c, fd);
+    log (LOG_INFO, "connect from %s fd %d", c, fd);
 
     /* XXX global vars must die */
     sender = receiver = fd;
@@ -99,8 +99,8 @@ spider_accept(int fd, void *data)
     /* XXX make creator function for Conn */
     SENDER_CONN = malloc (sizeof(Conn));
     if (SENDER_CONN == NULL) {
-	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	       __FILE__);
+	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	     __FILE__);
 	exit(1);
     }
     SENDER_CHAN = fdopen (sender, "r+");

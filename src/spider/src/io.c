@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.9 2000/01/14 23:26:29 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.10 2000/01/16 23:04:22 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -58,7 +58,7 @@ get_mesg(FILE *fp)
             ok = false;
             break;
         }
-	debug_log("[%d] <- %s", fileno(fp), c);
+	log (LOG_DEBUG, "[%d] <- %s", fileno(fp), c);
         tmp = arr_add(tmp, c);
         if (eot(c)) {
             ok = false;
@@ -90,14 +90,14 @@ get_line(FILE * fp)
         start = 0;
         c = malloc(size);
         if (c == NULL) {
-            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-                   __FILE__);
+            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
             exit(1);
         }
         input = fgets(c, size, fp);
         if (input == NULL) {
             if (!feof(fp)) {
-                syslog(LOG_WARNING, "get_line: %m");
+                log (LOG_WARNING, "get_line: %m");
             }
             ok = false;
         }
@@ -109,7 +109,7 @@ get_line(FILE * fp)
             fgets(&c[start], LARGE_BUF, fp);
             if (input == NULL) {
                 if (!feof(fp)) {
-                    syslog(LOG_WARNING, "get_line: %m");
+                    log (LOG_WARNING, "get_line: %m");
                 }
                 ok = false;
             }
@@ -141,8 +141,8 @@ input_data(Connp c)
     if (c->buf == NULL) {
 	c->buf = malloc(LARGE_BUF);
 	if (c->buf == NULL) {
-	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-                   __FILE__);
+	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
             exit(1);
         }
 	c->buflen = LARGE_BUF;
@@ -153,8 +153,8 @@ input_data(Connp c)
     if (c->bufhwm == c->buflen) {
 	cp = realloc (c->buf, c->buflen + LARGE_BUF);
 	if (cp == NULL){
-	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-                   __FILE__);
+	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
             exit(1);
         }
 	c->buf = cp;
@@ -196,13 +196,13 @@ put_mesg(FILE *fp, char **msg)
         for (tmp = msg; *tmp != NULL; tmp++) {
             fputs(*tmp, fp);
             fputs(eol, fp);
-	    debug_log("[%d] -> %s", fileno(fp), *tmp);
+	    log (LOG_DEBUG, "[%d] -> %s", fileno(fp), *tmp);
         }
         /* If the line before last is not a "." */
         if (!eot(*(tmp-1))) {
             fputs(END_OF_DATA, fp);
             fputs(eol, fp);
-	    debug_log("[%d] -> .", fileno(fp));
+	    log (LOG_DEBUG, "[%d] -> .", fileno(fp));
         }
     }
 }

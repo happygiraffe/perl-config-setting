@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: ds.c,v 1.5 2000/01/16 12:54:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: ds.c,v 1.6 2000/01/16 23:04:21 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/types.h>
@@ -162,8 +162,8 @@ arr_add(char ** arr, char * str)
 	if (arr == NULL) {
 	    tmp_arr = malloc(2 * sizeof(char *));
 	    if (tmp_arr == NULL) {
-		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		       __FILE__);
+		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		     __FILE__);
 		exit(1);
 	    }
 	    tmp_arr[0] = str;
@@ -304,8 +304,8 @@ hash_insert(char * name, void * data, Hashp h)
             /* This entry doesn't already exist */
             np = malloc(sizeof(Node));
 	    if (np == NULL) {
-		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		       __FILE__);
+		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		     __FILE__);
 		exit(1);
 	    }
             np->name = copy_token(name, 0);
@@ -398,8 +398,8 @@ hash_stat(char * name, Hashp h)
             }
         }
 
-        syslog(LOG_INFO, "hash %s usage is %d/%d avg chain length is %f", 
-	       name, total, HASH_SIZE, (float) tot_in_chains / total);
+        log (LOG_INFO, "hash %s usage is %d/%d avg chain length is %f", 
+	     name, total, HASH_SIZE, (float) tot_in_chains / total);
     }
 }
 
@@ -599,7 +599,7 @@ whole_msg(Connp c)
     char *ch;
 
     /*
-     * search through the data in the buffer looking for "\n.[\r\n]"
+     * search through the data in the buffer looking for "\n\.[\r\n]"
      * in regex speak.  that's why we stop 3 chars before bufhwm.
      */
     /* XXX should this be <= instead? */
@@ -628,8 +628,8 @@ conn_init_buf(Connp c)
 	/* create buf if we don't already have one */
 	c->buf = malloc(size);
 	if (c->buf == NULL) {
-	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-                   __FILE__);
+	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
             exit(1);
 	}
 	c->buflen = size;	/* the allocated size of buf */
@@ -652,8 +652,8 @@ conn_grow_buf(Connp c, int size)
 	newsize = c->buflen + size;
 	newbuf = realloc(c->buf, newsize);
 	if (newbuf == NULL) {
-	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-                   __FILE__);
+	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
             exit(1);
 	}
 	c->buf = newbuf;
@@ -661,9 +661,18 @@ conn_grow_buf(Connp c, int size)
     }
 }
 
-/*
- * Functions pertaining to configuration.
+/***********************************************************************
+ * conn_parse_buf: translate a buffer into an array of strings.  stops
+ * at the end of the first message.
  */
+char **
+conn_parse_buf(Connp c)
+{
+    return NULL;
+}
+
+/*
+ * Functions pertaining to configuration.  */
 
 /***********************************************************************
  * config_find: return the config item with name

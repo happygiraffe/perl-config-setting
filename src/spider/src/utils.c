@@ -6,10 +6,13 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: utils.c,v 1.6 2000/01/06 23:55:57 dom Exp $";
+static const char rcsid[]="@(#) $Id: utils.c,v 1.7 2000/01/16 23:04:22 dom Exp $";
 
 #include <config.h>
+#include <sys/types.h>
+
 #include <ctype.h>
+#include <errno.h>
 #include <stdlib.h>             /* malloc */
 /* This ugliness recommended by autoconf for portability */
 #if STDC_HEADERS
@@ -28,6 +31,7 @@ static const char rcsid[]="@(#) $Id: utils.c,v 1.6 2000/01/06 23:55:57 dom Exp $
 #include <stdarg.h>
 #include <syslog.h>
 #include <unistd.h>             /* sysconf */
+
 #include "spider.h"
 
 /*********************************************************************
@@ -56,7 +60,6 @@ mk_a_dir(char * name, int mode)
 }
 
 #ifndef HAVE_STRDUP
-
 /*********************************************************************
  * strdup
  *
@@ -216,8 +219,8 @@ make_repline(int code, char * msg)
         i = REPLY_CODE_LEN + strlen(msg) + 1;
         c = malloc((size_t)i);
         if (c == NULL) {
-            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-                   __FILE__);
+            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
             exit(1);
         }
         sprintf(c, REPLY_FMT, code, msg);
@@ -380,8 +383,8 @@ copy_token(char * buf, int n)
 	    len = len_token(c);
 	    word = malloc((size_t)len+1);
 	    if (word == NULL) {
-		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		       __FILE__);
+		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		     __FILE__);
 		exit(1);
 	    }
 	    strncpy(word, c, len);
@@ -446,28 +449,26 @@ cmp_token(char * buf, int n, char * s)
     return ok;
 }
 
-/*********************************************************************
- * debug_log
- *
- * Log a message if in debugging mode.  Log to syslog if we've
- * daemonised, else send to stderr.
+/***********************************************************************
+ * log: log a message with syslog, or maybe stdout.
  */
 void
-debug_log(char *msg, ...)
+log (int priority, char *msg, ...)
 {
+    int		saved_errno = errno;
     va_list	args;
-
-    if (!debug)
-	return;
 	
     va_start (args, msg);
     if (am_daemon) {
-	(void)vsyslog (LOG_DEBUG, msg, args);
-    } else {
-	vfprintf(stderr, msg, args);
-	fprintf(stderr, "\n");
+	(void)vsyslog (priority, msg, args);
+    } else if (priority != LOG_DEBUG || debug) {
+	vfprintf (stderr, msg, args);
+	if (strstr (msg, "%m"))
+	    fprintf (stderr, " (errno=%d)", saved_errno);
+	fprintf (stderr, "\n");
     }
     va_end (args);
+    return;
 }
 
 /*

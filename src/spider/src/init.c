@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.16 2000/01/16 21:37:10 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.17 2000/01/16 23:04:22 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -153,12 +153,12 @@ spider_init(void)
     }
 
     /* Now, we must open a syslog connection, as we are blind & dumb */
-    openlog(basename(fullname), LOG_NDELAY, get_facility());
-    syslog(LOG_INFO, "Starting v%s", VERSION);
+    openlog (basename(fullname), LOG_NDELAY, get_facility());
+    log (LOG_INFO, "Starting v%s", VERSION);
 
     spool_dir = config_get("Spool_Dir");
     if(chdir(spool_dir) < 0) {
-        syslog(LOG_ERR, "Couldn't change to %s: %m", spool_dir);
+        log (LOG_ERR, "Couldn't change to %s: %m", spool_dir);
         exit(1);
     }
     write_pid_file();
@@ -166,16 +166,16 @@ spider_init(void)
 
     /* Put in signal handlers for common things */
     if (signal(SIGHUP, the_end) == SIG_ERR) {
-        syslog(LOG_WARNING, "Couldn't install signal handler for HUP: %m");
+        log (LOG_WARNING, "Couldn't install signal handler for HUP: %m");
     }
     if (signal(SIGTERM, the_end) == SIG_ERR) {
-        syslog(LOG_WARNING, "Couldn't install signal handler for TERM: %m");
+        log (LOG_WARNING, "Couldn't install signal handler for TERM: %m");
     }
     if (signal(SIGCHLD, reap_child) == SIG_ERR) {
-        syslog(LOG_WARNING, "Couldn't install signal handler for CHILD: %m");
+        log (LOG_WARNING, "Couldn't install signal handler for CHILD: %m");
     }
     if (signal(SIGUSR1, do_stats) == SIG_ERR) {
-        syslog(LOG_WARNING, "Couldn't install signal handler for USR1: %m");
+        log (LOG_WARNING, "Couldn't install signal handler for USR1: %m");
     }
 
     /* Initialize data structures */
@@ -257,7 +257,7 @@ ck_config(void)
     for (i = 0; tocheck[i]; ++i) {
 	val = config_get(tocheck[i]);
 	if (val == NULL) {
-	    syslog (LOG_ERR, "no value for %s defined in config file",
+	    log (LOG_ERR, "no value for %s defined in config file",
 		    tocheck[i]);
 	    exit (1);
 	}
@@ -318,7 +318,7 @@ parse_cfg_file(void)
 	if (i < 2)
 	{
 	    if (i)
-		syslog (LOG_WARNING, "invalid line (%d): %s", lineno, buf);
+		log (LOG_WARNING, "invalid line (%d): %s", lineno, buf);
 	    free(buf);
 	    buf = get_line(cfg);
 	    lineno++;
@@ -331,10 +331,10 @@ parse_cfg_file(void)
 	ci   = config_find (keyw);
 	if (ci) {
 	    config_set(ci, val);
-	    debug_log("config: %s %s", keyw, val);
+	    log (LOG_DEBUG, "config: %s %s", keyw, val);
 	} else {
-	    syslog(LOG_WARNING, "unknown keyword \"%s\" on line %d", 
-		   keyw, lineno);
+	    log (LOG_WARNING, "unknown keyword \"%s\" on line %d", 
+		 keyw, lineno);
 	    free (val);
 	}
 
@@ -369,7 +369,7 @@ write_pid_file(void)
         /* If file doesn't exist */
         pf = fopen(pid_file, "w");
         if (pf == NULL) {
-            syslog(LOG_WARNING, "Error opening pid file %s: %m", pid_file);
+            log (LOG_WARNING, "Error opening pid file %s: %m", pid_file);
 	} else {
 	    fprintf(pf, "%ld\n", (long)getpid());
 	    fclose(pf);
@@ -378,12 +378,12 @@ write_pid_file(void)
         /* File exists, read it to see if it is really in use */
         pf = fopen(pid_file, "r+");
         if (pf == NULL)
-            syslog(LOG_WARNING, "Error opening pid file %s: %m", pid_file);
+            log (LOG_WARNING, "Error opening pid file %s: %m", pid_file);
         fscanf(pf, "%ld", (long *)&old_pid);
         if ((old_pid > 0) && (kill(old_pid, 0) == 0)) {
             /* Eeek, spider is already running */
-            syslog(LOG_WARNING, "Spider is already running as pid %ld",
-                   (long)old_pid);
+            log (LOG_WARNING, "Spider is already running as pid %ld",
+		 (long)old_pid);
             exit (1);
         }
         /* OK, we can write our own pid in. */
@@ -406,8 +406,8 @@ init_data(void)
     maxfd = get_max_fds();
     open_conns = malloc(maxfd * sizeof(Connp));
     if (open_conns == NULL) {
-	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	       __FILE__);
+	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	     __FILE__);
 	exit(1);
     }
     (void)memset(open_conns, '\0', (size_t)(maxfd * sizeof(Connp)));
@@ -429,57 +429,57 @@ init_internal_cmds(void)
 {
     Cmdp	tmp;
 
-    debug_log("start init internal_commands");
+    log (LOG_DEBUG, "start init_internal_commands");
 
     tmp = malloc(sizeof(Cmd));
     if (tmp == NULL) {
-	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	       __FILE__);
+	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	     __FILE__);
 	exit(1);
     }
     tmp->name = "LOGIN";
     tmp->type = internal;
     tmp->det.in.fn = cmd_login;
     Cmd_add(tmp->name, tmp);
-    debug_log("cmd %s ok", tmp->name);
+    log (LOG_DEBUG, "cmd %s ok", tmp->name);
 
     tmp = malloc(sizeof(Cmd));
     if (tmp == NULL) {
-	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	       __FILE__);
+	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	     __FILE__);
 	exit(1);
     }
     tmp->name = "HELP";
     tmp->type = internal;
     tmp->det.in.fn = cmd_help;
     Cmd_add(tmp->name, tmp);
-    debug_log("cmd %s ok", tmp->name);
+    log (LOG_DEBUG, "cmd %s ok", tmp->name);
 
     tmp = malloc(sizeof(Cmd));
     if (tmp == NULL) {
-	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	       __FILE__);
+	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	     __FILE__);
 	exit(1);
     }
     tmp->name = "WHO";
     tmp->type = internal;
     tmp->det.in.fn = cmd_who;
     Cmd_add(tmp->name, tmp);
-    debug_log("cmd %s ok", tmp->name);
+    log (LOG_DEBUG, "cmd %s ok", tmp->name);
 
     tmp = malloc(sizeof(Cmd));
     if (tmp == NULL) {
-	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-	       __FILE__);
+	log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	     __FILE__);
 	exit(1);
     }
     tmp->name = "QUIT";
     tmp->type = internal;
     tmp->det.in.fn = cmd_quit;
     Cmd_add(tmp->name, tmp);
-    debug_log("cmd %s ok", tmp->name);
+    log (LOG_DEBUG, "cmd %s ok", tmp->name);
 
-    debug_log("end init internal_commands");
+    log (LOG_DEBUG, "end init internal_commands");
 }
 
 /*********************************************************************
@@ -504,8 +504,8 @@ find_module(char * name)
 	    len = strlen(module_path[i]) + 1 + strlen(name) + 1;
 	    abs_name = malloc((size_t)len);
 	    if (abs_name == NULL) {
-		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		       __FILE__);
+		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		     __FILE__);
 		exit(1);
 	    }
 	    strcpy(abs_name, module_path[i]);
@@ -551,14 +551,14 @@ activate_module(char * path)
 
 	i = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (i == -1) {
-	    syslog(LOG_WARNING, "socketpair failed; module %s not loaded",
-		   path);
+	    log (LOG_WARNING, "socketpair failed; module %s not loaded",
+		 path);
 	    return;
 	}
 
 	if ( (pid = fork()) == -1) {
-	    syslog(LOG_WARNING, "fork failed; reason %m; module %s not loaded",
-		   path);
+	    log (LOG_WARNING, "fork failed; reason %m; module %s not loaded",
+		 path);
 	    return;
 	} else if ( pid == 0 ) {
 	    /* Child */
@@ -566,12 +566,12 @@ activate_module(char * path)
 	    close(fd[0]);
 	    i = dup2(fd[1], STDIN_FILENO);
 	    if (i != STDIN_FILENO) {
-		syslog(LOG_WARNING, "dup2(,stdin) failed");
+		log (LOG_WARNING, "dup2(,stdin) failed");
 		exit(1);
 	    }
 	    i = dup2(fd[1], 1);
 	    if (i != STDOUT_FILENO) {
-		syslog(LOG_WARNING, "dup2(,stdout) failed");
+		log (LOG_WARNING, "dup2(,stdout) failed");
 		exit(1);
 	    }
 	    /* Make sure that the child gets it's own directory */
@@ -589,14 +589,14 @@ activate_module(char * path)
 		}
 	    }
 	    execl(path, basename(path), NULL);
-	    syslog(LOG_WARNING, "exec failed; reason %m");
+	    log (LOG_WARNING, "exec failed; reason %m");
 	} else {
 	    /* Parent */
 	    close(fd[1]);
 	    thisone = malloc(sizeof(Conn));
 	    if (thisone == NULL) {
-		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		       __FILE__);
+		log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		     __FILE__);
 		exit(1);
 	    }
 	    thisone->eol = "\n";
@@ -615,8 +615,8 @@ activate_module(char * path)
             FD_SET(fd[0], &wait_on);
             SET_WAIT_MAX(fd[0]);
 	    
-	    syslog(LOG_INFO, "module %s is pid %d fd %d", thisone->name,
-		   thisone->det.mod.pid, fd[0]);
+	    log (LOG_INFO, "module %s is pid %d fd %d", thisone->name,
+		 thisone->det.mod.pid, fd[0]);
 	}
     }
 }
@@ -640,8 +640,8 @@ neg_cmd(char * buf, Connp mod)
 	/* Setup a new command structure */
 	cmd = malloc(sizeof(Cmd));
 	if (cmd == NULL) {
-	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		   __FILE__);
+	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
 	    exit(1);
 	}
 	cmd->name = NULL;
@@ -684,13 +684,13 @@ neg_cmd(char * buf, Connp mod)
 	}
 	tmp = malloc(strlen(REPLY_FMT)+strlen(reason)+6);
 	if (tmp == NULL) {
-	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		   __FILE__);
+	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
 	    exit(1);
 	}
 	(void)sprintf(tmp, REPLY_FMT "\n", code, reason);
 	fputs(tmp, mod->chan);
-	debug_log("[%d] -> %s", fileno(mod->chan), tmp);
+	log (LOG_DEBUG, "[%d] -> %s", fileno(mod->chan), tmp);
 	free(tmp);
     }
 }
@@ -710,7 +710,7 @@ proc_new_cmds(char *modname)
     if (modname != NULL) {
 	/* Find out whom we're dealing with */
 	mod = carr_find(modname, module);
-	debug_log("proc_new_cmds(%s) starting", modname);
+	log (LOG_DEBUG, "proc_new_cmds(%s) starting", modname);
 
 	/* I/O with the module */
 	do {
@@ -718,7 +718,7 @@ proc_new_cmds(char *modname)
                 free(buf);
             }
             buf = get_line(mod->chan);
-	    debug_log("[%d] <- %s", fileno(mod->chan), buf);
+	    log (LOG_DEBUG, "[%d] <- %s", fileno(mod->chan), buf);
 	    /* Solaris stdio needs this; probably others, too.  If it
              * doesn't get it, then we end up writing our last input
              * back out! */
@@ -751,14 +751,14 @@ init_modules(void)
 	mod = find_module(modules[i]);
 	if (mod == NULL)
 	{
-	    syslog(LOG_ERR, "Module %s not present or not executable",
-		   modules[i]);
+	    log (LOG_ERR, "Module %s not present or not executable",
+		 modules[i]);
 	    continue;		/* XXX Should we exit(1) here? */
 	}
-	debug_log("start init module %s", modules[i]);
+	log (LOG_DEBUG, "start init module %s", modules[i]);
 	activate_module(mod);
 	proc_new_cmds(basename(mod));
-	debug_log("end init module %s", modules[i]);
+	log (LOG_DEBUG, "end init module %s", modules[i]);
     }
 }
 
@@ -781,7 +781,7 @@ init_users(void)
     user_file = config_get("User_File");
     if (stat(user_file, &st) == -1)
     {
-	syslog(LOG_ERR, "Could not find user file %s.", user_file);
+	log (LOG_ERR, "Could not find user file %s.", user_file);
 	exit(1);
     } 
 
@@ -801,8 +801,8 @@ init_users(void)
 	}
 	if (len != 2)
 	{
-	    syslog(LOG_WARNING, "Problem with User File on line %d",
-		   lineno);
+	    log (LOG_WARNING, "Problem with User File on line %d",
+		 lineno);
             free(buf);
             buf = get_line(usrf);
 	    lineno++;
@@ -810,8 +810,8 @@ init_users(void)
 	}
 	usr = malloc(sizeof(Conn));
 	if (usr == NULL) {
-	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-		   __FILE__);
+	    log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
 	    exit(1);
 	}
 	/* Assume that name has already been scanned for valid

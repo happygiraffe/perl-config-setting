@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.10 2000/01/16 12:54:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.11 2000/01/16 23:04:22 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -160,7 +160,7 @@ main(int argc, char **argv)
                 break;
             }
             if (log_all_cmds && (SENDER_CONN->state == s_conn)) {
-                syslog(LOG_INFO, "user %s: %s", SENDER_NAME, msg[0]);
+                log (LOG_INFO, "user %s: %s", SENDER_NAME, msg[0]);
             }
             /* Update time of last command */
             SENDER_CONN->det.usr.last_cmd_time = time(0);
@@ -235,7 +235,7 @@ new_conn(int l_sock)
     sender = accept(l_sock, (struct sockaddr *) &client,
                       &client_len);
     if (sender < 0) {
-        syslog(LOG_WARNING, "accept(2): %m");
+        log (LOG_WARNING, "accept: %m");
         ok = false;
     }
     /* Whoever thought of the params for this should be shot */
@@ -248,19 +248,19 @@ new_conn(int l_sock)
             c = strdup(hp->h_name);
         }
         if (SENDER_CONN != NULL) {
-            syslog(LOG_WARNING, "socket %d already occupied!",
-                   sender);
+            log (LOG_WARNING, "socket %d already occupied!",
+		 sender);
             close(sender);
             free(c);
             ok = false;
         }
     }
     if (ok) {
-	syslog(LOG_INFO, "connect from %s fd %d", c, sender);
+	log (LOG_INFO, "connect from %s fd %d", c, sender);
         SENDER_CONN = malloc(sizeof(Conn));
         if (open_conns == NULL) {
-            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-                   __FILE__);
+            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
             exit(1);
         }
         SENDER_CHAN = fdopen(sender, "r+");
@@ -295,8 +295,8 @@ validate_user(char ** input)
     /* Check that all the input went ok */
     if (input == NULL) {
         if (!feof(SENDER_CHAN)) {
-            syslog(LOG_INFO, "Problem with user %s: %m (user logged off)",
-                   SENDER_NAME);
+            log (LOG_INFO, "Problem with user %s: %m (user logged off)",
+		 SENDER_NAME);
         }
         term_conn();
         ok = false;
@@ -353,11 +353,11 @@ validate_mod(char ** input)
     /* Check that all went well with the input */
     if (input == NULL) {
         if (feof(SENDER_CHAN)) {
-            syslog(LOG_INFO, "EOF from module %s.  Removing it",
-                   SENDER_NAME);
+            log (LOG_INFO, "EOF from module %s.  Removing it",
+		 SENDER_NAME);
         } else {
-            syslog(LOG_INFO, "Problem (%m) with module %s.  Removing it",
-                   SENDER_NAME);
+            log (LOG_INFO, "Problem (%m) with module %s.  Removing it",
+		 SENDER_NAME);
         }
         term_conn();
         ok = false;
@@ -411,8 +411,8 @@ add_username(char ** msg)
         i = strlen(SENDER_NAME) + 1 + strlen(msg[0]) + 1;
         c = malloc((size_t)i);
         if (c == NULL) {
-            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-                   __FILE__);
+            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
             exit(1);
         }
         c = strcpy(c, SENDER_NAME);
@@ -440,8 +440,8 @@ del_username(char ** msg)
         d = find_token(msg[0], 1);
         c = malloc(strlen(d) + 1);
         if (c == NULL) {
-            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
-                   __FILE__);
+            log (LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		 __FILE__);
             exit(1);
         }
         c = strcpy(c, d);
@@ -504,7 +504,7 @@ figure_out_event_type(int sel_val, fd_set * tmp_set, int listener, int sig)
 	    }
 	} else {
 	    /* file a complaint */
-	    syslog(LOG_WARNING, "select error - %m");
+	    log (LOG_WARNING, "select error - %m");
 	}
     } else {
 	/* XXX How do we determine a Child Death event? */

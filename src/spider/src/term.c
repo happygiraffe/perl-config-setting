@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: term.c,v 1.2 2000/01/16 12:54:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: term.c,v 1.3 2000/01/16 23:04:22 dom Exp $";
 
 #include <sys/types.h>
 #include <config.h>
@@ -94,7 +94,7 @@ term_user(void)
 
     tmp = SENDER_CONN;
     if (tmp->name != NULL) {
-        syslog(LOG_INFO, "user %s: logout", tmp->name);
+        log (LOG_INFO, "user %s: logout", tmp->name);
         free(tmp->det.usr.host);
         tmp->det.usr.host = NULL;
         tmp->det.usr.login_time = 0;
@@ -124,12 +124,12 @@ term_module(void)
     /* Log what happened to the damn child. */
     if (WIFEXITED(child_status)) {
         /* normal exit */
-        syslog(LOG_INFO, "module %s exited with status %d", tmp->name,
-               WEXITSTATUS(child_status));
+        log (LOG_INFO, "module %s exited with status %d", tmp->name,
+	     WEXITSTATUS(child_status));
     }
     if (WIFSIGNALED(child_status)) {
-        syslog(LOG_INFO, "module %s killed by signal %d", tmp->name,
-               WTERMSIG(child_status));
+        log (LOG_INFO, "module %s killed by signal %d", tmp->name,
+	     WTERMSIG(child_status));
     }
     child_status = 0;
     child_pid = 0;
@@ -208,7 +208,7 @@ rm_pid_file(void)
     pid_file = config_get("Pid_File");
     /* Don't worry if it fails; there's probably a good reason for it */
     unlink(pid_file);
-    syslog (LOG_INFO, "Stopping");
+    log (LOG_INFO, "Stopping");
 }
 
 /*********************************************************************

@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.7 2000/01/16 12:54:42 dom Exp $
+ * @(#) $Id: spider.h,v 1.8 2000/01/16 23:04:19 dom Exp $
  */
 
 #ifndef _SPIDER_H_
@@ -311,7 +311,7 @@ char * 	find_token(char * buf, int n);
 char * 	copy_token(char * buf, int n);
 int 	num_tokens(char * buf);
 Bool	cmp_token(char * buf, int n, char * s);
-void	debug_log(char * msg, ...);
+void	log(int priority, char * msg, ...);
 
 #endif /* _SPIDER_H_ */
 
