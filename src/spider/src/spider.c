@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.6 2000/01/06 22:02:07 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.7 2000/01/15 00:04:21 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -62,6 +62,9 @@ int 	receiver;
 fd_set 	wait_on;
 /* Highest numbered fd in wait_on */
 int	wait_on_max;
+
+/* something for what to search for */
+static const char spider_version[] = "@(#) Spider v" VERSION;
 
 /*********************************************************************
  * main()
