@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile
+README
+TODO
+compile.c
+defs.h
+eg/sedscr
+eg/index.html
+eg/sedscr.foo
+extern.h
+main.c
+misc.c
+mod_sed.c
+process.c
