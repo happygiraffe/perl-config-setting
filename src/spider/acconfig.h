@@ -1,5 +1,5 @@
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef _CONFIG_H_
+#define _CONFIG_H_ 1
 
 /***************** You may have to change these: *****************/
 
@@ -16,7 +16,7 @@
 @TOP@
 @BOTTOM@
 
-#endif /* _CONFIG_H */
+#endif /* _CONFIG_H_ */
 
 /*
  * Local variables:
