@@ -29,8 +29,8 @@
 Implementation of <dtml-whois>.
 """
 
-__rcs_id__='$Id: WhoisTag.py,v 1.4 2000/09/05 20:41:47 dom Exp $'
-__version__='$Revision: 1.4 $'[11:-2]
+__rcs_id__='$Id: WhoisTag.py,v 1.5 2000/09/05 21:02:05 dom Exp $'
+__version__='$Revision: 1.5 $'[11:-2]
 
 from sys import stderr
 from DocumentTemplate.DT_Util import *
@@ -56,7 +56,7 @@ class WhoisTag:
         if args.has_key('server'):
             self.server = args['server']
         else:
-            server = None
+            self.server = None
 
         # Try to sort out whether we have an expression to be
         # evaluated, or a simple name...
