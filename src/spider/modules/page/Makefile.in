@@ -33,12 +33,12 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-ALL_CFLAGS = -I@top_srcdir@/lib -I@top_srcdir@/src -I../.. $(CFLAGS)
-LDFLAGS = -L../../lib -lmod
+ALL_CFLAGS = -I@top_srcdir@/lib/mod -I@top_srcdir@/src -I../.. $(CFLAGS)
+LDFLAGS = -L../../lib/mod -lmod
 
 #-----------------------------------------------------------------------
 
-LIBMOD=../../lib/libmod.a
+LIBMOD=../../lib/mod/libmod.a
 
 OBJS = page.o
 
