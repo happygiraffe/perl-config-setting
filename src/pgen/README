@@ -11,6 +11,9 @@ To install:
 
 See the pgen(1) page for full details.
 
+These tools are available under a BSD license.  See the LICENSE file for
+details.
+
 The basic macros have been in use for over 4 years, I've only just
 gotten around to releasing them.  :-(
 
@@ -18,4 +21,4 @@ gotten around to releasing them.  :-(
 
 # ----------------------------------------------------------------------
 # vim: ai sw=4 et
-# @(#) $Id: README,v 1.1 2001/05/26 17:28:03 dom Exp $
+# @(#) $Id: README,v 1.2 2001/06/22 23:55:17 dom Exp $
