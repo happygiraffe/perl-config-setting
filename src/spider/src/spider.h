@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.2 1999/03/18 23:44:45 dom Exp $
+ * @(#) $Id: spider.h,v 1.3 1999/03/28 01:24:01 dom Exp $
  */
 
 #ifndef _SPIDER_H_
@@ -248,6 +248,9 @@ void 	write_pid_file(void);
 void	put_mesg(FILE *fp, char **msg);
 char **	get_mesg(FILE *fp);
 char *	get_line(FILE * fp);
+
+/* net.c */
+int	spider_listen(int port);
 
 /* spider.c */
 int 	main (int argc, char **argv);

@@ -2,7 +2,7 @@
 #
 # Main Makefile for Spider
 #
-# $Id: Makefile.in,v 1.1 1999/03/11 15:39:49 dom Exp $
+# $Id: Makefile.in,v 1.2 1999/03/28 01:24:01 dom Exp $
 #
 
 @SET_MAKE@
@@ -44,7 +44,7 @@ RM=/bin/rm -f
 
 #-----------------------------------------------------------------------
 
-OBJECTS	= cmds.o ds.o init.o io.o spider.o term.o utils.o
+OBJECTS	= cmds.o ds.o init.o io.o net.o spider.o term.o utils.o
 SCRIPTS = kill_spider debug_client trace_spider
 
 # C-\ in Emacs for backslashes.  :-)
@@ -82,6 +82,8 @@ ds.o: ds.c
 init.o: init.c
 
 io.o: io.c
+
+net.o: net.c
 
 spider.o: spider.c
 

@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.4 1999/03/22 23:37:14 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.5 1999/03/28 01:24:01 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -77,7 +77,6 @@ main(int argc, char **argv)
     Connp	usr = NULL;
     fd_set	tmp_set;
     int		l_sock;         /* listening socket */
-    struct sockaddr_in	server;
     int		opt;		/* option flag */
     int 	sel_val;	/* return value from select() */
     Event	ev;
@@ -113,19 +112,7 @@ main(int argc, char **argv)
     spider_init();
 
     /* Socket initialization */
-    l_sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (l_sock < 0) {
-        syslog(LOG_ERR, "socket(2): %m");
-        exit(1);
-    }
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = ntohs(port);
-    if (bind(l_sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
-        syslog(LOG_ERR, "bind(2): %m");
-        exit(1);
-    }
-    listen(l_sock, 5);
+    l_sock = spider_listen (port);
     FD_SET(l_sock, &wait_on);
     SET_WAIT_MAX(l_sock);
 
