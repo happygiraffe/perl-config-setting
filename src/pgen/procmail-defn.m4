@@ -1,7 +1,7 @@
 ########################################################################
 # procmail-defn.m4 - definitions for building a procmailrc file.
 #
-# $Id: procmail-defn.m4,v 1.4 2001/05/26 17:43:38 dom Exp $
+# $Id: procmail-defn.m4,v 1.5 2001/06/15 23:37:38 dom Exp $
 ########################################################################
 
 `# This procmail.rc was built on' syscmd(date)dnl
@@ -18,7 +18,16 @@ ifdef(MH-USER,
 `# MH-USER was defined.', 
 `# MH-USER not defined, defaulting to mbox.')
 
+# Save initial argument for later use.
+SAVARG = $1
+
 divert(-1)
+
+# STOPDUPS
+define(STOPDUPS,
+`:0 Wh: msgid.lock
+| formail -D 32768 msgid.cache')
+
 
 # LIST(listname, folder [, type]) ; foldername w/o the "+".
 define(LIST,
@@ -29,7 +38,7 @@ ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
 				$3, `MH', `$2/.',
 				$3, `MBOX', `$2',
 				ifdef(`MH-USER', `| rcvstore +')$2)'
-)dnl
+)
 
 # SUBJ(subject, folder [, type]) ; foldername w/o the "+".
 define(SUBJ,
@@ -40,7 +49,7 @@ ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
 				$3, `MH', `$2/.',
 				$3, `MBOX', `$2',
 				ifdef(`MH-USER', `| rcvstore +')$2)'
-)dnl
+)
 
 # FROM(from, folder [, type]) ; foldername w/o the "+".
 define(FROM,
@@ -51,18 +60,18 @@ ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
 				$3, `MH', `$2/.',
 				$3, `MBOX', `$2',
 				ifdef(`MH-USER', `| rcvstore +')$2)'
-)dnl
+)
 
 # ARG(arg, folder [, type]) ; foldername w/o the "+".
 define(ARG,
 `ifdef(`INABLOCK',`	'):0: ifdef(MH-USER,$2/.lock)
-ifdef(`INABLOCK',`	')* `$ARG' ?? $1
+ifdef(`INABLOCK',`	')* `$SAVARG' ?? $1
 ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
 				$3, `RCVSTORE', `| rcvstore +$2',
 				$3, `MH', `$2/.',
 				$3, `MBOX', `$2',
 				ifdef(`MH-USER', `| rcvstore +')$2)'
-)dnl
+)
 
 # START a blocked section.
 define(`START',
@@ -70,13 +79,13 @@ define(`START',
 :0
 * (^TO$1|^Return-Path:.*$1)
 {'
-)dnl
+)
 
 # END a blocked section
 define(`END',
 `undefine(`INABLOCK')dnl
 }'
-)dnl
+)
 
 ########################################################################
 # End of procmail-defn.m4
