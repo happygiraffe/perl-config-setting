@@ -65,7 +65,7 @@ order to set the policy for file locations.
 Returns a parser object.  The default is the
 L<Config::Setting::IniParser> object.  You may want to override this in
 a subclass if you wish to use an alternative format for your
-configuration files..
+configuration files.
 
 =item sections ( )
 
@@ -155,7 +155,8 @@ sub _init {
         my @txts = $provider->provide();
         my @configs;
         foreach my $s (@txts) {
-                my $p = $self->parser(String => $s);
+                my $p = $self->parser();
+                $p->parse_string($s);
                 push @configs, $p;
         }
 

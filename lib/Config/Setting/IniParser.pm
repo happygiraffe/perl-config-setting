@@ -57,15 +57,6 @@ Recognised options are:
 
 =over 4
 
-=item Filename
-
-Process the filename provided.
-
-=item String
-
-Process the string passed in directly, rather than accessing it from
-the disk.
-
 =item CommentChar
 
 Pass in a character that is used as a comment inside the data.  This
@@ -73,7 +64,13 @@ defaults to "#", but is also commonly ";".
 
 =back
 
-One of Filename or String is required.
+=item parse_file ( FILENAME )
+
+Parse FILENAME into the object.
+
+=item parse_string ( STRING )
+
+Parse STRING into the object.
 
 =item sections ( )
 
@@ -121,44 +118,40 @@ sub new {
         my $class = shift;
         my (%args) = @_;
 
-        croak "IniParser->new() requires Filename or String parameter."
-                unless exists($args{Filename}) || exists($args{String});
-
         my $self = {
                 Contents    => {},
                 Sections    => [],
-                Filename    => "",
-                String      => "",
                 CommentChar => "#",
                 %args,
         };
         bless($self, $class);
-        return $self->_init->_parse;
+        return $self;
 }
 
-# Read in the file that we have been asked to and parse it.
-sub _init {
+sub parse_file {
         my $self = shift;
+        open my $fh, $self->{Filename}
+                or croak "open($self->{Filename}): $!";
+        my $string = do { local $/ ; <$fh> };
+        close $fh;
+        return $self->_parse( $string );
+}
 
-        my $txt;
-        if ($self->{Filename}) {
-                open my $fh, $self->{Filename}
-                        or croak "open($self->{Filename}): $!";
-                $self->{String} = do { local $/ ; <$fh> };
-                close $fh;
-        }
-
-        return $self;
+sub parse_string {
+        my $self = shift;
+        my ( $string ) = @_;
+        return $self->_parse( $string );
 }
 
 # Parse the stuff we hold.
 sub _parse {
         my $self = shift;
+        my ( $string ) = @_;
         my $section = "";
         my $cc = $self->{CommentChar};
         my $lineno = 1;
 
-        foreach my $line (split /\r?\n/, $self->{String}) {
+        foreach my $line (split /\r?\n/, $string) {
                 $line =~ s/$cc.*//;
                 $line =~ s/^\s+//;
                 next unless $line;

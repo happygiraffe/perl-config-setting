@@ -62,24 +62,16 @@ stripped.
 
 =item new ( ARGS )
 
-Instantiate a new object.  ARGS is a set of keyword / value pairs.
-Recognised options are:
+Instantiate a new object.  ARGS is a set of keyword / value pairs which
+will be passed to the L<XML::Parser> constructor.
 
-=over 4
+=item parse_file ( FILENAME )
 
-=item Filename
+Parse FILENAME as XML.
 
-Process the filename provided.
+=item parse_string ( STRING )
 
-=item String
-
-Process the string passed in directly, rather than accessing it from
-the disk.
-
-=back
-
-One of Filename or String is required.  Any remaining arguments will
-be passed to the L<XML::Parser> constructor.
+Parse the string as XML.
 
 =item sections ( )
 
@@ -120,22 +112,17 @@ use XML::Parser;
 $rcsid = '@(#) $Id$ ';
 $VERSION = (qw( $Revision$ ))[1];
 
-# Pass in either a Filename parameter or a String parameter.
 sub new {
         my $class = shift;
         my (%args) = @_;
 
-        croak "XMLParser->new() requires Filename or String parameter."
-                unless exists($args{Filename}) || exists($args{String});
-
         my $self = {
                 Contents => {},
                 Sections => [],
-                Filename => delete $args{Filename},
-                String => delete $args{String},
+                Args     => \%args,
         };
         bless($self, $class);
-        return $self->_init->_parse(%args);
+        return $self;
 }
 
 # Read in the file that we have been asked to and parse it.
@@ -144,13 +131,25 @@ sub _init {
 
         my $txt;
         if ($self->{Filename}) {
-                open my $fh, $self->{Filename}
-                        or croak "open($self->{Filename}): $!";
-                $self->{String} = do { local $/ ; <$fh> };
-                close F;
         }
 
         return $self;
+}
+
+sub parse_file {
+        my $self = shift;
+        my ( $filename ) = @_;
+        open my $fh, $filename
+                or croak "open($filename): $!";
+        my $string = do { local $/ ; <$fh> };
+        close $fh;
+        return $self->_parse( $string );
+}
+
+sub parse_string {
+        my $self = shift;
+        my ( $string ) = @_;
+        return $self->_parse( $string );
 }
 
 #---------------------------------------------------------------------
@@ -161,18 +160,18 @@ sub _init {
         # Parse the stuff we hold.
         sub _parse {
                 my $self = shift;
-                my %args = @_;
+                my ($string) = @_;
                 my $p = XML::Parser->new(
                         Style => "Subs",
                         Pkg => ref($self),
-                        %args
+                        %{ $self->{ Args } },
                        );
                 $p->setHandlers(Char => \&Text);
 
                 $me = $self;
                 $me->{CurItem} = 0;
                 eval {
-                        $p->parse($self->{String});
+                        $p->parse($string);
                 };
                 croak "$@" if $@;
 
