@@ -1,0 +1,73 @@
+mod_sed 0.1                                                        -*- text -*-
+===========
+
+			     INTRODUCTION
+
+This is a module for apache which allows you to automatically run
+sed(1) over files before they are sent out to the client.  It is
+derived from the FreeBSD sed(1) command.
+
+			       BUILDING
+
+To build, you should just be able to type in "make" on a 4.4BSD
+compatible system.  I'm still working on the portability aspects of
+this module, so it might not run on (say) Linux yet.
+
+You'll need apxs(8) in your path to build this module.  I'm not sure
+if it works with statically compiled apaches.
+
+To install, "make install" should copy the mod_sed.so to your data
+directory and put the correct lines in your httpd.conf to enable it.
+
+			       TESTING
+
+This is all the documentation you get until I write some more, I'm
+afraid  :-)
+
+You'll need: A directory or file that you want to run sed over inside
+apache.  In my case, this is "/usr/local/www/data/sed/".  The
+httpd.conf fragment I used looked like this:
+
+    <Directory /usr/local/www/data/sed>
+        SetHandler sed-handler
+        SedExtendedRegex on
+        #SedProgram "s/foo/BAR/g"
+        SedProgram /usr/local/www/data/sedscr
+        SedPathMap /foo /usr/local/www/data/sedscr.foo
+    </Directory>
+
+You'll need to make sure that the directory you specify is visible
+from apache.  In fact, it's probably a good idea to do that /before/
+installing this module...
+
+The important bit to activate mod_sed is the "SetHandler" line.  That
+enables all files under that directory to be passed through mod_sed.
+
+The "SedExtendedRegex" line asks that sed use Enhanced Regexes instead
+of basic ones.  If you don't know what that means, always include this
+line.  For more details on the differences between basic regexes and
+extended regexes see re_format(7).
+
+The "SedProgram" keyword can specify either a whole sed program (like
+you would give on the command line with -e) or a pathname to a file
+containing a sed program (this is generally the preferred option).  To
+determine between the two, mod_sed will attempt to see if a file by
+that name exists, otherwise it'll try and compile it as a program.
+
+The last command, "SedPathMap" takes two arguments: a PATH_INFO and
+another SedProgram argument.  What it means is that when somebody
+requests a file:
+
+    http://my.server/sed/index.html/foo
+
+The sed program in /usr/local/www/data/sedscr.foo will get run instead
+of the default in SedProgram.  This can be very handy for serving up
+alternative versions of files.
+
+				 BUGS
+
+There's bound to be a few, so please report them to
+dom+sed@happygiraffe.net.  Don't forget to include anything that shows
+up in the error log.
+
+@(#) $Id: README,v 1.1 2001/06/03 11:56:56 dom Exp $

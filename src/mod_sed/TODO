@@ -1,0 +1,66 @@
+* [MOSTLY DONE] Get rid of all statically defined data.
+
+  At present, all the statically defined data is being reused after
+  the initial request.  We need to arrange for previously static data
+  to be made visible to the handler and to have it initialized to zero
+  at the beginning of each request.
+
+  I've already done [HPS]S, but now there's something in mf_fgets()
+  which needs looking at, probably related to add_file().
+
+  A handler that only works once is not terribly useful.
+
+  Update: I've now got it working correctly over a number of files,
+  the remaining static data does not appear to be important.
+
+* [TODO] Implement timestamps correctly.
+
+  I need to make sure that the last modified time is either that of
+  the file being requested or the script, whichever is newer.
+
+* [DONE] Implement HEAD.
+
+  Right now, we're throwing everything back to the client, no matter
+  what they ask for.
+
+* Redefine err() and errx() to be useful within apache.
+
+  They should abort the current transaction, not exit.  They do this
+  with setjmp()/longjmp() around compile().  If there's been an error,
+  we log it and return internal server error.
+
+* Portability.
+
+  Convert to ap_ functions everywhere.
+
+  Get rid of err(), errx(), warnx() (see above).
+
+  fgetln() and snprintf() need to have replacements from BSD libc
+  installed.  Actually, apache might well have snprintf() itself...
+
+* [DONE] Need to move the handler into mod_sed.c...
+
+* [DONE] A normal Makefile would be nice.
+
+* [DONE] More options: SedNoDefaultOutput (-n) and SedExtendedRegex (-E)
+
+* Should handle multiple SedExprs and SedScripts?
+
+* [DONE] Need a pathinfo mapping for alternate script files.
+
+  Something like:
+
+	SedMap	/upper	/tmp/upper.sed
+
+  Which will supercede the usual sed expression when the pathinfo is set
+  to "/upper".
+
+* Cache compiled code...
+
+* Make work as an apache 2.0 filter.
+
+# Local Variables:
+# mode: outline
+# End:
+#
+# @(#) $Id: TODO,v 1.1 2001/06/03 11:56:56 dom Exp $
