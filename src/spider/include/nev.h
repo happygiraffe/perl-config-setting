@@ -5,7 +5,7 @@
  *
  * Copyright 2000 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: nev.h,v 1.1 2000/01/12 21:21:29 dom Exp $
+ * @(#) $Id: nev.h,v 1.2 2000/01/13 00:21:59 dom Exp $
  */
 
 #ifndef _NEV_H_
@@ -19,6 +19,8 @@ typedef void (*nev_cbfn)(int, void *); /* callback function */
 
 /* nev.c */
 
+/* nev_init: initialise an instance of the library. */
+int	nev_init(void *data);
 /* nev_listen: set up a listener, and a callback function for
  * connections accepted on that socket.  returns socket or -1. */
 int	nev_listen(char *addr, char *port,
