@@ -108,8 +108,8 @@ use Carp;
 use Config::Setting::IniParser;
 use Config::Setting::FileProvider;
 
-$VERSION = '0.01';
-$rcsid = '@(#) $Id: Setting.pm,v 1.2 2001/06/24 15:24:30 dom Exp $ ';
+$VERSION = '0.02';
+$rcsid = '@(#) $Id: Setting.pm,v 1.3 2001/06/24 15:25:06 dom Exp $ ';
 
 sub new {
         my ($proto) = @_;
