@@ -1,0 +1,6 @@
+s/should/banana/g
+s/have/lemon/g
+s/that/grapefruit/g
+s/<p>/<blockquote>/g
+s/<\/p>/<\/blockquote>/g
+s/ +$/!!!TRAILING WHITESPACE!!!/
