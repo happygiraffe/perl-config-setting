@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.13 2000/01/15 12:18:26 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.14 2000/01/15 12:19:10 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -541,7 +541,7 @@ find_module(char * name)
 
 	    retval = stat(abs_name, &st);
 	    /* fail if it doesn't have exec perms */
-	    if (retval == -1 ||	!(st.mode & (S_IXUSR|S_IXGRP|S_IXOTH)) )
+	    if (retval == -1 ||	!(st.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH)) )
 	    {
 		/* Module doesn't exist at this location */
 		free(abs_name);
