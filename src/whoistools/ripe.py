@@ -29,8 +29,8 @@
 Perform a ripe query.
 """
 
-__rcs_id__='$Id: ripe.py,v 1.6 2000/09/05 11:05:33 dom Exp $'
-__version__='$Revision: 1.6 $'[11:-2]
+__rcs_id__='$Id: ripe.py,v 1.7 2000/09/05 20:41:47 dom Exp $'
+__version__='$Revision: 1.7 $'[11:-2]
 
 import sys
 import string
@@ -161,3 +161,5 @@ if __name__ == '__main__':
             print
     except IndexError:
         print "usage: ripe query"
+
+# vim: ai et sw=4

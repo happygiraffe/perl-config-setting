@@ -8,8 +8,8 @@ Originally by Fredrik Lundh <effbot@telia.com>
 This probably needs fiddling with before it works...
 """
 
-__rcs_id__='$Id: asyncwhois.py,v 1.1 2000/09/05 11:03:05 dom Exp $'
-__version__='$Revision: 1.1 $'[11:-2] 
+__rcs_id__='$Id: asyncwhois.py,v 1.2 2000/09/05 20:41:47 dom Exp $'
+__version__='$Revision: 1.2 $'[11:-2] 
 
 import os
 import sys
@@ -102,3 +102,5 @@ for i in range(32):		# Try to keep 30 requests on the go.
 
 # loop returns when all requests have been processed
 asyncore.loop()
+
+# vim: ai et sw=4

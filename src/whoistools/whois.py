@@ -32,8 +32,8 @@ Server(domain)	- Return an appropriate whois server for a domain.
 Whois(domain, server=None)	- Return whois output for domain.
 """
 
-__rcs_id__='$Id: whois.py,v 1.5 2000/09/05 11:05:33 dom Exp $'
-__version__='$Revision: 1.5 $'[11:-2]
+__rcs_id__='$Id: whois.py,v 1.6 2000/09/05 20:41:47 dom Exp $'
+__version__='$Revision: 1.6 $'[11:-2]
 
 import os
 import sys
@@ -125,3 +125,5 @@ if __name__ == '__main__':
         pprint(WhoisList(name, dom))
     except IndexError:
 	print "usage: whoisserver.py name domain"
+
+# vim: ai et sw=4

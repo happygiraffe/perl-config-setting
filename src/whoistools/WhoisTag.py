@@ -29,8 +29,8 @@
 Implementation of <dtml-whois>.
 """
 
-__rcs_id__='$Id: WhoisTag.py,v 1.3 2000/09/05 20:40:56 dom Exp $'
-__version__='$Revision: 1.3 $'[11:-2]
+__rcs_id__='$Id: WhoisTag.py,v 1.4 2000/09/05 20:41:47 dom Exp $'
+__version__='$Revision: 1.4 $'[11:-2]
 
 from sys import stderr
 from DocumentTemplate.DT_Util import *
@@ -75,3 +75,5 @@ class WhoisTag:
     __call__ = render
 
 String.commands['whois'] = WhoisTag
+
+# vim: ai et sw=4

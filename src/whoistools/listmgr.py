@@ -39,8 +39,8 @@ from cStringIO import StringIO
 
 #-----------------------------------------------------------------------
 
-__rcs_id__='$Id: listmgr.py,v 1.2 2000/09/05 11:05:33 dom Exp $'
-__version__='$Revision: 1.2 $'[11:-2]
+__rcs_id__='$Id: listmgr.py,v 1.3 2000/09/05 20:41:47 dom Exp $'
+__version__='$Revision: 1.3 $'[11:-2]
 
 WHOISLISTURL = 'http://www.geektools.com/dist/whoislist.gz'
 
@@ -82,3 +82,5 @@ servers = {
 
 if __name__ == '__main__':
     main()
+
+# vim: ai et sw=4

@@ -31,3 +31,5 @@ Init the whois tag.
 
 # This is all that's needed!
 import WhoisTag
+
+# vim: ai et sw=4
