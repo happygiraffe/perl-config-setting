@@ -1,2 +1,2 @@
 #define MODULE_NAME "talker"
-#define CONFIG_FILE "/home/alex/project/modules/src/talker/talker_config"
+#define TALKER_CFFILE "/home/alex/project/modules/src/talker/talker_config"

@@ -39,7 +39,7 @@ void setreply(char *userid, char *tdc, char *human) {
 
 /*-| flush_cmd |------------------------------------------------------------*/
 
-void flush_cmd() {
+void flush_cmd(void) {
 	char buf[MAXCOMLEN+1];
 
 	while (strcmp(".\n", fgets(buf, MAXCOMLEN, stdin)) != 0);

@@ -1,4 +1,3 @@
-
 #define FIND_ONLY 1
 #define CREATE_ONLY 2
 #define FIND_OR_CREATE 3
@@ -26,4 +25,3 @@ typedef struct channel {
 	Userlist *ulist;
 	char topic[MAXTOPICLEN];
 } Channel;
-

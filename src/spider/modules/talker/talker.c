@@ -8,6 +8,7 @@
 #include "config.h"
 #include "talker.h"
 #include "replies.h"
+#include "protos.h"
 
 /* Externs */
 extern Reply reply;
@@ -211,8 +212,6 @@ int deluser(char *userid, int channel)
 int str2channel(char *sptr)
 {
 	int channel;
-	char *message;
-	char format[20];
 
 	/* Using atoi - which means we can't trap errors.. */
 	channel = atoi(sptr);
@@ -223,7 +222,7 @@ int str2channel(char *sptr)
 			with error messages.. */
 		
 		/* Cut off leading white space, as atoi does */
-		while (isspace(*sptr)) ++sptr;
+		while (isspace((int)*sptr)) ++sptr;
 		
 		if (*sptr != '0')
 			/* Aha, not a real 0, return error */
@@ -280,8 +279,6 @@ int bchan(Cmdline *cmdline)
 {
 	int channel;
 	char *message;
-	char *sptr;
-	char format[20];
 
 	/* Using atoi - which means we can't trap errors.. */
 	channel = str2channel(cmdline->param);
@@ -301,9 +298,9 @@ int bchan(Cmdline *cmdline)
 	message = cmdline->param; 		
   
 	/* Skip the leading white space */
-	while (isspace(*message)) ++message;
+	while (isspace((int)*message)) ++message;
 	/* Skip the digits */
-	while (isdigit(*message)) ++message;
+	while (isdigit((int)*message)) ++message;
 	/* Skip the obligitary space after the digit. */
 	if (*message != ' ') {
 		setreply(cmdline->userid, "500", H_BAD_PARAM); 
@@ -424,8 +421,8 @@ void startup_rooms()
 	char format[20];
 	int channel;
 	
-	if ((fp = fopen(CONFIG_FILE, "rt")) == NULL) {
-		logerr("startup_rooms: Can't read soft config file", CONFIG_FILE);
+	if ((fp = fopen(TALKER_CFFILE, "rt")) == NULL) {
+		logerr("startup_rooms: Can't read soft config file", TALKER_CFFILE);
 		return;
 	}
 	

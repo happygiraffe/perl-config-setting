@@ -136,7 +136,7 @@ main (void)
     {
       getcmd (buf);
       /* A command? */
-      if (!isdigit (buf[0]))
+      if (!isdigit ((int)buf[0]))
 	{
 	  if (parse (&cmdline, buf))
 	    /* We have something to reply to */

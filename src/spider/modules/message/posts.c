@@ -1,9 +1,13 @@
+#include <sys/types.h>
+
+#include <assert.h>
+#include <ctype.h>
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-#include <dirent.h>
-#include <ctype.h>
+#include <string.h>
 #include <unistd.h>
+
 #include "command.h"
 #include "config.h"
 #include "posts.h"
@@ -47,7 +51,7 @@ valid_msgid (char *msgid)
       return (0);
     }
   for (count = 0; (count < MSGIDLEN) && i; ++count)
-    if (!isdigit (msgid[count]))
+    if (!isdigit ((int)msgid[count]))
       i = 0;
   return (i);
 }
