@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: motd.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[]="@(#) $Id: motd.c,v 1.2 2000/01/12 21:21:47 dom Exp $";
 
 #include <sys/stat.h>
 #include <ctype.h>
@@ -138,7 +138,7 @@ read_motd(void)
 }
 
 /*
- * Local Variables:
+ * Local variables:
  * mode: C
  * c-file-style: "BSD"
  * comment-column: 32
