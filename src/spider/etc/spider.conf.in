@@ -8,7 +8,7 @@
 ######################################################################
 # There may be more than one of these.
 #
-Module_Dir !libexecdir!/spider
+Module_Dir !PKGLIBEXECDIR!
 
 ######################################################################
 # These must be executable to be recognised by Spider.
@@ -22,12 +22,12 @@ Module  message
 ######################################################################
 # Really, this should be in /var/run, to be normal.
 #
-PID_File        !pkgetcdir!/spider.pid
+PID_File        !PKGETCDIR!/spider.pid
 
 ######################################################################
 # This is the BBS passwd file.
 #
-User_File       !pkgetcdir!/users
+User_File       !PKGETCDIR!/users
 
 ######################################################################
 # This is the TCP socket that Spider will listen(2) on.
@@ -38,7 +38,7 @@ Port    4321
 # This is where the running modules will each have their current
 # working directories.
 #
-Spool_Dir       !libdir!/spider
+Spool_Dir       !PKGSPOOLDIR!
 
 ######################################################################
 # If uncommented, every single command by every user will be logged.
