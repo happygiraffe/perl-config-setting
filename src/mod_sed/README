@@ -75,4 +75,10 @@ There's bound to be a few, so please report them to
 dom+mod_sed@happygiraffe.net.  Don't forget to include anything that
 shows up in the error log.
 
-@(#) $Id: README,v 1.5 2001/06/14 07:49:11 dom Exp $
+				LICENSE
+
+This software uses a BSD style license.  There should be a copy in the
+LICENSE file in this archive.  It's originally based upon the version of
+sed that was contributed to 4.4BSD by Diomidis Spinellis.
+
+@(#) $Id: README,v 1.6 2001/06/14 09:24:48 dom Exp $
