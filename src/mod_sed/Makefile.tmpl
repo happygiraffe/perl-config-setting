@@ -1,23 +1,25 @@
 # This file is used when building mod_sed into apache.
 #
-# @(#) $Id: Makefile.tmpl,v 1.1 2001/06/15 07:20:51 dom Exp $
+# @(#) $Id: Makefile.tmpl,v 1.2 2001/06/15 07:24:18 dom Exp $
 
 SRCS=		mod_sed.c compile.c main.c misc.c process.c
 
-# Uncomment to use standalone.
+# Uncomment these bits to use standalone.  We have to use a slight
+# modification of the standard apache depend target.
+
 # INCDIR!=	apxs -q INCLUDEDIR
 # INCLUDES=	-I$(INCDIR)
 # OSDIR=		/usr/include
-
-depend:
-	cp Makefile.tmpl Makefile.tmpl.bak \
-	    && sed -ne '1,/^# DO NOT REMOVE/p' Makefile.tmpl > Makefile.new \
-	    && gcc -MM $(INCLUDES) $(CFLAGS) $(SRCS) >> Makefile.new \
-	    && sed -e '1,$$s: $(INCDIR)/: $$(INCDIR)/:g' \
-		   -e '1,$$s: $(OSDIR)/: $$(OSDIR)/:g' \
-		   -e '1,$$s: $(SRCS) : $$(SRCS) :g' Makefile.new \
-		> Makefile.tmpl \
-	    && rm Makefile.new
+#
+#depend:
+#	cp Makefile.tmpl Makefile.tmpl.bak \
+#	    && sed -ne '1,/^# DO NOT REMOVE/p' Makefile.tmpl > Makefile.new \
+#	    && gcc -MM $(INCLUDES) $(CFLAGS) $(SRCS) >> Makefile.new \
+#	    && sed -e '1,$$s: $(INCDIR)/: $$(INCDIR)/:g' \
+#		   -e '1,$$s: $(OSDIR)/: $$(OSDIR)/:g' \
+#		   -e '1,$$s: $(SRCS) : $$(SRCS) :g' Makefile.new \
+#		> Makefile.tmpl \
+#	    && rm Makefile.new
 
 #Dependencies
 
