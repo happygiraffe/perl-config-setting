@@ -109,6 +109,7 @@ use strict;
 use vars qw($rcsid $VERSION);
 
 use Carp;
+use Config::Setting::Chunk;
 
 $rcsid = '@(#) $Id$ ';
 $VERSION = (qw( $Revision$ ))[1];
@@ -150,6 +151,7 @@ sub _parse {
         my $section = "";
         my $cc = $self->{CommentChar};
         my $lineno = 1;
+        my $chunk = Config::Setting::Chunk->new;
 
         foreach my $line (split /\r?\n/, $string) {
                 $line =~ s/$cc.*//;
@@ -158,43 +160,16 @@ sub _parse {
 
                 if ($line =~ m/^\[(.*?)\]/) {
                         $section = $1;
-                        unless (exists $self->{Contents}{$section}) {
-                                $self->{Contents}{$section} = {};
-                                push @{ $self->{Sections} }, $section;
-                        }
+                        $chunk->add_section( $section );
                 } elsif ($line =~ m/^(.+?)\s*=\s*(.*)/) {
                         croak "line $lineno occurs outside a section"
                                 unless $section;
-                        $self->{Contents}{$section}{$1} = $2;
+                        $chunk->set_item( $section, $1, $2 );
                 } else {
                         carp "line $lineno is invalid: '$line'";
                 }
         }
-        return $self;
-}
-
-sub sections {
-        my $self = shift;
-        return @{ $self->{Sections} };
-}
-
-# I don't want to call this "keys"...  At the very least it messes up
-# Emacs' syntax highlighting.
-sub keylist {
-        my $self = shift;
-        my ($section) = @_;
-        croak "usage: IniParser->keylist(section)"
-                unless $section;
-        return keys %{ $self->{Contents}{$section} };
-}
-
-sub get {
-        my $self = shift;
-        my ($section, $key) = @_;
-        croak "usage: IniParser->get(section,key)"
-                unless $section && $key;
-
-        return $self->{Contents}{$section}{$key};
+        return $chunk;
 }
 
 1;

@@ -106,7 +106,7 @@ use strict;
 use vars qw($rcsid $VERSION);
 
 use Carp;
-
+use Config::Setting::Chunk;
 use XML::Parser;
 
 $rcsid = '@(#) $Id$ ';
@@ -155,7 +155,10 @@ sub parse_string {
 #---------------------------------------------------------------------
 
 {
-        my $me;                 # Copy of $self during parse.
+        my $chunk;                 # Copy of $self during parse.
+        my $CurSection;
+        my $CurItem;
+        my $CurVal;
 
         # Parse the stuff we hold.
         sub _parse {
@@ -168,18 +171,12 @@ sub parse_string {
                        );
                 $p->setHandlers(Char => \&Text);
 
-                $me = $self;
-                $me->{CurItem} = 0;
-                eval {
-                        $p->parse($string);
-                };
-                croak "$@" if $@;
+                $chunk = Config::Setting::Chunk->new;
+                $CurSection = $CurItem = $CurVal = "";
+                eval { $p->parse($string) };
+                croak $@ if $@;
 
-                delete $self->{CurSection};
-                delete $self->{CurItem};
-                delete $self->{CurText};
-
-                return $self;
+                return $chunk;
         }
 
         sub section {
@@ -187,12 +184,8 @@ sub parse_string {
                 my $section = $attrs{name};
                 croak "no section name specified!"
                         unless $section;
-                unless (exists $me->{Contents}{$section}) {
-                        $me->{Contents}{$section} = {};
-                        push @{ $me->{Sections} }, $section;
-                }
-                $me->{CurSection} = $section;
-#                warn ">> <section name='$section'>\n";
+                $CurSection = $section;
+                $chunk->add_section( $section );
         }
 
         sub item {
@@ -200,56 +193,22 @@ sub parse_string {
                 my $key = $attrs{name};
                 croak "no item name specified!"
                         unless $key;
-                $me->{CurItem} = $key;
-                my $section = $me->{CurSection};
-                $me->{Contents}{$section}{$key} = "";
-#                warn ">> <item name='$key'>\n";
+                $CurItem = $key;
         }
 
         sub Text {
                 my ($expat, $val) = @_;
-                return unless $me->{CurItem};
-                my $section = $me->{CurSection};
-                my $key = $me->{CurItem};
-                $me->{Contents}{$section}{$key} .= $val;
-#                warn ">> Text($val)\n";
+                return unless $CurItem;
+                $CurVal .= $val;
         }
 
         sub item_ {
                 my ($expat, $tag) = @_;
-                my $section = $me->{CurSection};
-                my $key = $me->{CurItem};
                 # Trim whitespace.
-                $me->{Contents}{$section}{$key} =~ s/^\s*(.*)\s*$/$1/;
-#                warn ">> </item>\n";
-                $me->{CurItem} = 0;
+                $CurVal =~ s/^\s*(.*)\s*$/$1/;
+                $chunk->set_item( $CurSection, $CurItem, $CurVal );
+                $CurItem = $CurVal = "";
         }
-}
-
-#---------------------------------------------------------------------
-
-sub sections {
-        my $self = shift;
-        return @{ $self->{Sections} };
-}
-
-# I don't want to call this "keys"...  At the very least it messes up
-# Emacs' syntax highlighting.
-sub keylist {
-        my $self = shift;
-        my ($section) = @_;
-        croak "usage: XMLParser->keylist(section)"
-                unless $section;
-        return keys %{ $self->{Contents}{$section} };
-}
-
-sub get {
-        my $self = shift;
-        my ($section, $key) = @_;
-        croak "usage: XMLParser->get(section,key)"
-                unless $section && $key;
-
-        return $self->{Contents}{$section}{$key};
 }
 
 1;

@@ -156,8 +156,7 @@ sub _init {
         my @configs;
         foreach my $s (@txts) {
                 my $p = $self->parser();
-                $p->parse_string($s);
-                push @configs, $p;
+                push @configs, $p->parse_string( $s );
         }
 
         return $self->_merge(@configs);
@@ -177,8 +176,8 @@ sub _merge {
                                 $cf{$s} = {};
                                 push @sections, $s;
                         }
-                        foreach my $k ($c->keylist($s)) {
-                                $cf{$s}{$k} = $c->get($s, $k);
+                        foreach my $k ($c->section_keys($s)) {
+                                $cf{$s}{$k} = $c->get_item($s, $k);
                         }
                 }
         }
