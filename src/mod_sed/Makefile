@@ -1,7 +1,7 @@
 #
 # build mod_sed using apxs.
 #
-# @(#) $Id: Makefile,v 1.6 2001/06/15 11:39:02 dom Exp $
+# @(#) $Id: Makefile,v 1.7 2001/06/22 21:46:04 dom Exp $
 #
 
 #---------------------------------------------------------------------
@@ -24,7 +24,7 @@ SRCS=		mod_sed.c compile.c main.c misc.c process.c $(FGETLN)
 OBJS=		$(SRCS:.c=.o)
 HDRS=		extern.h defs.h
 
-VERSION=	0.1
+VERSION=	0.2
 NAME=		mod_sed
 DISTNAME=	$(NAME)-$(VERSION)
 
