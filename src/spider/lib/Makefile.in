@@ -38,7 +38,7 @@ pkgspooldir = $(libdir)/spider
 
 #-----------------------------------------------------------------------
 
-OBJECTS	= ds.o utils.o io.o mod.o
+OBJECTS	= mod_ds.o mod_utils.o mod_io.o mod_mod.o
 
 INSTFILES =			\
 	$(includedir)/mod.h	\
@@ -66,11 +66,11 @@ $(OBJECTS): $(top_srcdir)/lib/mod.h ../config.h
 
 # Explicit dependencies listed for the benefit of Solaris make.
 
-ds.o: ds.c
+mod_ds.o: mod_ds.c
 
-utils.o: utils.c
+mod_utils.o: mod_utils.c
 
-io.o: io.c
+mod_io.o: mod_io.c
 
 mod.o: mod.c
 
