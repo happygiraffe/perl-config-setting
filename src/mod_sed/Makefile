@@ -1,10 +1,17 @@
 #
 # build mod_sed using apxs.
 #
-# @(#) $Id: Makefile,v 1.2 2001/06/14 07:06:12 dom Exp $
+# @(#) $Id: Makefile,v 1.3 2001/06/14 07:12:49 dom Exp $
 #
 
+#---------------------------------------------------------------------
+# User configurabl parts here.
+
 APXS=		/usr/local/sbin/apxs
+
+# End of user configurable parts.
+#---------------------------------------------------------------------
+
 DSO=		$(NAME).so
 #APXSFLAGS= 	-S CFLAGS="-funsigned-char -g -pipe -march=pentiumpro"
 
