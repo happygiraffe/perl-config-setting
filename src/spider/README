@@ -36,8 +36,12 @@
 
 	.../bin			binaries client.
 	.../etc/spider		configuration files.
+	.../include/ds.h	header for libds.a.
 	.../include/mod.h	header for libmod.a.
+	.../include/nev.h	header for libnev.a.
+	.../lib/libds.a		library for data structures.
 	.../lib/libmod.a	library for modules.
+	.../lib/libnev.a	library for network events.
 	.../lib/spider/		spool directory for spider.
 	.../libexec/spider	binary modules.
 	.../man			manual pages.
@@ -55,4 +59,4 @@
 	It is reccomended that you get a better client, such as
 	tkspider.
 
-@(#) $Id: README,v 1.5 2000/01/16 13:00:17 dom Exp $
+@(#) $Id: README,v 1.6 2000/01/16 13:01:26 dom Exp $
