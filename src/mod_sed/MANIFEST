@@ -11,6 +11,7 @@ eg/sedscr
 eg/index.html
 eg/sedscr.foo
 extern.h
+fgetln.c
 main.c
 misc.c
 mod_sed.c
