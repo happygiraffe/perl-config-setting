@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.4 1999/03/22 23:37:14 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.5 1999/04/14 22:14:38 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <stdio.h>
@@ -116,6 +116,58 @@ get_line(FILE * fp)
         free(c);
     }
     return input;
+}
+
+/*********************************************************************
+ * input_data
+ *
+ * Pulls in whatever comes next from an fd.  Stores it in the
+ * connection's buffer.  This may block.  Only call if we are sure
+ * that Connection's fd is readable.
+ */
+Bool
+input_data(Connp c)
+{
+    Bool	ok;
+    char *	cp;
+    ssize_t	bytes;
+
+    /* If we don't already have a buffer, create one. */
+    if (c->buf == NULL) {
+	c->buf = malloc(LARGE_BUF);
+	if (c->buf == NULL) {
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+                   __FILE__);
+            exit(1);
+        }
+	c->buflen = LARGE_BUF;
+	c->bufhwm = 0;
+    }
+
+    /* Check that we actually have some buffer left... */
+    if (c->bufhwm == (c->buf + c->buflen)) {
+	cp = realloc (c->buf, c->buflen + LARGE_BUF);
+	if (cp == NULL){
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+                   __FILE__);
+            exit(1);
+        }
+	c->buf = cp;
+    }
+    
+    /* Read into however many bytes we have left in our buffer */
+    bytes = read(c->fd, (void *)(c->bufhwm),
+		 (size_t)((c->buf+c->buflen)-c->bufhwm));
+
+    /* Update the connection if successful */
+    if (bytes < 0) {
+	ok = false;
+    } else {
+	ok = true;
+	c->bufhwm += bytes	    
+    }
+
+    return ok;
 }
 
 /*********************************************************************

@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.3 1999/03/28 01:24:01 dom Exp $
+ * @(#) $Id: spider.h,v 1.4 1999/04/14 22:14:38 dom Exp $
  */
 
 #ifndef _SPIDER_H_
@@ -115,6 +115,10 @@ typedef struct conn_struct {
     char * 	name;
     Conntype 	type;		/* Type of connection */
     Connstate	state;		/* State of connection */
+    int		fd;		/* file descriptor */
+    char *	buf;		/* data waiting to be output */
+    int		buflen;		/* length of buffer */
+    char *	bufhwm;		/* end of buffer */
     union {
 	struct {
 	    pid_t pid;		/* Pid of module */
@@ -247,6 +251,7 @@ void 	write_pid_file(void);
 /* io.c */
 void	put_mesg(FILE *fp, char **msg);
 char **	get_mesg(FILE *fp);
+Bool	input_data(Connp c);
 char *	get_line(FILE * fp);
 
 /* net.c */
