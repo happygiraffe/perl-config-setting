@@ -3,7 +3,7 @@
  *
  * Copyright 2000 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: ds.h,v 1.1 2000/01/05 08:08:52 dom Exp $
+ * @(#) $Id: ds.h,v 1.1 2000/01/06 21:55:55 dom Exp $
  */
 
 #ifndef _DS_H_
