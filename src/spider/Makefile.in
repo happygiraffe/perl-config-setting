@@ -3,7 +3,7 @@
 # instead.  Some make programs appear to have problems with my use of
 # VPATHs.
 #
-# @(#) $Id: Makefile.in,v 1.3 2000/01/06 21:36:58 dom Exp $
+# @(#) $Id: Makefile.in,v 1.4 2000/01/08 23:05:34 dom Exp $
 #
 
 #-----------------------------------------------------------------------
@@ -264,6 +264,8 @@ LIBDS_OBJS	=				\
 	lib/ds/ds.o
 LIBDS_SRCS	= $(LIBDS_OBJS:.o=.c)
 
+$(LIBDS_OBJS): include/ds.h
+
 lib/ds/libds.a: $(LIBDS_OBJS)
 	$(RM) $@
 	$(AR) rcv $@ $(LIBDS_OBJS)
@@ -278,6 +280,9 @@ LIBMOD_OBJS	=				\
 	lib/mod/mod_io.o			\
 	lib/mod/mod_utils.o
 LIBMOD_SRCS	= $(LIBMOD_OBJS:.o=.c)
+LIBMOD_INCLUDES	= include/codes.h include/mod.h
+
+$(LIBMOD_OBJS): include/mod.h include/codes.h
 
 lib/mod/libmod.a: $(LIBMOD_OBJS)
 	$(RM) $@
@@ -300,6 +305,8 @@ SPIDER_OBJS	=				\
 	src/term.o				\
 	src/utils.o
 SPIDER_SRCS	= $(SPIDER_OBJS:.o=.c)
+
+$(SPIDER_OBJS): include/spider.h include/codes.h
 
 src/spider: $(SPIDER_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SPIDER_OBJS) $(LIBS)
@@ -344,6 +351,8 @@ MOTD_OBJS	=				\
 	modules/motd/motd.o
 MOTD_SRCS	= $(MOTD_OBJS:.o=.c)
 
+$(MOTD_OBJS): $(LIBMOD_INCLUDES)
+
 modules/motd/motd: $(MOTD_OBJS) lib/mod/libmod.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -Llib/mod -o $@ $(MOTD_OBJS) $(LIBS) -lmod
 
@@ -353,6 +362,8 @@ modules/motd/motd: $(MOTD_OBJS) lib/mod/libmod.a
 PAGE_OBJS	= 				\
 	modules/page/page.o
 PAGE_SRCS	= $(PAGE_OBJS:.o=.c)
+
+$(PAGE_OBJS): $(LIBMOD_INCLUDES)
 
 modules/page/page: $(PAGE_OBJS) lib/mod/libmod.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -Llib/mod -o $@ $(PAGE_OBJS) $(LIBS) -lmod
@@ -379,6 +390,8 @@ modules/talker/talker: $(TALKER_OBJS)
 TEST_OBJS	=				\
 	modules/test/test.o
 TEST_SRCS	= $(TEST_OBJS:.o=.c)
+
+$(TEST_OBJS): $(LIBMOD_INCLUDES)
 
 modules/test/test: $(TEST_OBJS) lib/mod/libmod.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -Llib/mod -o $@ $(TEST_OBJS) $(LIBS) -lmod
