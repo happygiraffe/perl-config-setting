@@ -16,7 +16,7 @@ provides:
     version: 552
   Config::Setting::FileProvider:
     file: lib/Config/Setting/FileProvider.pm
-    version: 552
+    version: 555
   Config::Setting::IniParser:
     file: lib/Config/Setting/IniParser.pm
     version: 552
