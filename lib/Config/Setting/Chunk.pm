@@ -171,8 +171,7 @@ sub to_string {
         my $str  = '';
         foreach my $sect ( $self->sections ) {
                 $str .= "[$sect]\n";
-                foreach my $key ( sort keys %{ $self->{ Sections }{ $sect } } )
-                {
+                foreach my $key ( $self->section_keys( $sect ) ) {
                         $str .= $key . '=' . $self->get_item( $sect, $key );
                         $str .= "\n";
                 }
