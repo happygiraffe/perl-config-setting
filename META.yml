@@ -13,14 +13,14 @@ provides:
     version: 0.03
   Config::Setting::Chunk:
     file: lib/Config/Setting/Chunk.pm
-    version: 537
+    version: 542
   Config::Setting::FileProvider:
     file: lib/Config/Setting/FileProvider.pm
     version: 534
   Config::Setting::IniParser:
     file: lib/Config/Setting/IniParser.pm
-    version: 533
+    version: 543
   Config::Setting::XMLParser:
     file: lib/Config/Setting/XMLParser.pm
-    version: 533
+    version: 543
 generated_by: Module::Build version 0.2608
