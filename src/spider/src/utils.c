@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: utils.c,v 1.4 2000/01/06 22:02:07 dom Exp $";
+static const char rcsid[]="@(#) $Id: utils.c,v 1.5 2000/01/06 23:37:17 dom Exp $";
 
 #include <config.h>
 #include <ctype.h>
@@ -449,7 +449,8 @@ cmp_token(char * buf, int n, char * s)
 /*********************************************************************
  * debug_log
  *
- * Log a message if in debugging mode.
+ * Log a message if in debugging mode.  Log to syslog if we've
+ * daemonised, else send to stderr.
  */
 void
 debug_log(char *msg, ...)
@@ -458,7 +459,12 @@ debug_log(char *msg, ...)
 
     if (debug) {
 	va_start (args, msg);
-	(void)vsyslog (LOG_DEBUG, msg, args);
+	if (am_daemon) {
+	    (void)vsyslog (LOG_DEBUG, msg, args);
+	} else {
+	    vfprintf(stderr, msg, args);
+	    fprintf(stderr, "\n");
+	}
 	va_end (args);
     }
 }

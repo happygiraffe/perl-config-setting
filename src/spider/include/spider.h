@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.1 2000/01/06 21:55:39 dom Exp $
+ * @(#) $Id: spider.h,v 1.2 2000/01/06 23:37:15 dom Exp $
  */
 
 #ifndef _SPIDER_H_
@@ -175,6 +175,7 @@ extern int	caught_sig;
 /* init.c */
 extern char *	conf_file;
 extern Bool	want_to_fork;
+extern Bool	am_daemon;
 extern char * 	pid_file;
 extern char * 	user_file;
 extern char **  module_path;
@@ -237,6 +238,7 @@ void	Usr_visit(void (*func)(void *));
 void 	spider_init(void);
 void 	go_daemon(void);
 void 	ck_config(void);
+void	set_facility(char *);
 void 	parse_cfg_file(void);
 void	init_data(void);
 void	init_internal_cmds(void);

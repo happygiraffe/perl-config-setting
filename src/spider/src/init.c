@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.8 2000/01/06 22:10:44 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.9 2000/01/06 23:37:17 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -52,6 +52,7 @@ static const char rcsid[]="@(#) $Id: init.c,v 1.8 2000/01/06 22:10:44 dom Exp $"
 /* Globals */
 char *	conf_file;		/* config file name */
 Bool	want_to_fork;
+Bool	am_daemon = false;	/* true when we've forked */
 char *  pid_file;       
 char *  user_file;      
 char ** module_path;  
@@ -60,6 +61,7 @@ int	maxfd;
 unsigned short	port;
 char *	spool_dir;
 Bool	log_all_cmds = false;   /* default value */
+int	facility = LOG_LOCAL0;
 
 /*********************************************************************
  * spider_init()
@@ -71,18 +73,18 @@ Bool	log_all_cmds = false;   /* default value */
 void
 spider_init(void)
 {
+    /* Parse the config_file into the global variables */
+    parse_cfg_file();
+
     if (want_to_fork)
     {
 	go_daemon();		/* put ourselves into the background */
     }
 
     /* Now, we must open a syslog connection, as we are blind & dumb */
-    openlog(basename(fullname), LOG_NDELAY, SPIDER_FACIL);
+    openlog(basename(fullname), LOG_NDELAY, facility);
     syslog(LOG_INFO, "Starting");
 
-    /* Now, parse the config_file into the global variables and take
-       action based on them. */
-    parse_cfg_file();
     if(chdir(spool_dir) < 0) {
         syslog(LOG_ERR, "Couldn't change to %s: %m", spool_dir);
         exit(1);
@@ -156,6 +158,8 @@ go_daemon(void)
     for  (i = 0; i < maxfd; ++i) {
 	close(i);
     }
+
+    am_daemon = true;
 }
 
 /*********************************************************************
@@ -189,6 +193,73 @@ ck_config(void)
 	exit(1);
     }
 }
+
+/*********************************************************************
+ * set_facility
+ *
+ * Set the syslog facility from a string.
+ */
+void
+set_facility(char *fac)
+{
+    /* Don't use LOG_KERN. */
+
+#ifdef LOG_USER
+    if (strcmp(fac, "user") == 0) facility = LOG_USER;
+#endif /* LOG_USER */
+#ifdef LOG_MAIL
+    if (strcmp(fac, "mail") == 0) facility = LOG_MAIL;
+#endif /* LOG_MAIL */
+#ifdef LOG_DAEMON
+    if (strcmp(fac, "daemon") == 0) facility = LOG_DAEMON;
+#endif /* LOG_DAEMON */
+#ifdef LOG_AUTH
+    if (strcmp(fac, "auth") == 0) facility = LOG_AUTH;
+#endif /* LOG_AUTH */
+#ifdef LOG_LPR
+    if (strcmp(fac, "lpr") == 0) facility = LOG_LPR;
+#endif /* LOG_LPR */
+#ifdef LOG_NEWS
+    if (strcmp(fac, "news") == 0) facility = LOG_NEWS;
+#endif /* LOG_NEWS */
+#ifdef LOG_UUCP
+    if (strcmp(fac, "uucp") == 0) facility = LOG_UUCP;
+#endif /* LOG_UUCP */
+#ifdef LOG_CRON
+    if (strcmp(fac, "cron") == 0) facility = LOG_CRON;
+#endif /* LOG_CRON */
+#ifdef LOG_FTP
+    if (strcmp(fac, "ftp") == 0) facility = LOG_FTP;
+#endif /* LOG_FTP */
+#ifdef LOG_NTP
+    if (strcmp(fac, "ntp") == 0) facility = LOG_NTP;
+#endif /* LOG_NTP */
+#ifdef LOG_LOCAL0
+    if (strcmp(fac, "local0") == 0) facility = LOG_LOCAL0;
+#endif /* LOG_LOCAL0 */
+#ifdef LOG_LOCAL1
+    if (strcmp(fac, "local1") == 0) facility = LOG_LOCAL1;
+#endif /* LOG_LOCAL1 */
+#ifdef LOG_LOCAL2
+    if (strcmp(fac, "local2") == 0) facility = LOG_LOCAL2;
+#endif /* LOG_LOCAL2 */
+#ifdef LOG_LOCAL3
+    if (strcmp(fac, "local3") == 0) facility = LOG_LOCAL3;
+#endif /* LOG_LOCAL3 */
+#ifdef LOG_LOCAL4
+    if (strcmp(fac, "local4") == 0) facility = LOG_LOCAL4;
+#endif /* LOG_LOCAL4 */
+#ifdef LOG_LOCAL5
+    if (strcmp(fac, "local5") == 0) facility = LOG_LOCAL5;
+#endif /* LOG_LOCAL5 */
+#ifdef LOG_LOCAL6
+    if (strcmp(fac, "local6") == 0) facility = LOG_LOCAL6;
+#endif /* LOG_LOCAL6 */
+#ifdef LOG_LOCAL7
+    if (strcmp(fac, "local7") == 0) facility = LOG_LOCAL7;
+#endif /* LOG_LOCAL7 */
+}
+
 
 /*********************************************************************
  * parse_cfg_file
@@ -244,49 +315,38 @@ parse_cfg_file(void)
 
 	/* Please excuse the horrid indentation. */
 
-	/* MODULE_PATH: */
 	if (cmp_token(buf, 0, "Module_Dir") == true) {
 	    name = copy_token(buf, 1);
 	    debug_log("Module_Dir %s", name);
 	    module_path = arr_add(module_path, name);
-	} else 
-	/* MODULE: */
-	if (cmp_token(buf, 0, "Module") == true) {
+	} else if (cmp_token(buf, 0, "Module") == true) {
 	    name = copy_token(buf, 1);
 	    debug_log("Module %s", name);
 	    modules = arr_add(modules, name);
-	} else 
-	/* PID_FILE: */
-	if (cmp_token(buf, 0, "Pid_File") == true) {
+	} else if (cmp_token(buf, 0, "Pid_File") == true) {
 	    name = copy_token(buf, 1);
 	    debug_log("Pid_File %s", name);
 	    pid_file = name;
-	} else 
-	/* USER_FILE: */
-	if (cmp_token(buf, 0, "User_File") == true) {
+	} else if (cmp_token(buf, 0, "User_File") == true) {
 	    name = copy_token(buf, 1);
 	    debug_log("User_File %s", name);
 	    user_file = name;
-	} else
-	/* PORT: */
-        if (cmp_token(buf, 0, "Port") == true) {
+	} else if (cmp_token(buf, 0, "Port") == true) {
 	    name = find_token(buf, 1);
 	    debug_log("Port %s", name);
 	    port = atoi(name);
-	} else
-	/* SPOOL_DIR: */
-        if(cmp_token(buf, 0, "Spool_Dir") == true) {
+	} else if (cmp_token(buf, 0, "Spool_Dir") == true) {
 	    name = copy_token(buf, 1);
 	    debug_log("Spool_Dir %s", name);
 	    spool_dir = name;
-	} else
-	/* LOG_ALL_CMDS: */
-        if(cmp_token(buf, 0, "Log_All_Cmds") == true) {
+	} else if (cmp_token(buf, 0, "Log_All_Cmds") == true) {
 	    debug_log("Log_All_Cmds");
 	    log_all_cmds = true;
-	} else
-	/* ERROR */
-	{
+	} else if (cmp_token(buf, 0, "Facility") == true) {
+	    name = find_token(buf, 1);
+	    debug_log("Facility %s", name);
+	    set_facility(name);
+	} else {
             keyw = copy_token(buf, 0);
 	    syslog(LOG_WARNING, "Unknown keyword \"%s\" on line %d", 
                    keyw, lineno);

@@ -44,3 +44,9 @@ Spool_Dir       !PKGSPOOLDIR!
 # If uncommented, every single command by every user will be logged.
 #
 # Log_All_Cmds
+
+######################################################################
+# You can change where the syslog messages go.  Defaults to local0.
+# For a full list of facilities, look in syslog(3).
+#
+Facility daemon
