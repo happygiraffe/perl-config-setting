@@ -17,7 +17,7 @@
 	% env CC=gcc CFLAGS="-O2 -pipe" ./configure --prefix=/opt/spider
 
 	Also note that the source code can be built for several
-	architectures simultaneously, bu specifying a path to
+	architectures simultaneously, by specifying a path to
 	configure.  For example, here's what I use for testing.
 
 	% tar xvzf spider-1.0.2.tar.gz
@@ -55,4 +55,4 @@
 	It is reccomended that you get a better client, such as
 	tkspider.
 
-@(#) $Id: README,v 1.4 2000/01/06 21:29:00 dom Exp $
+@(#) $Id: README,v 1.5 2000/01/16 13:00:17 dom Exp $
