@@ -1,5 +1,8 @@
 Revision history for Perl extension Config::Setting.
 
+0.03  Mon Feb 21 12:27:52 GMT 2005
+	- Switch to Module::Build and subversion.
+
 0.02  Mon Feb  4 08:37:44 GMT 2002
 	- Move to Test::Simple.
 	- Make some methods private.
