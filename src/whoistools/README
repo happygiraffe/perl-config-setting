@@ -1,61 +1,68 @@
 Whois Tools For Python & Zope
------------------------------
 
-These set of tools allow one to query whois servers for information
-easily from with python and Zope.  To get started, you'll need to
-download a list of whois servers from the internet.  To do so, run
-this command:
+What are they?
 
-% python listmgr.py
+  These set of tools allow one to query whois servers for information
+  easily from with python and Zope.  To get started, you'll need to
+  download a list of whois servers from the internet.  To do so, run
+  this command::
 
-That will create the whoislist.py file that the main library needs.
+    % python listmgr.py
 
-To use the library from within python:
+  That will create the whoislist.py file that the main library needs.
 
->>> import whois
->>> print whois.Whois("python.org")
-...
-Yadda, yadda.
-...
->>> print whois.Server("python.org")
-whois.crsnic.net
+  To use the library from within python::
 
-It's pretty easy.  There's also a whois.Whoislist function for
-returning the output as a list of strings instead.  Read the source
-for the full details.
+    >>> import whois
+    >>> print whois.Whois("python.org")
+    ...
+    Yadda, yadda.
+    ...
+    >>> print whois.Server("python.org")
+    whois.crsnic.net
 
-To use this from within Zope, install a link to this directory from
-within your ~zope/lib/python/Products directory and restart Zope.  You
-will then find a <dtml-whois> tag available.  You can say either:
+  It's pretty easy.  There's also a whois.Whoislist function for
+  returning the output as a list of strings instead.  Read the source
+  for the full details.
+
+  To use this from within Zope, install a link to this directory from
+  within your ~zope/lib/python/Products directory and restart Zope.  You
+  will then find a <dtml-whois> tag available.  You can say either::
 
     <dtml-whois mylookupstring>
 
-Which will attempt to look up the contents of mylookupstring on the
-default server, or you can say:
+  Which will attempt to look up the contents of mylookupstring on the
+  default server, or you can say::
 
     <dtml-whois mylookupstring server="whois.ripe.net">
 
-which will attempt to use the whois.ripe.net server instead.
+  which will attempt to use the whois.ripe.net server instead.
 
-Beware that adding whois lookups like this to your pages can
-significantly slow down the rendering of your page.  If possible, set
-up a local whois mirror (this is possible in the case of the RIPE
-database).
+  Beware that adding whois lookups like this to your pages can
+  significantly slow down the rendering of your page.  If possible, set
+  up a local whois mirror (this is possible in the case of the RIPE
+  database).
 
-There a couple of files in here, which are not part of the package,
-just experiments I have been working upon.  There is asyncwhois.py,
-from a posting by the eff-bot and ripe.py for working with the
-RIPE.net database.
+  There a couple of files in here, which are not part of the package,
+  just experiments I have been working upon.  There is asyncwhois.py,
+  from a posting by the eff-bot and ripe.py for working with the
+  RIPE.net database.
 
 TODO:
 
-* Add a "resolve" option to the Whois function, so that it can cope
-  with the multiple whois servers that we now have for .com/.net/.org.
-* Complete the ripe.py tools for working with the RIPE database.
-* Make asynchwhois.py integrate with the other tools a bit better and
-  more functional as a standalone whois query tool.
+  * Add a "resolve" option to the Whois function, so that it can cope
+    with the multiple whois servers that we now have for .com/.net/.org.
 
-Any bugs, comments, etc. to Dominic Mitchell <dom@happygiraffe.net>,
-please.
+  * Complete the ripe.py tools for working with the RIPE database.
 
-@(#) $Id: README,v 1.1 2000/09/05 11:18:38 dom Exp $
+  * Make asynchwhois.py integrate with the other tools a bit better and
+    more functional as a standalone whois query tool.
+
+Finally
+
+  This software is alpha!  You have been warned.
+
+  Any bugs, comments, etc. to Dominic Mitchell <dom@happygiraffe.net>,
+  please.
+
+  @(#) $Id: README,v 1.2 2000/09/05 11:29:26 dom Exp $
