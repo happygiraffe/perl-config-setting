@@ -7,15 +7,7 @@
 # 
 
 #
-# $Header: /home/ncvs/src/tkclient/init.tcl,v 1.1 1997/02/13 17:04:56 dom Exp $
-#
-# $Log: init.tcl,v $
-# Revision 1.1  1997/02/13 17:04:56  dom
-# Initial revision
-#
-# Revision 1.0  1996/05/14 08:44:29  dom
-# Initial revision
-#
+# $Header: /home/ncvs/src/tkclient/init.tcl,v 1.2 1997/02/13 17:08:45 dom Exp $
 #
 
 ###

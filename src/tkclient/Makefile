@@ -2,6 +2,8 @@
 #
 # Makefile to install TkClient 1.0
 #
+# $Header: /home/ncvs/src/tkclient/Makefile,v 1.2 1997/02/13 17:08:43 dom Exp $
+#
 
 VERSION = 1.0
 

@@ -8,15 +8,7 @@
 # 
 
 #
-# $Header: /home/ncvs/src/tkclient/messages.tcl,v 1.1 1997/02/13 17:04:56 dom Exp $
-#
-# $Log: messages.tcl,v $
-# Revision 1.1  1997/02/13 17:04:56  dom
-# Initial revision
-#
-# Revision 1.0  1996/05/14 08:44:12  dom
-# Initial revision
-#
+# $Header: /home/ncvs/src/tkclient/messages.tcl,v 1.2 1997/02/13 17:08:46 dom Exp $
 #
 
 ######################################################################
