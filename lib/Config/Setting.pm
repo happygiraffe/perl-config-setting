@@ -109,6 +109,10 @@ variables.
 It would be useful to know where each setting derived from, in order to
 help debugging.
 
+Correspondingly a list of mandatory parameters would be a handy thing
+for an application specific class to declare.  If they're not specified,
+we should die as soon as the parse is done.
+
 =head1 AUTHOR
 
 Dominic Mitchell, E<lt>cpan@happygiraffe.netE<gt>
