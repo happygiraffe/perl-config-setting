@@ -8,25 +8,21 @@ use strict;
 use Test::More tests => 6;
 
 # Override the default file layout, by sub classing.
-package TestSetting;
+{
+        package TestSetting;
 
-use strict;
-use vars qw(@ISA);
+        use Config::Setting::FileProvider;
 
-use Config::Setting;
-use Config::Setting::FileProvider;
+        use base qw( Config::Setting );
 
-@ISA = qw( Config::Setting );
-
-sub provider {
-        my $self = shift;
-        return Config::Setting::FileProvider->new(
-               Env   => "TEST_SETTINGS_INI",
-               Paths => [ "t/test.ini" ],
-              );
+        sub provider {
+                my $self = shift;
+                return Config::Setting::FileProvider->new(
+                        Env   => "TEST_SETTINGS_INI",
+                        Paths => [ "t/test.ini" ],
+                );
+        }
 }
-
-package main;
 
 # Test 1: Can we subclass ok?
 my $stg = TestSetting->new;

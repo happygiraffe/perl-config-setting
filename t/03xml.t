@@ -8,31 +8,27 @@ use strict;
 use Test::More tests => 6;
 
 # Override the default file layout, by sub classing.
-package TestSetting;
+{
+        package TestSetting;
 
-use strict;
-use vars qw(@ISA);
+        use Config::Setting::FileProvider;
+        use Config::Setting::XMLParser;
 
-use Config::Setting;
-use Config::Setting::FileProvider;
-use Config::Setting::XMLParser;
+        use base qw(Config::Setting);
 
-@ISA = qw(Config::Setting);
+        sub provider {
+                my $self = shift;
+                return Config::Setting::FileProvider->new(
+                        Env   => "TEST_SETTINGS_XML",
+                        Paths => [ "t/test.xml" ],
+                );
+        }
 
-sub provider {
-        my $self = shift;
-        return Config::Setting::FileProvider->new(
-               Env   => "TEST_SETTINGS_XML",
-               Paths => [ "t/test.xml" ],
-              );
+        sub parser {
+                my $self = shift;
+                return Config::Setting::XMLParser->new( @_ );
+        }
 }
-
-sub parser {
-        my $self = shift;
-        return Config::Setting::XMLParser->new( @_ );
-}
-
-package main;
 
 # Test 1: Can we subclass ok?
 my $stg = TestSetting->new;
