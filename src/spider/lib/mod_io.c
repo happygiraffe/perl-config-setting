@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[] = "@(#) $Id: io.c,v 1.2 1999/03/18 23:37:36 dom Exp $";
+static const char rcsid[] = "@(#) $Id: mod_io.c,v 1.1 1999/03/22 07:59:06 dom Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>

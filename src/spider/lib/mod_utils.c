@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: utils.c,v 1.2 1999/03/18 23:37:37 dom Exp $";
+static const char rcsid[]="@(#) $Id: mod_utils.c,v 1.1 1999/03/22 07:59:23 dom Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>
