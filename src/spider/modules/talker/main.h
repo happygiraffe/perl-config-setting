@@ -1,1 +1,0 @@
-#define TEMPDIR "/tmp"
