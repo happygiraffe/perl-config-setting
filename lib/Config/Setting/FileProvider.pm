@@ -68,6 +68,10 @@ A list of file paths to be used, in order, for settings files.
 In both Env and Paths, you may use the tilde-notation ("~") to specify
 home directories.
 
+Any files specified in Paths will also have an identical file searched
+for but with the hostname specified.  This should make per-host
+customization simpler.
+
 Any Env settings files will be looked at I<after> any Paths settings
 files.
 
@@ -75,7 +79,7 @@ It is reccomended that you specify both parameters in the constructor.
 
 =item provide ( )
 
-Return a list containing file contents.
+Return a list of file contents, one per file read.
 
 =back
 
