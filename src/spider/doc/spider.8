@@ -1,4 +1,4 @@
-.\" @(#) $Id: spider.8,v 1.1 2000/01/05 07:45:57 dom Exp $
+.\" @(#) $Id: spider.8,v 1.2 2000/01/06 08:07:36 dom Exp $
 .TH spider 1 "4 Jan 2000" "Local Software"
 .SH NAME
 spider \- bbs software
@@ -15,14 +15,14 @@ spider \- bbs software
 .B spider
 is the central daemon portion of the Spider BBS.  Normally, when
 executed, it looks for a configuration file in
-.IR .../etc/spider/spider.conf .
+.IR !CONFIG! .
 Also, spider will put itself into the background.
 .LP
 When started,
 .B spider
 will change into the spool directory specified in the configuration
 file.  This defaults to 
-.IR .../lib/spider .
+.IR !PKGSPOOLDIR! .
 .SH OPTIONS
 .LP
 There are several options available.
