@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.5 2000/01/14 23:26:23 dom Exp $
+ * @(#) $Id: spider.h,v 1.6 2000/01/15 00:00:05 dom Exp $
  */
 
 #ifndef _SPIDER_H_
@@ -229,6 +229,7 @@ Connp	Usr_find(char * name);
 Bool	Usr_add(char *name, Connp data);
 void 	Usr_stat(void);
 void	Usr_visit(void (*func)(void *));
+Bool	whole_msg(Connp);
 void	conn_init_buf(Connp);
 void	conn_grow_buf(Connp, int);
 

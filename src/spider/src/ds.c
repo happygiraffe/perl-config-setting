@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: ds.c,v 1.3 2000/01/14 23:26:29 dom Exp $";
+static const char rcsid[]="@(#) $Id: ds.c,v 1.4 2000/01/15 00:00:11 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/types.h>
@@ -583,6 +583,33 @@ void
 Usr_visit(void (*func)(void *))
 {
     hash_visit(func, &Usr_hash);
+}
+
+/*
+ * Functions pertaining to text buffers.
+ */
+
+/***********************************************************************
+ * whole_msg: return true if the buffer contains at least one whole
+ * protocol message.
+ */
+Bool
+whole_msg(Connp c)
+{
+    char *ch;
+
+    /*
+     * search through the data in the buffer looking for "\n.[\r\n]"
+     * in regex speak.  that's why we stop 3 chars before bufhwm.
+     */
+    /* XXX should this be <= instead? */
+    for (ch = c->buf; ch < (c->buf + (c->bufhwm - 3)); ch++)
+	if ( ch[0] == '\n' &&
+	     ch[1] == '.'  &&
+	    (ch[2] == '\r' || ch[2] == '\n'))
+	    return true;
+
+    return false;
 }
 
 /*
