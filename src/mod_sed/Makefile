@@ -1,18 +1,18 @@
 #
 # build mod_sed using apxs.
 #
-# @(#) $Id: Makefile,v 1.5 2001/06/15 11:35:54 dom Exp $
+# @(#) $Id: Makefile,v 1.6 2001/06/15 11:39:02 dom Exp $
 #
 
 #---------------------------------------------------------------------
 # User configurable parts here.
 
-# Where does apxs live?
-APXS=		/usr/local/sbin/apxs
+# Where does apxs live?  Change if it's not in your PATH.
+APXS=		apxs
 
 # Uncomment if you don't have fgetln(3) on your system (pretty likely
 # unless you're running *BSD).
-FGETLN=		# fgetln.c
+#FGETLN= 	fgetln.c
 
 # End of user configurable parts.
 #---------------------------------------------------------------------
