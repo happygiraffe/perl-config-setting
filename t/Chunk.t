@@ -30,12 +30,15 @@ use_ok( 'Config::Setting::Chunk' );
 
 my $chunk = Config::Setting::Chunk->new;
 isa_ok( $chunk, 'Config::Setting::Chunk' );
-can_ok( $chunk, qw( add_section sections set_item get_item get to_string ));
+can_ok( $chunk,
+        qw( add_section sections section_keys set_item get_item get to_string )
+);
 
 test_add_section();
 test_set_item();
 test_to_string();
 test_get();
+test_section_keys();
 
 sub test_add_section {
         my $chunk = Config::Setting::Chunk->new;
@@ -77,6 +80,28 @@ sub test_get {
         $chunk->set_item( 'sect2', 'key3', 'val4' );
         is( $chunk->get( 'key1' ), 'val1', 'get()' );
         is( $chunk->get( 'key3' ), 'val4', 'get()' );
+}
+
+sub test_section_keys {
+        my $chunk = Config::Setting::Chunk->new;
+        $chunk->set_item( foo => bar => 42 );
+        $chunk->set_item( foo => baz => 43 );
+        $chunk->set_item( quux => boink => 47 );
+        is_deeply(
+                [ $chunk->section_keys( 'foo' ) ],
+                [qw(bar baz)],
+                'section_keys() foo',
+        );
+        is_deeply(
+                [ $chunk->section_keys( 'quux' ) ],
+                ['boink'],
+                'section_keys() quux',
+        );
+        is_deeply(
+                [ $chunk->section_keys( 'notpresent' ) ],
+                [],
+                'section_keys() notpresent',
+        );
 }
 
 # vim: set ai et sw=8 syntax=perl :

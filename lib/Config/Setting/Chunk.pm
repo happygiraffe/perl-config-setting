@@ -62,6 +62,10 @@ present in this chunk.
 Return a list of all sections in this chunk, in the order in which they
 were added.
 
+=item section_keys ( SECTION )
+
+Returns a list of all keys present in SECTION.
+
 =item set_item ( SECTION, KEY, VALUE )
 
 Set the item KEY to have VALUE in SECTION.  if SECTION does not exist,
@@ -124,6 +128,14 @@ sub add_section {
 sub sections {
         my $self = shift;
         return @{ $self->{ SectionOrder } || [] };
+}
+
+sub section_keys {
+        my $self = shift;
+        my ( $sect ) = @_;
+        croak "usage: section_keys(sect)"
+                unless $sect;
+        return sort keys %{ $self->{Sections}{$sect} || {} };
 }
 
 sub set_item {
