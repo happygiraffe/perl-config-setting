@@ -1,6 +1,9 @@
 Revision history for Perl extension Config::Setting.
 
 0.03  Tue Feb 22 12:46:02 GMT 2005
+	- Don't blow up if the first file asked for isn't there.
+	  Instead, check the is_configured() method of the main
+	  Config::Setting object.
 	- Introduce Config::Setting::Chunk as an abstract representation
 	  instead of repeating the same idea throughout the code.
 	- Relicense as BSD.

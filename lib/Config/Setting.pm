@@ -53,6 +53,11 @@ the settings can be determined for your project.
 
 The constructor.  Takes no arguments.
 
+=item is_configured ( )
+
+Returns true if more than one configuration file has been found and
+read.
+
 =item provider ( )
 
 Returns an object which can be used to collect the contents of files.
@@ -158,6 +163,7 @@ sub _init {
                 my $p = $self->parser();
                 push @configs, $p->parse_string( $s );
         }
+        $self->{ is_configured } = @configs > 0;
 
         return $self->_merge(@configs);
 }
@@ -252,6 +258,11 @@ sub _chunk {
         my $self = shift;
         $self->{ _chunk } = $_[0] if @_;
         return $self->{ _chunk };
+}
+
+sub is_configured {
+        my $self = shift;
+        return $self->{ is_configured };
 }
 
 1;

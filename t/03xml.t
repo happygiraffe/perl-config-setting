@@ -24,7 +24,7 @@
 # @(#) $Id$
 
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 # Override the default file layout, by sub classing.
 {
@@ -52,6 +52,7 @@ use Test::More tests => 6;
 # Test 1: Can we subclass ok?
 my $stg = TestSetting->new;
 isa_ok( $stg, 'TestSetting' );
+ok( $stg->is_configured, 'is_configured()' );
 
 my @expected_sections = ( 'settings', 'other stuff' );
 my @sections          = $stg->sections();
