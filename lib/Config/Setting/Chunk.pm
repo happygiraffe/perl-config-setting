@@ -101,8 +101,8 @@ use vars qw($VERSION $rcsid);
 
 use Carp;
 
-$VERSION = (qw( $Revision$ ))[1];
-$rcsid = '@(#) $Id$ ';
+$VERSION = ( qw( $Revision$ ) )[1];
+$rcsid   = '@(#) $Id$ ';
 
 sub new {
         my $class = shift;
@@ -113,7 +113,7 @@ sub add_section {
         my $self = shift;
         my ( $sect ) = @_;
         croak "usage: add_section(sect)" unless $sect;
-        unless (exists $self->{ Sections }{ $sect }) {
+        unless ( exists $self->{ Sections }{ $sect } ) {
                 $self->{ Sections }{ $sect } = {};
                 $self->{ SectionOrder } ||= [];
                 push @{ $self->{ SectionOrder } }, $sect;
@@ -130,7 +130,7 @@ sub set_item {
         my $self = shift;
         my ( $sect, $key, $val ) = @_;
         croak "usage: set_item(sect,key,val)"
-                unless $sect && $key && $val;
+            unless $sect && $key && $val;
         $self->add_section( $sect );
         $self->{ Sections }{ $sect }{ $key } = $val;
         return;
@@ -140,7 +140,7 @@ sub get_item {
         my $self = shift;
         my ( $sect, $key ) = @_;
         croak "usage: get_item(sect,key)"
-                unless $sect && $key;
+            unless $sect && $key;
         return $self->{ Sections }{ $sect }{ $key };
 }
 
@@ -156,10 +156,11 @@ sub get {
 
 sub to_string {
         my $self = shift;
-        my $str = '';
+        my $str  = '';
         foreach my $sect ( $self->sections ) {
                 $str .= "[$sect]\n";
-                foreach my $key (sort keys %{ $self->{Sections}{$sect} }) {
+                foreach my $key ( sort keys %{ $self->{ Sections }{ $sect } } )
+                {
                         $str .= $key . '=' . $self->get_item( $sect, $key );
                         $str .= "\n";
                 }

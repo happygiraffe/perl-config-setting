@@ -21,7 +21,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-# @(#) $Id: 02simple.t 531 2005-02-21 13:27:34Z dom $
+# @(#) $Id$
 
 use strict;
 use Test::More tests => 18;
@@ -39,21 +39,21 @@ test_get();
 
 sub test_add_section {
         my $chunk = Config::Setting::Chunk->new;
-        is_deeply( [$chunk->sections], [], 'sections() empty' );
+        is_deeply( [ $chunk->sections ], [], 'sections() empty' );
         is( $chunk->add_section( 'foo' ), undef, 'add_section() retval' );
-        is_deeply( [$chunk->sections], ['foo'], 'sections() one' );
+        is_deeply( [ $chunk->sections ], ['foo'], 'sections() one' );
         is( $chunk->add_section( 'bar' ), undef, 'add_section() retval' );
         is( $chunk->add_section( 'baz' ), undef, 'add_section() retval' );
-        is_deeply( [$chunk->sections], [qw(foo bar baz)], 'sections() three' );
+        is_deeply( [ $chunk->sections ], [qw(foo bar baz)],
+                'sections() three' );
 }
 
 sub test_set_item {
         my $chunk = Config::Setting::Chunk->new;
-        is( $chunk->get_item( 'foo', 'bar' ), undef,
-            'get_item() no such section' );
+        is( $chunk->get_item( 'foo', 'bar' ),
+                undef, 'get_item() no such section' );
         $chunk->add_section( 'foo' );
-        is( $chunk->get_item( 'foo', 'bar' ), undef,
-            'get_item() no such key' );
+        is( $chunk->get_item( 'foo', 'bar' ), undef, 'get_item() no such key' );
         is( $chunk->set_item( 'foo', 'bar', 42 ), undef, 'set_item() retval' );
         is( $chunk->get_item( 'foo', 'bar' ), 42, 'get_item() success' );
 }
@@ -69,6 +69,7 @@ sub test_to_string {
 
 sub test_get {
         my $chunk = Config::Setting::Chunk->new;
+
         # This also tests that set_item() automatically adds sections.
         $chunk->set_item( 'sect1', 'key1', 'val1' );
         $chunk->set_item( 'sect1', 'key2', 'val2' );
