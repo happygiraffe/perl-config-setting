@@ -6,9 +6,11 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.6 1999/04/14 22:18:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.7 2000/01/06 22:01:14 dom Exp $";
 
 #include <config.h>             /* autoconf */
+
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* This ugliness recommended by autoconf for portability */
@@ -26,6 +28,8 @@ static const char rcsid[]="@(#) $Id: io.c,v 1.6 1999/04/14 22:18:43 dom Exp $";
 # endif
 #endif
 #include <syslog.h>
+#include <unistd.h>
+
 #include "spider.h"
 
 /*********************************************************************
