@@ -5,7 +5,7 @@
 # @(#) $Id$
 
 use strict;
-use Test::Simple tests => 6;
+use Test::More tests => 6;
 
 # Override the default file layout, by sub classing.
 package TestSetting;
@@ -36,39 +36,23 @@ package main;
 
 # Test 1: Can we subclass ok?
 my $stg = TestSetting->new;
-ok( $stg, "Object creation" );
-
-#---------------------------------------------------------------------
-# From perlfaq4
-
-sub compare_arrays {
-        my ($first, $second) = @_;
-        local $^W = 0;  # silence spurious -w undef complaints
-        return 0 unless @$first == @$second;
-        for (my $i = 0; $i < @$first; $i++) {
-                return 0 if $first->[$i] ne $second->[$i];
-        }
-        return 1;
-}
-
-#---------------------------------------------------------------------
+isa_ok( $stg, 'TestSetting' );
 
 my @expected_sections = ( 'settings', 'other stuff' );
 my @sections          = $stg->sections();
-ok( compare_arrays(\@expected_sections, \@sections),
-    "Correct list of sections." );
+is_deeply( \@expected_sections, \@sections, "Correct list of sections." );
 
 my @expected_keys = sort qw(foo baz Ivor combined);
 my @keys = sort $stg->keylist('settings');
-ok( compare_arrays(\@expected_keys, \@keys), "Correct list of keys" );
+is_deeply( \@expected_keys, \@keys, "Correct list of keys" );
 
 my $v = $stg->get("settings", "baz");
-ok( $v eq "quux", "'baz' key has the right value" );
+is( $v, "quux", "'baz' key has the right value" );
 
 $v = $stg->get("settings", "foo");
-ok( $v eq "bar, The Engine", "'foo' key has the right value" );
+is( $v, "bar, The Engine", "'foo' key has the right value" );
 
 $v = $stg->get("settings", "combined");
-ok( $v eq "bar, The Engine quux ", "'combined' key has the right value");
+is( $v, "bar, The Engine quux ", "'combined' key has the right value");
 
 # vim: set ai et sw=8 syntax=perl :
