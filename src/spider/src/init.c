@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.15 2000/01/16 12:54:43 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.16 2000/01/16 21:37:10 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -599,6 +599,7 @@ activate_module(char * path)
 		       __FILE__);
 		exit(1);
 	    }
+	    thisone->eol = "\n";
 	    thisone->chan = fdopen(fd[0], "r+");
 	    thisone->name = basename(path);
 	    thisone->type = module;
