@@ -51,8 +51,6 @@ A list of file paths to be used, in order, for settings files.
 
 =back
 
-=item
-
 In both Env and Paths, you may use the tilde-notation ("~") to specify
 home directories.
 
@@ -93,8 +91,8 @@ use vars qw($rcsid $VERSION $default);
 use Carp;
 use Sys::Hostname;
 
-$rcsid = '@(#) $Id: FileProvider.pm,v 1.1 2001/06/24 15:21:58 dom Exp $ ';
-$VERSION = substr q$Revision: 1.1 $, 10, -1;
+$rcsid = '@(#) $Id: FileProvider.pm,v 1.2 2001/07/15 12:08:03 dom Exp $ ';
+$VERSION = substr q$Revision: 1.2 $, 10, -1;
 $default = "~/.settingsrc";
 
 sub new {
