@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.12 2000/01/15 11:35:27 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.13 2000/01/15 12:18:26 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -523,6 +523,7 @@ find_module(char * name)
     int 	len;
     int		retval;
     char * 	abs_name = NULL;
+    struct stat	st;
 
     if (name != NULL) {
 	for (i = 0 ; module_path[i] != (char*)NULL; i++)
@@ -538,8 +539,9 @@ find_module(char * name)
 	    strcat(abs_name, "/");
 	    strcat(abs_name, name);
 
-	    retval = access(abs_name, X_OK);
-	    if (retval == -1)
+	    retval = stat(abs_name, &st);
+	    /* fail if it doesn't have exec perms */
+	    if (retval == -1 ||	!(st.mode & (S_IXUSR|S_IXGRP|S_IXOTH)) )
 	    {
 		/* Module doesn't exist at this location */
 		free(abs_name);
@@ -797,8 +799,9 @@ init_users(void)
     int		lineno;
     int		len;
     Connp	usr;
+    struct stat	st;
 
-    if (access(user_file, R_OK) == -1)
+    if (stat(user_file, &st) == -1)
     {
 	syslog(LOG_ERR, "Could not find user file %s.", user_file);
 	exit(1);
