@@ -68,27 +68,17 @@ message: $(OBJS) $(LIBMOD)
 #-----------------------------------------------------------------------
 # Must explicitly list dependencies...
 
-command.o: $(srcdir)/command.c 
+command.o: command.c $(srcdir)/command.h $(srcdir)/posts.h
 
-$(srcdir)/command.c: $(srcdir)/command.h $(srcdir)/posts.h
+error.o: error.c
 
-error.o: $(srcdir)/error.c
+main.o: main.c $(srcdir)/command.h $(srcdir)/main.h
 
-main.o: $(srcdir)/main.c 
+parse.o: parse.c $(srcdir)/command.h
 
-$(srcdir)/main.c: $(srcdir)/command.h $(srcdir)/main.h
+posts.o: posts.c $(srcdir)/command.h $(srcdir)/posts.h $(srcdir)/replies.h
 
-parse.o: $(srcdir)/parse.c
-
-$(srcdir)/parse.c: $(srcdir)/command.h
-
-posts.o: $(srcdir)/posts.c 
-
-$(srcdir)/posts.c: $(srcdir)/command.h $(srcdir)/posts.h $(srcdir)/replies.h
-
-util.o: $(srcdir)/util.c
-
-$(srcdir)/util.c: $(srcdir)/command.h
+util.o: util.c $(srcdir)/command.h
 
 #-----------------------------------------------------------------------
 
