@@ -1,56 +1,18 @@
-# -*- makefile -*-
 #
-# Makefile for all the Spider Libraries.
+# Dummy Makefile.
+#
+# @(#) $Id: Makefile.in,v 1.5 2000/01/06 08:17:56 dom Exp $
 #
 
 @SET_MAKE@
 
-srcdir = @srcdir@
-VPATH = @srcdir@
-prefix = @prefix@
-exec_prefix = @exec_prefix@
-
-bindir = @bindir@
-sbindir = @sbindir@
-libexecdir = @libexecdir@
-datadir = @datadir@
-sysconfdir = @sysconfdir@
-sharedstatedir = @sharedstatedir@
-localstatedir = @localstatedir@
-libdir = @libdir@
-mandir = @mandir@
-includedir = @includedir@
-top_srcdir = @top_srcdir@
-
-pkglibexecdir = $(libexecdir)/spider
-pkgspooldir = $(libdir)/spider
-
-CC	 = @CC@
-CFLAGS   = @CFLAGS@
-CPPFLAGS = @CPPFLAGS@
-INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_DATA = @INSTALL_DATA@
-INSTALL_SCRIPT = @INSTALL_SCRIPT@
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-
-#-----------------------------------------------------------------------
-
-SUBDIRS=	ds mod
-
-MAKE_SUBDIR = for dir in $(SUBDIRS); do (echo "===> Making $@ in lib/$$dir" ; cd $$dir; $(MAKE) $@) || exit 1 ; done
-
-#-----------------------------------------------------------------------
+MAKEINPARENT	= cd .. && $(MAKE)
 
 all:
-	@$(MAKE_SUBDIR)
-
-install:
-	@$(MAKE_SUBDIR)
+	@$(MAKEINPARENT) $@
 
 clean:
-	@$(MAKE_SUBDIR)
+	@$(MAKEINPARENT) $@
 
-#-----------------------------------------------------------------------
-
-.PHONY: clean all install
+# Remind some make's that these are not real targets.
+.PHONY: all clean

@@ -1,73 +1,18 @@
-# -*- makefile -*-
 #
-# Makefile for etc, misc spider files.
+# Dummy Makefile.
+#
+# @(#) $Id: Makefile.in,v 1.2 2000/01/06 08:17:56 dom Exp $
 #
 
 @SET_MAKE@
 
-srcdir = @srcdir@
-VPATH = @srcdir@
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+MAKEINPARENT	= cd .. && $(MAKE)
 
-bindir = @bindir@
-sbindir = @sbindir@
-libexecdir = @libexecdir@
-datadir = @datadir@
-sysconfdir = @sysconfdir@
-sharedstatedir = @sharedstatedir@
-localstatedir = @localstatedir@
-libdir = @libdir@
-mandir = @mandir@
-includedir = @includedir@
-top_srcdir = @top_srcdir@
-
-CC	 = @CC@
-CFLAGS   = @CFLAGS@
-CPPFLAGS = @CPPFLAGS@
-INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_DATA = @INSTALL_DATA@
-INSTALL_SCRIPT = @INSTALL_SCRIPT@
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-ALL_CFLAGS = -I.. -I@top_srcdir@/src $(CFLAGS)
-RANLIB   = @RANLIB@
-
-pkglibexecdir = $(libexecdir)/spider
-pkgspooldir = $(libdir)/spider
-pkgetcdir = $(sysconfdir)/spider
-
-#-----------------------------------------------------------------------
-
-INSTFILES =				\
-	$(pkgetcdir)/spider.conf	\
-	$(pkgetcdir)/users
-
-#-----------------------------------------------------------------------
-
-all: spider.conf
-
-install: $(pkgetcdir) $(INSTFILES)
-
-spider.conf: spider.conf.in
-	sed -e 's#!pkgetcdir!#$(pkgetcdir)#g' \
-	    -e 's#!libexecdir!#$(libexecdir)#g' \
-	    -e 's#!libdir!#$(libdir)#g' $? > $@
-
-#-----------------------------------------------------------------------
-
-$(pkgetcdir):
-	@$(mkinstalldirs) $@
-
-$(pkgetcdir)/spider.conf: spider.conf
-	$(INSTALL_DATA) $? $@
-
-$(pkgetcdir)/users: users
-	$(INSTALL_DATA) $? $@
-
-#-----------------------------------------------------------------------
-
-.PHONY: clean all install
+all:
+	@$(MAKEINPARENT) $@
 
 clean:
-	-rm -f spider.conf
+	@$(MAKEINPARENT) $@
+
+# Remind some make's that these are not real targets.
+.PHONY: all clean

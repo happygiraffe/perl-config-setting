@@ -1,90 +1,18 @@
-# -*- makefile -*-
 #
-# Makefile for libds.a, the Spider Data Structures library.
+# Dummy Makefile.
+#
+# @(#) $Id: Makefile.in,v 1.2 2000/01/06 08:17:56 dom Exp $
 #
 
 @SET_MAKE@
 
-srcdir = @srcdir@
-VPATH = @srcdir@
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+MAKEINPARENT	= cd .. && $(MAKE)
 
-bindir = @bindir@
-sbindir = @sbindir@
-libexecdir = @libexecdir@
-datadir = @datadir@
-sysconfdir = @sysconfdir@
-sharedstatedir = @sharedstatedir@
-localstatedir = @localstatedir@
-libdir = @libdir@
-mandir = @mandir@
-includedir = @includedir@
-top_srcdir = @top_srcdir@
-
-CC	 = @CC@
-CFLAGS   = @CFLAGS@
-CPPFLAGS = @CPPFLAGS@
-INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_DATA = @INSTALL_DATA@
-INSTALL_SCRIPT = @INSTALL_SCRIPT@
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-ALL_CFLAGS = -I../.. -I@top_srcdir@/src $(CFLAGS)
-RANLIB   = @RANLIB@
-
-pkglibexecdir = $(libexecdir)/spider
-pkgspooldir = $(libdir)/spider
-
-#-----------------------------------------------------------------------
-
-OBJECTS	= ds.o
-
-INSTFILES =			\
-	$(includedir)/ds.h	\
-	$(libdir)/libds.a
-
-#-----------------------------------------------------------------------
-
-.c.o:
-	$(CC) -o $@ $(CPPFLAGS) $(ALL_CFLAGS) -c $<
-
-#-----------------------------------------------------------------------
-
-all: libds.a
-
-install: $(includedir) $(libdir) $(INSTFILES)
-
-#-----------------------------------------------------------------------
-
-libds.a: $(OBJECTS) 
-	rm -f $@
-	$(AR) rc $@ $(OBJECTS)
-	$(RANLIB) $@
-
-$(OBJECTS): $(top_srcdir)/lib/ds/ds.h ../../config.h
-
-# Explicit dependencies listed for the benefit of Solaris make.
-
-ds.o: ds.c
-
-#-----------------------------------------------------------------------
-
-$(includedir):
-	@$(mkinstalldirs) $@
-
-$(libdir):
-	@$(mkinstalldirs) $@
-
-$(includedir)/ds.h: $(top_srcdir)/lib/ds/ds.h
-	$(INSTALL_DATA) $? $@
-
-$(libdir)/libds.a: libds.a
-	$(INSTALL_PROGRAM) $? $@
-
-#-----------------------------------------------------------------------
-
-.PHONY: clean all
+all:
+	@$(MAKEINPARENT) $@
 
 clean:
-	-rm -f core libds.a $(OBJECTS)
+	@$(MAKEINPARENT) $@
+
+# Remind some make's that these are not real targets.
+.PHONY: all clean

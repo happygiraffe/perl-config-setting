@@ -1,90 +1,18 @@
-# -*- makefile -*-
 #
-# Makefile for Spider Documentation
+# Dummy Makefile.
 #
+# @(#) $Id: Makefile.in,v 1.4 2000/01/06 08:17:56 dom Exp $
+#
+
 @SET_MAKE@
 
-srcdir = @srcdir@
-VPATH = @srcdir@
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+MAKEINPARENT	= cd .. && $(MAKE)
 
-bindir = @bindir@
-sbindir = @sbindir@
-libexecdir = @libexecdir@
-datadir = @datadir@
-sysconfdir = @sysconfdir@
-sharedstatedir = @sharedstatedir@
-localstatedir = @localstatedir@
-libdir = @libdir@
-mandir = @mandir@
-includedir = @includedir@
-top_srcdir = @top_srcdir@
-INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_DATA = @INSTALL_DATA@
-INSTALL_SCRIPT = @INSTALL_SCRIPT@
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-SHELL = /bin/sh
-RM =	/bin/rm -f
+all:
+	@$(MAKEINPARENT) $@
 
-man1dir = $(mandir)/man1
-man8dir = $(mandir)/man8
+clean:
+	@$(MAKEINPARENT) $@
 
-INSTFILES=					\
-	$(man1dir)/debug_client.1		\
-	$(man8dir)/kill_spider.8		\
-	$(man8dir)/spider.8
-
-NROFF = nroff
-TROFF = troff
-TBL   = tbl
-
-.SUFFIXES:      .me .ps .txt
-
-.me.txt:
-	$(TBL) $< | $(NROFF) -me > $@
-
-.me.ps:
-	$(TBL) $< | $(TROFF) -me > $@
-
-all: text
-
-text: extend.txt protocol.txt
-
-ps: extend.ps ipr.ps protocol.ps
-
-install: $(man1dir) $(man8dir) $(INSTFILES)
-
-extend.txt: extend.me
-
-ipr.txt: ipr.me
-
-protocol.txt: protocol.me
-
-#-----------------------------------------------------------------------
-
-$(man1dir):
-	@$(mkinstalldirs) $@
-
-$(man8dir):
-	@$(mkinstalldirs) $@
-
-#-----------------------------------------------------------------------
-
-$(man1dir)/debug_client.1: debug_client.1
-	$(INSTALL_DATA) $? $@
-
-$(man8dir)/kill_spider.8: kill_spider.8
-	$(INSTALL_DATA) $? $@
-
-$(man8dir)/spider.8: spider.8
-	$(INSTALL_DATA) $? $@
-
-#-----------------------------------------------------------------------
-
-clean: 
-	$(RM) extend.txt ipr.txt protocol.txt
-	$(RM) extend.ps ipr.ps protocol.ps
-
-.DUMMY: all clean ps text 
+# Remind some make's that these are not real targets.
+.PHONY: all clean

@@ -1,46 +1,122 @@
-# -*- makefile -*-
 #
-# Main Makefile for Spider.
+# Main Makefile for Spider.  If you get errors, try using gmake
+# instead.  Some make programs appear to have problems with my use of
+# VPATHs.
+#
+# @(#) $Id: Makefile.in,v 1.2 2000/01/06 08:17:49 dom Exp $
 #
 
 #-----------------------------------------------------------------------
+# Stuff that is set by autoconf.
 
 @SET_MAKE@
 
-srcdir = @srcdir@
-VPATH = @srcdir@
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+# To support building in different directories.
+srcdir		= @srcdir@
+VPATH		= @srcdir@
 
-bindir = @bindir@
-sbindir = @sbindir@
-libexecdir = @libexecdir@
-datadir = @datadir@
-sysconfdir = @sysconfdir@
-sharedstatedir = @sharedstatedir@
-localstatedir = @localstatedir@
-libdir = @libdir@
-mandir = @mandir@
-includedir = @includedir@
-top_srcdir = @top_srcdir@
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
 
-INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_DATA = @INSTALL_DATA@
-INSTALL_SCRIPT = @INSTALL_SCRIPT@
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-SHELL = /bin/sh
-RM=	/bin/rm -f
+bindir		= @bindir@
+sbindir		= @sbindir@
+libexecdir	= @libexecdir@
+datadir		= @datadir@
+sysconfdir	= @sysconfdir@
+sharedstatedir	= @sharedstatedir@
+localstatedir	= @localstatedir@
+libdir		= @libdir@
+mandir		= @mandir@
+includedir	= @includedir@
+top_srcdir	= @top_srcdir@
 
-pkgetcdir = $(sysconfdir)/spider
-pkglibexecdir = $(libexecdir)/spider
-pkgspooldir = $(libdir)/spider
+INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+INSTALL_DATA	= @INSTALL_DATA@
+INSTALL_SCRIPT	= @INSTALL_SCRIPT@
+
+AWK		= @AWK@
+CC		= @CC@
+CFLAGS		= @CFLAGS@
+CPPFLAGS	= -I. @CPPFLAGS@ @DEFS@ -DCONFIG_FILE=\"$(configfile)\"
+LDFLAGS		= @LDFLAGS@
+LIBS		= @LIBS@
+RANLIB		= @RANLIB@
+
+#-----------------------------------------------------------------------
+# Separate configuration.
+
+mkinstalldirs	= $(SHELL) $(top_srcdir)/mkinstalldirs
+# Nobody in their right minds is going to change these...
+AR		= ar
+CHMOD		= chmod
+RM		= rm -f
+SHELL		= /bin/sh
+
+# You may need to change these.
+TBL		= tbl
+NROFF		= nroff
+TROFF		= groff
+
+pkgetcdir	= $(sysconfdir)/spider
+configfile	= $(pkgetcdir)/spider.conf
+pkglibexecdir	= $(libexecdir)/spider
+pkgspooldir	= $(libdir)/spider
+
+SUBSTFILE	= sed 	-e 's:!AWK!:$(AWK):'	\
+			-e 's:!CONFIG!:$(configfile):' \
+			-e 's:!PKGETCDIR!:$(pkgetcdir):' \
+			-e 's:!PKGLIBEXECDIR!:$(pkglibexecdir):' \
+			-e 's:!PKGSPOOLDIR!:$(pkgspooldir):'
+
+ALL_BINS	=				\
+	src/debug_client			\
+	src/kill_spider				\
+	src/spider
+
+ALL_LIBS	=				\
+	lib/ds/libds.a				\
+	lib/mod/libmod.a
+
+ALL_MODS	=				\
+	modules/message/message			\
+	modules/motd/motd			\
+	modules/page/page			\
+	modules/talker/talker			\
+	modules/test/test
+
+ALL_ETC		=				\
+	etc/spider.conf
+
+ALL_DOC		=				\
+	doc/debug_client.1			\
+	doc/extend.txt				\
+	doc/kill_spider.8			\
+	doc/protocol.txt			\
+	doc/spider.8
+
+INSTFILES	=				\
+	$(bindir)/debug_client			\
+	$(includedir)/ds.h			\
+	$(includedir)/mod.h			\
+	$(libdir)/libds.a			\
+	$(libdir)/libmod.a			\
+	$(mandir)/man1/debug_client.1		\
+	$(mandir)/man8/kill_spider.8		\
+	$(mandir)/man8/spider.8			\
+	$(pkgetcdir)/spider.conf		\
+	$(pkgetcdir)/users			\
+	$(pkglibexecdir)/message		\
+	$(pkglibexecdir)/motd			\
+	$(pkglibexecdir)/page			\
+	$(pkglibexecdir)/talker			\
+	$(pkglibexecdir)/test			\
+	$(sbindir)/kill_spider			\
+	$(sbindir)/spider
 
 #-----------------------------------------------------------------------
 
-# Order is important; lib must be before modules.
-SUBDIRS= src lib modules etc doc
-
+# A list of files that must be packaged.
 DISTFILES= 					\
 	Makefile.in				\
 	README					\
@@ -52,6 +128,7 @@ DISTFILES= 					\
 	install-sh				\
 	mkinstalldirs
 
+# Stuff that should be deleted before going near a pkg/CVS.
 NEWFILES=					\
 	Makefile				\
 	config.cache				\
@@ -69,13 +146,81 @@ NEWFILES=					\
 	modules/test/Makefile			\
 	src/Makefile
 
-MAKE_SUBDIR = for dir in $(SUBDIRS); do (echo "===> Making $@ in $$dir" ; cd $$dir; $(MAKE) $@) || exit 1 ; done
+#-----------------------------------------------------------------------
+# Suffix rules.
 
-all:
-	@$(MAKE_SUBDIR)
+# Shouldn't have to add these to .SUFFIXES, as they should be in the
+# default list...
+.c.o:
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
 
-install:
-	@$(MAKE_SUBDIR)
+
+.SUFFIXES:      .me .ps .txt
+
+.me.txt:
+	$(TBL) $< | $(NROFF) -me > $@
+
+.me.ps:
+	$(TBL) $< | $(TROFF) -me > $@
+
+#-----------------------------------------------------------------------
+# Main user-accessible targets.
+
+all: $(ALL_LIBS) $(ALL_BINS) $(ALL_MODS) $(ALL_ETC) $(ALL_DOC)
+
+install: all dirs $(INSTFILES)
+
+clean:
+	-$(RM)	$(ALL_BINS) $(ALL_LIBS) $(ALL_MODS)
+	-$(RM)	$(LIBDS_OBJS)			\
+		$(LIBMOD_OBJS)			\
+		$(SPIDER_OBJS)			\
+		$(MESSAGE_OBJS)			\
+		$(MOTD_OBJS)			\
+		$(PAGE_OBJS)			\
+		$(TALKER_OBJS)			\
+		$(TEST_OBJS)
+
+#-----------------------------------------------------------------------
+# Internal targets.
+
+# These are all dependencies to correctly set up the directory structure.
+dirs: 						\
+	$(bindir)				\
+	$(includedir)				\
+	$(libdir)				\
+	$(mandir)/man1				\
+	$(mandir)/man8				\
+	$(pkglibexecdir)			\
+	$(sbindir)
+
+$(bindir):
+	@$(mkinstalldirs) $@
+
+$(includedir):
+	@$(mkinstalldirs) $@
+
+$(libdir):
+	@$(mkinstalldirs) $@
+
+$(mandir)/man1:
+	@$(mkinstalldirs) $@
+
+$(mandir)/man8:
+	@$(mkinstalldirs) $@
+
+$(pkglibexecdir):
+	@$(mkinstalldirs) $@
+
+$(sbindir):
+	@$(mkinstalldirs) $@
+
+# This target will alert some make's to the fact that these are not
+# real files.
+.PHONY: all clean dirs dist distclean install
+
+#-----------------------------------------------------------------------
+# Maintainer only stuff.
 
 # Because only the maintainer should run this, it doesn't matter that
 # we use a couple of non standard things...
@@ -92,11 +237,211 @@ dist:
 	tar czf $$NAME.tar.gz $$NAME ; \
 	rm -rf $$NAME
 
-clean:
-	@$(MAKE_SUBDIR)
-
 distclean: clean
 	-$(RM) $(NEWFILES)
 
+#-----------------------------------------------------------------------
+# The build targets.
 
-.PHONY: all clean install
+#---------------------------------------------------------------
+### Libraries
+
+#---------------------------------------
+## libds.a
+
+LIBDS_OBJS	=				\
+	lib/ds/ds.o
+LIBDS_SRCS	= $(LIBDS_OBJS:.o=.c)
+
+lib/ds/libds.a: $(LIBDS_OBJS)
+	$(RM) $@
+	$(AR) rcv $@ $(LIBDS_OBJS)
+	$(RANLIB) $@
+
+#---------------------------------------
+## libmod.a
+
+LIBMOD_OBJS	=				\
+	lib/mod/mod.o				\
+	lib/mod/mod_ds.o			\
+	lib/mod/mod_io.o			\
+	lib/mod/mod_utils.o
+LIBMOD_SRCS	= $(LIBMOD_OBJS:.o=.c)
+
+lib/mod/libmod.a: $(LIBMOD_OBJS)
+	$(RM) $@
+	$(AR) rcv $@ $(LIBMOD_OBJS)
+	$(RANLIB) $@
+
+#---------------------------------------------------------------
+### Binaries
+
+#---------------------------------------
+## spider
+
+SPIDER_OBJS	=				\
+	src/cmds.o				\
+	src/ds.o				\
+	src/init.o				\
+	src/io.o				\
+	src/net.o				\
+	src/spider.o				\
+	src/term.o				\
+	src/utils.o
+SPIDER_SRCS	= $(SPIDER_OBJS:.o=.c)
+
+src/spider: $(SPIDER_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SPIDER_OBJS) $(LIBS)
+
+#---------------------------------------
+## debug_client
+
+src/debug_client: src/debug_client.sh
+	$(SUBSTFILE) $? > $@
+	$(CHMOD) a+x $@
+
+#---------------------------------------
+## kill_spider
+
+src/kill_spider: src/kill_spider.sh
+	$(SUBSTFILE) $? > $@
+	$(CHMOD) a+x $@
+
+#---------------------------------------------------------------
+### Modules
+
+#---------------------------------------
+## message
+
+MESSAGE_OBJS	=				\
+	modules/message/command.o		\
+	modules/message/error.o			\
+	modules/message/main.o			\
+	modules/message/parse.o			\
+	modules/message/posts.o			\
+	modules/message/util.o
+MESSAGE_SRCS	= $(MESSAGE_OBJS:.o=.c)
+
+# Does not yet depend on libmod.a
+modules/message/message: $(MESSAGE_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MESSAGE_OBJS) $(LIBS)
+
+#---------------------------------------
+## motd
+
+MOTD_OBJS	=				\
+	modules/motd/motd.o
+MOTD_SRCS	= $(MOTD_OBJS:.o=.c)
+
+modules/motd/motd: $(MOTD_OBJS) lib/mod/libmod.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -Llib/mod -o $@ $(MOTD_OBJS) $(LIBS) -lmod
+
+#---------------------------------------
+## page
+
+PAGE_OBJS	=				\
+	modules/page/page.o
+PAGE_SRCS	= $(PAGE_OBJS:.o=.c)
+
+modules/message/page: $(PAGE_OBJS) lib/mod/libmod.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -Llib/mod -o $@ $(PAGE_OBJS) $(LIBS) -lmod
+
+#---------------------------------------
+## talker
+
+TALKER_OBJS	=				\
+	modules/talker/command.o		\
+	modules/talker/error.o			\
+	modules/talker/main.o			\
+	modules/talker/parse.o			\
+	modules/talker/talker.o			\
+	modules/talker/util.o
+TALKER_SRCS	= $(TALKER_OBJS:.o=.c)
+
+# Does not yet depend on libmod.a
+modules/talker/talker: $(TALKER_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TALKER_OBJS) $(LIBS)
+
+#---------------------------------------
+## test
+
+TEST_OBJS	=				\
+	modules/test/test.o
+TEST_SRCS	= $(TEST_OBJS:.o=.c)
+
+modules/test/test: $(TEST_OBJS) lib/mod/libmod.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -Llib/mod -o $@ $(TEST_OBJS) $(LIBS) -lmod
+
+#---------------------------------------------------------------
+### Etc.
+
+# We do the substituion ourselves, so that it's under control of make,
+# not autoconf.
+etc/spider.conf: etc/spider.conf.in
+	$(SUBSTFILE) $? > $@
+
+#---------------------------------------------------------------
+### Doc.
+
+doc/debug_client.1: doc/debug_client.man
+	$(SUBSTFILE) $? > $@
+
+doc/kill_spider.8: doc/kill_spider.man
+	$(SUBSTFILE) $? > $@
+
+doc/spider.8: doc/spider.man
+	$(SUBSTFILE) $? > $@
+
+#-----------------------------------------------------------------------
+# The install targets.
+
+$(bindir)/debug_client: src/debug_client
+	$(INSTALL_SCRIPT) $? $@
+
+$(includedir)/ds.h: lib/ds/ds.h
+	$(INSTALL_DATA) $? $@
+
+$(includedir)/mod.h: lib/mod/mod.h
+	$(INSTALL_DATA) $? $@
+
+$(libdir)/libds.a: lib/ds/libds.a
+	$(INSTALL_DATA) $? $@
+
+$(libdir)/libmod.a: lib/mod/libmod.a
+	$(INSTALL_DATA) $? $@
+
+$(mandir)/man1/debug_client.1: doc/debug_client.1
+	$(INSTALL_DATA) $? $@
+
+$(mandir)/man8/kill_spider.8: doc/kill_spider.8
+	$(INSTALL_DATA) $? $@
+
+$(mandir)/man8/spider.8: doc/spider.8
+	$(INSTALL_DATA) $? $@
+
+$(pkgetcdir)/spider.conf: etc/spider.conf
+	$(INSTALL_DATA) $? $@
+
+$(pkgetcdir)/users: etc/users
+	$(INSTALL_DATA) $? $@
+
+$(pkglibexecdir)/message: modules/message/message
+	$(INSTALL_PROGRAM) $? $@
+
+$(pkglibexecdir)/motd: modules/motd/motd
+	$(INSTALL_PROGRAM) $? $@
+
+$(pkglibexecdir)/page: modules/page/page
+	$(INSTALL_PROGRAM) $? $@
+
+$(pkglibexecdir)/talker: modules/talker/talker
+	$(INSTALL_PROGRAM) $? $@
+
+$(pkglibexecdir)/test: modules/test/test
+	$(INSTALL_PROGRAM) $? $@
+
+$(sbindir)/kill_spider: src/kill_spider
+	$(INSTALL_SCRIPT) $? $@
+
+$(sbindir)/spider: src/spider
+	$(INSTALL_PROGRAM) $? $@

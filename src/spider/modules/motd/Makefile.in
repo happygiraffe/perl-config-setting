@@ -1,94 +1,18 @@
-# -*- makefile -*-
 #
-# Makefile for motd module
+# Dummy Makefile.
+#
+# @(#) $Id: Makefile.in,v 1.5 2000/01/06 08:17:57 dom Exp $
 #
 
 @SET_MAKE@
 
-srcdir = @srcdir@
-VPATH = @srcdir@
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+MAKEINPARENT	= cd .. && $(MAKE)
 
-bindir = @bindir@
-sbindir = @sbindir@
-libexecdir = @libexecdir@
-datadir = @datadir@
-sysconfdir = @sysconfdir@
-sharedstatedir = @sharedstatedir@
-localstatedir = @localstatedir@
-libdir = @libdir@
-mandir = @mandir@
-includedir = @includedir@
-top_srcdir = @top_srcdir@
-
-pkglibexecdir = $(libexecdir)/spider
-pkgspooldir = $(libdir)/spider
-
-CC	 = @CC@
-CFLAGS   = @CFLAGS@
-CPPFLAGS = @CPPFLAGS@
-INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_DATA = @INSTALL_DATA@
-INSTALL_SCRIPT = @INSTALL_SCRIPT@
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-ALL_CFLAGS = -I@top_srcdir@/lib/mod -I@top_srcdir@/src -I../.. $(CFLAGS)
-LDFLAGS = -L../../lib/mod -lmod
-
-#-----------------------------------------------------------------------
-
-LIBMOD=../../lib/mod/libmod.a
-
-OBJS = motd.o
-
-INSTFILES =			\
-	$(pkglibexecdir)/motd	\
-	$(pkgspooldir)/motd/motd.txt
-
-#-----------------------------------------------------------------------
-
-.c.o:
-	$(CC) -o $@ $(CPPFLAGS) $(ALL_CFLAGS) -c $<
-
-#-----------------------------------------------------------------------
-
-all: motd
-
-install: $(pkglibexecdir) $(pkgspooldir) $(pkgspooldir)/motd $(INSTFILES)
+all:
+	@$(MAKEINPARENT) $@
 
 clean:
-	-rm -f motd *.o *~
+	@$(MAKEINPARENT) $@
 
-#-----------------------------------------------------------------------
-
-$(LIBMOD):
-	@cd ../../lib && echo "===> Making all in lib" && make all
-
-motd: $(OBJS) $(LIBMOD)
-	$(CC) -o $@ $(OBJS) $(LDFLAGS)
-
-#-----------------------------------------------------------------------
-
-motd.o: motd.c
-
-#-----------------------------------------------------------------------
-
-$(pkglibexecdir):
-	@$(mkinstalldirs) $@
-
-$(pkgspooldir):
-	@$(mkinstalldirs) $@
-
-$(pkgspooldir)/motd:
-	@$(mkinstalldirs) $@
-
-$(pkglibexecdir)/motd: motd
-	$(INSTALL_PROGRAM) $? $@
-
-$(pkgspooldir)/motd/motd.txt: motd-sample.txt
-	$(INSTALL_DATA) $? $@
-
-#-----------------------------------------------------------------------
-
-.PHONY: clean all dummy install
+# Remind some make's that these are not real targets.
+.PHONY: all clean
