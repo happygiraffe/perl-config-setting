@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: net.c,v 1.1 1999/03/28 01:24:01 dom Exp $";
+static const char rcsid[]="@(#) $Id: net.c,v 1.2 2000/01/06 22:01:41 dom Exp $";
 
 #include <config.h>
 #include <sys/types.h>
@@ -39,7 +39,8 @@ spider_listen(int port)
         syslog(LOG_ERR, "socket(2): %m");
         exit(1);
     }
-    setsockopt(l_sock, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+    setsockopt(l_sock, SOL_SOCKET, SO_REUSEADDR, (void *)&reuse,
+	       sizeof(reuse));
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = ntohs(port);
