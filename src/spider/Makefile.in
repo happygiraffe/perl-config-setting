@@ -3,7 +3,11 @@
 # instead.  Some make programs appear to have problems with my use of
 # VPATHs.
 #
-# @(#) $Id: Makefile.in,v 1.9 2000/01/14 07:10:52 dom Exp $
+# This Makefile does all the work.  For the reasoning behind this, see
+# Peter Miller's paper, "Recursive Make Considered Harmful".
+# http://www.canb.auug.org.au/~millerp/rmch/recu-make-cons-harm.html
+#
+# @(#) $Id: Makefile.in,v 1.10 2000/01/16 13:33:24 dom Exp $
 #
 
 #-----------------------------------------------------------------------
