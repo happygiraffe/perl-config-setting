@@ -28,8 +28,16 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 SHELL = /bin/sh
 RM =	/bin/rm -f
 
+man1dir = $(mandir)/man1
+man8dir = $(mandir)/man8
+
+INSTFILES=					\
+	$(man1dir)/debug_client.1		\
+	$(man8dir)/kill_spider.8		\
+	$(man8dir)/spider.8
+
 NROFF = nroff
-TROFF = groff
+TROFF = troff
 TBL   = tbl
 
 .SUFFIXES:      .me .ps .txt
@@ -46,13 +54,34 @@ text: extend.txt protocol.txt
 
 ps: extend.ps ipr.ps protocol.ps
 
-install:
+install: $(man1dir) $(man8dir) $(INSTFILES)
 
 extend.txt: extend.me
 
 ipr.txt: ipr.me
 
 protocol.txt: protocol.me
+
+#-----------------------------------------------------------------------
+
+$(man1dir):
+	@$(mkinstalldirs) $@
+
+$(man8dir):
+	@$(mkinstalldirs) $@
+
+#-----------------------------------------------------------------------
+
+$(man1dir)/debug_client.1: debug_client.1
+	$(INSTALL_DATA) $? $@
+
+$(man8dir)/kill_spider.8: kill_spider.8
+	$(INSTALL_DATA) $? $@
+
+$(man8dir)/spider.8: spider.8
+	$(INSTALL_DATA) $? $@
+
+#-----------------------------------------------------------------------
 
 clean: 
 	$(RM) extend.txt ipr.txt protocol.txt
