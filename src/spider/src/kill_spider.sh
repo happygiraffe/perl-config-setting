@@ -2,7 +2,7 @@
 #
 # A script to shutdown Spider, by sending it a SIGTERM.
 #
-# $Id: kill_spider.sh,v 1.2 2000/01/06 07:23:54 dom Exp $
+# $Id: kill_spider.sh,v 1.3 2000/01/15 11:34:33 dom Exp $
 #
 
 config=!CONFIG!
@@ -12,4 +12,4 @@ spool_dir=`$awk '$1=="Spool_dir" {print $2}' $config`
 pid_file=`$awk '$1=="PID_File" {print $2}' $config`
 
 cd $spool_dir
-kill `cat $pid_file`
+test -f $pid_file && kill `cat $pid_file`
