@@ -94,7 +94,8 @@ Dominic Mitchell, E<lt>dom@happygiraffe.netE<gt>
 =head1 SEE ALSO
 
 Config::Setting::FileProvider(3),
-Config::Setting::IniParser(3).
+Config::Setting::IniParser(3),
+Config::Setting::XMLParser(3).
 
 =cut
 
@@ -108,7 +109,7 @@ use Config::Setting::IniParser;
 use Config::Setting::FileProvider;
 
 $VERSION = '0.01';
-$rcsid = '@(#) $Id: Setting.pm,v 1.1 2001/06/24 15:21:58 dom Exp $ ';
+$rcsid = '@(#) $Id: Setting.pm,v 1.2 2001/06/24 15:24:30 dom Exp $ ';
 
 sub new {
         my ($proto) = @_;
