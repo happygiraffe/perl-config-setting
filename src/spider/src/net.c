@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: net.c,v 1.2 2000/01/06 22:01:41 dom Exp $";
+static const char rcsid[]="@(#) $Id: net.c,v 1.3 2000/01/14 07:10:55 dom Exp $";
 
 #include <config.h>
 #include <sys/types.h>
@@ -18,7 +18,10 @@ static const char rcsid[]="@(#) $Id: net.c,v 1.2 2000/01/06 22:01:41 dom Exp $";
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <syslog.h>
+
+#include <nev.h>
 
 #include "spider.h"
 
@@ -50,6 +53,68 @@ spider_listen(int port)
     }
     listen(l_sock, 5);
     return (l_sock);
+}
+
+/***********************************************************************
+ * getrname: return remote host name.  also fills in addr.
+ */
+char *
+getrname(int fd, struct sockaddr *addr, int *addrlen)
+{
+    struct hostent *hp;
+    struct sockaddr_in *so = (struct sockaddr_in *)addr;
+
+    getpeername (fd, addr, addrlen);
+    hp = gethostbyaddr ((char *)&so->sin_addr.s_addr,
+			sizeof so->sin_addr.s_addr, AF_INET);
+    return strdup (hp ? hp->h_name : inet_ntoa(so->sin_addr));
+}
+
+/***********************************************************************
+ * spider_accept: set up a new connection.
+ */
+void
+spider_accept(int fd, void *data)
+{
+    char *c;
+    struct sockaddr_in client;
+    int client_len;
+
+    c = getrname (fd, (struct sockaddr *)&client, &client_len);
+
+    /* XXX Check for existing connection? */
+
+    syslog (LOG_INFO, "connect from %s fd %d", c, fd);
+
+    /* XXX global vars must die */
+    sender = receiver = fd;
+
+    /* XXX make creator function for Conn */
+    SENDER_CONN = malloc (sizeof(Conn));
+    if (SENDER_CONN == NULL) {
+	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	       __FILE__);
+	exit(1);
+    }
+    SENDER_CHAN = fdopen (sender, "r+");
+    setvbuf(SENDER_CHAN, NULL, _IOLBF, 0);
+    SENDER_CONN->type = user;
+    SENDER_CONN->det.usr.host = c;
+    nev_watch(fd, spider_read);
+    /* XXX shouldn't do manual output. */
+    fputs(INITIAL_GREETING "\r\n", SENDER_CHAN);
+    SENDER_CONN->state = s_init;
+
+    return;
+}
+
+/***********************************************************************
+ * spider_read: read in data from fd into a buffer.
+ */
+void
+spider_read(int fd, void *data)
+{
+    return;
 }
 
 /*

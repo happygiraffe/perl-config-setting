@@ -3,7 +3,7 @@
 # instead.  Some make programs appear to have problems with my use of
 # VPATHs.
 #
-# @(#) $Id: Makefile.in,v 1.8 2000/01/12 21:40:28 dom Exp $
+# @(#) $Id: Makefile.in,v 1.9 2000/01/14 07:10:52 dom Exp $
 #
 
 #-----------------------------------------------------------------------
@@ -335,8 +335,8 @@ SPIDER_SRCS	= $(SPIDER_OBJS:.o=.c)
 
 $(SPIDER_OBJS): include/spider.h include/codes.h
 
-src/spider: $(SPIDER_OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SPIDER_OBJS) $(LIBS)
+src/spider: $(SPIDER_OBJS) lib/nev/libnev.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -Llib/nev -o $@ $(SPIDER_OBJS) -lnev $(LIBS)
 
 #---------------------------------------
 ## debug_client
