@@ -2,12 +2,12 @@
 #
 # Makefile to install TkClient 1.0
 #
-# $Header: /home/ncvs/src/tkclient/Makefile,v 1.2 1997/02/13 17:08:43 dom Exp $
+# $Header: /home/ncvs/src/tkclient/Makefile,v 1.3 1997/02/13 17:41:45 dom Exp $
 #
 
 VERSION = 1.0
 
-LIBDIR  = /home/dom/work/tkclient-$(VERSION)
+LIBDIR  = /home/dom/work/tkclient
 DESTDIR = $(HOME)/bin
 
 all: $(DESTDIR)/tkclient
