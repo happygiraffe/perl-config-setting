@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.6 1999/03/22 23:37:14 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.7 2000/01/06 22:00:43 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/stat.h>		/* umask, stat */
@@ -321,7 +321,7 @@ write_pid_file(void)
         if (pf == NULL) {
             syslog(LOG_WARNING, "Error opening pid file %s: %m", pid_file);
 	} else {
-	    fprintf(pf, "%d\n", getpid());
+	    fprintf(pf, "%ld\n", (long)getpid());
 	    fclose(pf);
 	}
     } else {
@@ -329,16 +329,17 @@ write_pid_file(void)
         pf = fopen(pid_file, "r+");
         if (pf == NULL)
             syslog(LOG_WARNING, "Error opening pid file %s: %m", pid_file);
-        fscanf(pf, "%d", &old_pid);
+	/* Not sure if the cast is the correct thing... */
+        fscanf(pf, "%ld", (long *)&old_pid);
         if ((old_pid > 0) && (kill(old_pid, 0) == 0)) {
             /* Eeek, spider is already running */
-            syslog(LOG_WARNING, "Spider is already running as pid %d",
-                   old_pid);
+            syslog(LOG_WARNING, "Spider is already running as pid %ld",
+                   (long)old_pid);
             exit (1);
         }
         /* OK, we can write our own pid in. */
         fseek(pf, 0, SEEK_SET);
-	fprintf(pf, "%d\n", getpid());
+	fprintf(pf, "%ld\n", (long)getpid());
 	fclose(pf);
     }
 }
