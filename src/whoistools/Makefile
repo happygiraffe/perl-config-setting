@@ -1,11 +1,11 @@
 #
 # Makefile for whoistools
 #
-# @(#) $Id: Makefile,v 1.1 2000/09/05 11:25:03 dom Exp $
+# @(#) $Id: Makefile,v 1.2 2000/09/05 21:46:03 dom Exp $
 #
 
 NAME=		whoistools
-VERSION=	0.1
+VERSION=	0.2
 DIST=		$(NAME)-$(VERSION)
 
 FILES=						\
@@ -18,10 +18,13 @@ FILES=						\
 	ripe.py					\
 	whois.py
 
-all: whoislist.py
+all: whoislist.py compile
 
 whoislist.py: listmgr.py
 	@python listmgr.py
+
+compile:
+	@python -c 'from compileall import compile_dir;compile_dir(".")'
 
 dist:
 	@rm -rf $(DIST)
@@ -29,3 +32,6 @@ dist:
 	@cp $(FILES) $(DIST)
 	tar cvzf $(DIST).tar.gz $(DIST)
 	@rm -rf $(DIST)
+
+clean:
+	rm -f *.pyc
