@@ -6,11 +6,12 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.8 2000/01/13 01:30:54 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.9 2000/01/14 23:26:29 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
 #include <sys/types.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* This ugliness recommended by autoconf for portability */
@@ -149,7 +150,7 @@ input_data(Connp c)
     }
 
     /* Check that we actually have some buffer left... */
-    if (c->bufhwm == (c->buf + c->buflen)) {
+    if (c->bufhwm == c->buflen) {
 	cp = realloc (c->buf, c->buflen + LARGE_BUF);
 	if (cp == NULL){
 	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
@@ -160,8 +161,8 @@ input_data(Connp c)
     }
     
     /* Read into however many bytes we have left in our buffer */
-    bytes = read(c->fd, (void *)(c->bufhwm),
-		 (size_t)((c->buf+c->buflen)-c->bufhwm));
+    bytes = read(c->fd, (void *)(c->buf + c->bufhwm),
+		 (size_t)(c->buflen - c->bufhwm));
 
     /* Update the connection if successful */
     if (bytes < 0) {
@@ -204,6 +205,56 @@ put_mesg(FILE *fp, char **msg)
 	    debug_log("[%d] -> .", fileno(fp));
         }
     }
+}
+
+/***********************************************************************
+ * single_read_conn: read in data from conn into it's buffer.  once
+ * only.
+ */
+int
+conn_single_read(Connp c)
+{
+    int bytes;
+    size_t bufspace;
+
+    if (c->buf == NULL)
+	conn_init_buf(c);
+
+    bufspace = c->buflen - c->bufhwm;
+    bytes = read(c->fd, c->buf, bufspace);
+    if (bytes >= 0)
+	c->bufhwm += bytes;
+    else if (bytes == -1 && errno == EINTR) {
+/* 	apres_sig(); */
+	/* restart the read */
+	bytes = conn_single_read(c);
+    }
+
+    return bytes;
+}
+
+/***********************************************************************
+ * read_conn: read in data from fd into a buffer.
+ * XXX must be careful to avoid blocking at all costs.  */
+int
+conn_read(Connp c)
+{
+    int bytes, totbytes = 0;
+    size_t bufspace;
+
+    do {
+	bufspace = c->buflen - c->bufhwm;
+	if (bufspace == 0) {
+	    conn_grow_buf(c, LARGE_BUF);
+	    bufspace += LARGE_BUF;
+	}
+	bytes = conn_single_read(c);
+	if (bytes == 0)
+	    return 0;		/* EOF */
+	totbytes += bytes;
+    } while (bytes == bufspace);
+
+    return totbytes;
 }
 
 /*

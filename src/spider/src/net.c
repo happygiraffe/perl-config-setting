@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: net.c,v 1.3 2000/01/14 07:10:55 dom Exp $";
+static const char rcsid[]="@(#) $Id: net.c,v 1.4 2000/01/14 23:26:29 dom Exp $";
 
 #include <config.h>
 #include <sys/types.h>
@@ -109,11 +109,24 @@ spider_accept(int fd, void *data)
 }
 
 /***********************************************************************
- * spider_read: read in data from fd into a buffer.
+ * spider_read: process new data that arrives on an fd.  if possible,
+ * dispatch to the correct destination.
  */
 void
 spider_read(int fd, void *data)
 {
+    sender = receiver = fd;
+
+    if (conn_read(SENDER_CONN) == 0) {
+	term_conn();
+    }
+
+/*     if (whole_msg(SENDER_CONN)) { */
+/* 	conn_parse_input(SENDER_CONN); */
+/* 	receiver = find_dest(SENDER_CONN); */
+/* 	conn_send_msg(SENDER_CONN);	     */
+/*     } */
+
     return;
 }
 

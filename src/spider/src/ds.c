@@ -6,26 +6,10 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: ds.c,v 1.2 1999/03/17 07:43:53 dom Exp $";
-
-/*
-
-  Add:
-
-  Tree handling functions for commands.
-
-    Bool cmd_tree_del(Cmdp tree);   (recursive delete & free)
-
-  Tree handling functions for connections. (user tree)
-
-    The following two may be needed:
-
-    Bool usr_tree_read(void);
-    Bool usr_tree_write(void);
-
- */
+static const char rcsid[]="@(#) $Id: ds.c,v 1.3 2000/01/14 23:26:29 dom Exp $";
 
 #include <config.h>             /* autoconf */
+#include <sys/types.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -599,6 +583,55 @@ void
 Usr_visit(void (*func)(void *))
 {
     hash_visit(func, &Usr_hash);
+}
+
+/*
+ * Functions pertaining to connection structures.
+ */
+
+/***********************************************************************
+ * conn_init_buf: initialize buffer for connection.
+ */
+void
+conn_init_buf(Connp c)
+{
+    int size = LARGE_BUF;
+
+    if (c->buf == NULL) {
+	/* create buf if we don't already have one */
+	c->buf = malloc(size);
+	if (c->buf == NULL) {
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+                   __FILE__);
+            exit(1);
+	}
+	c->buflen = size;	/* the allocated size of buf */
+	c->bufhwm = 0;		/* the point up to which data is in buf */
+    }
+}
+
+/***********************************************************************
+ * conn_grow_buf: extend a connection's buffer by size bytes.
+ */
+void
+conn_grow_buf(Connp c, int size)
+{
+    char *newbuf;
+    size_t newsize;
+
+    if (c->buf == NULL)
+	conn_init_buf(c);
+    else {
+	newsize = c->buflen + size;
+	newbuf = realloc(c->buf, newsize);
+	if (newbuf == NULL) {
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+                   __FILE__);
+            exit(1);
+	}
+	c->buf = newbuf;
+	c->buflen = newsize;
+    }
 }
 
 /*

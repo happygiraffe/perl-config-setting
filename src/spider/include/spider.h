@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.4 2000/01/14 07:10:53 dom Exp $
+ * @(#) $Id: spider.h,v 1.5 2000/01/14 23:26:23 dom Exp $
  */
 
 #ifndef _SPIDER_H_
@@ -118,7 +118,8 @@ typedef struct conn_struct {
     int		fd;		/* file descriptor */
     char *	buf;		/* data waiting to be output */
     int		buflen;		/* length of buffer */
-    char *	bufhwm;		/* end of buffer */
+    int		bufhwm;		/* high water mark of our data in buffer */
+    char *	eol;		/* end-of-line to use for output. */
     union {
 	struct {
 	    pid_t pid;		/* Pid of module */
@@ -192,10 +193,6 @@ pid_t	child_pid;
 /* ds.c */
 /* Array of connections */
 extern Connp *	open_conns;
-/* Head of Command tree */
-extern Cmdp 	Cmd_head;
-/* Head of User tree */
-extern Connp 	Usr_head;
 
 /*********************************************************************
  * Prototypes
@@ -232,7 +229,8 @@ Connp	Usr_find(char * name);
 Bool	Usr_add(char *name, Connp data);
 void 	Usr_stat(void);
 void	Usr_visit(void (*func)(void *));
-
+void	conn_init_buf(Connp);
+void	conn_grow_buf(Connp, int);
 
 /* init.c */
 void 	spider_init(void);
@@ -255,6 +253,8 @@ void	put_mesg(FILE *fp, char **msg);
 char **	get_mesg(FILE *fp);
 Bool	input_data(Connp c);
 char *	get_line(FILE * fp);
+int	conn_single_read(Connp c);
+int	conn_read(Connp c);
 
 /* net.c */
 int	spider_listen(int port);
@@ -262,7 +262,6 @@ void	spider_accept(int fd, void *data);
 void	spider_read(int fd, void *data);
 
 /* spider.c */
-int 	main (int argc, char **argv);
 Bool	new_conn(int l_sock);
 Bool	validate_user(char ** input);
 Bool	validate_mod(char ** input);
