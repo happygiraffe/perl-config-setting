@@ -134,7 +134,7 @@ use Carp;
 use Config::Setting::IniParser;
 use Config::Setting::FileProvider;
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 $rcsid = '@(#) $Id$ ';
 
 sub new {
