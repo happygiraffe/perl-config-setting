@@ -240,4 +240,4 @@ __END__
 # cperl-continued-statement-offset: 8
 # End:
 #
-# vim: ai et sw=8
+# vim: set ai et sw=8 :

@@ -103,7 +103,7 @@ $VERSION = substr q$Revision$, 10, -1;
 # Pass in either a Filename parameter or a String parameter.
 sub new {
         my $class = shift;
-	my (%args) = @_;
+        my (%args) = @_;
 
         croak "XMLParser->new() requires Filename or String parameter."
                 unless exists($args{Filename}) || exists($args{String});
@@ -243,4 +243,4 @@ __END__
 # cperl-continued-statement-offset: 8
 # End:
 #
-# vim: ai et sw=8
+# vim: ai et sw=8 :

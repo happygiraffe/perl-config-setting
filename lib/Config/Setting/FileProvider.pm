@@ -92,62 +92,62 @@ sub new {
         my (%args) = @_;
 
         my $self = {
-		Env => "SETTINGS_FILES",
-		Paths => [ $default ],
-		%args,
-		Files => [ ],	# Must not be overridden!
-	};
+                Env => "SETTINGS_FILES",
+                Paths => [ $default ],
+                %args,
+                Files => [ ],   # Must not be overridden!
+        };
         bless $self, $class;
         return $self->_init();
 }
 
 sub _init() {
-	my $self = shift;
-	my @files = @{ $self->{Paths} };
+        my $self = shift;
+        my @files = @{ $self->{Paths} };
 
-	# Allow listed files to be overridden by a hostname-specific
-	# one.
-	my $hn = hostname;
-	@files = map { $_, "$_.$hn" } @files;
+        # Allow listed files to be overridden by a hostname-specific
+        # one.
+        my $hn = hostname;
+        @files = map { $_, "$_.$hn" } @files;
 
-	# Always allow the environment to override previous choices.
-	if ($ENV{$self->{Env}}) {
-		push @files, split(":", $ENV{$self->{Env}});
-	}
-	push @{ $self->{Files} }, @files;
-	return $self;
+        # Always allow the environment to override previous choices.
+        if ($ENV{$self->{Env}}) {
+                push @files, split(":", $ENV{$self->{Env}});
+        }
+        push @{ $self->{Files} }, @files;
+        return $self;
 }
 
 # Utility function.
 sub _tildesubst {
-	my $fn = shift || $_;
-	if ($fn =~ m!^~([^/]*)!) {
-		$fn =~ s!!$1 ? (getpwnam($1))[7] :
-			($ENV{HOME} || $ENV{LOGDIR})!ex;
-	}
-	return $fn;
+        my $fn = shift || $_;
+        if ($fn =~ m!^~([^/]*)!) {
+                $fn =~ s!!$1 ? (getpwnam($1))[7] :
+                        ($ENV{HOME} || $ENV{LOGDIR})!ex;
+        }
+        return $fn;
 }
 
 sub provide {
-	my $self = shift;
-	my @files = map(_tildesubst, @{ $self->{Files} });
-	my @texts;
+        my $self = shift;
+        my @files = map(_tildesubst, @{ $self->{Files} });
+        my @texts;
         my $first = 1;
-	foreach my $f (@files) {
+        foreach my $f (@files) {
                 # First file in the list is considered "important".
                 unless (-f $f) {
                         next unless $first;
                         croak "can't stat $f";
                 }
                 $first = 0;
-		next unless -f $f;
-		open F, $f
-			or croak "open($f): $!";
-		my $txt = join "", <F>;
-		close F;
-		push @texts, $txt;
-	}
-	return @texts;
+                next unless -f $f;
+                open F, $f
+                        or croak "open($f): $!";
+                my $txt = join "", <F>;
+                close F;
+                push @texts, $txt;
+        }
+        return @texts;
 }
 
 1;
@@ -160,4 +160,4 @@ __END__
 # cperl-continued-statement-offset: 8
 # End:
 #
-# vim: ai et sw=8
+# vim: ai et sw=8 :
