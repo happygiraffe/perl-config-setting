@@ -95,7 +95,6 @@ use strict;
 use vars qw($rcsid $VERSION $default);
 
 use Carp;
-use File::Spec;
 use Sys::Hostname;
 
 $rcsid = '@(#) $Id$ ';
