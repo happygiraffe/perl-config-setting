@@ -30,7 +30,7 @@
 
 #include "nev.h"
 
-static const char rcsid[]="@(#) $Id: nev.c,v 1.3 2000/01/13 01:05:38 dom Exp $";
+static const char rcsid[]="@(#) $Id: nev.c,v 1.4 2000/01/13 01:06:17 dom Exp $";
 
 /* PROTOTYPES */
 
@@ -114,7 +114,7 @@ nev_listen(char *addr, char *port, nev_cbfn newconn_fn, void *data)
     listen (lsock, 5);
 
     /* start watching lsock now. */
-    nev_watch (lsock, nev_accept, NULL);
+    nev_watch (lsock, nev_accept);
 
     return lsock;
 }
