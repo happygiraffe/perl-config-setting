@@ -62,6 +62,10 @@ present in this chunk.
 Return a list of all sections in this chunk, in the order in which they
 were added.
 
+=item has_section ( SECTION )
+
+Returns true or false if SECTION is present or not in this chunk.
+
 =item section_keys ( SECTION )
 
 Returns a list of all keys present in SECTION.
@@ -130,6 +134,13 @@ sub sections {
         return @{ $self->{ SectionOrder } || [] };
 }
 
+sub has_section {
+        my $self = shift;
+        my ( $sect ) = @_;
+        croak "usage: has_section(sect)" unless $sect;
+        return exists $self->{ Sections }{ $sect };
+}
+
 sub section_keys {
         my $self = shift;
         my ( $sect ) = @_;
@@ -153,6 +164,8 @@ sub get_item {
         my ( $sect, $key ) = @_;
         croak "usage: get_item(sect,key)"
             unless $sect && $key;
+        # Avoid autovivification.
+        return unless $self->has_section( $sect );
         return $self->{ Sections }{ $sect }{ $key };
 }
 

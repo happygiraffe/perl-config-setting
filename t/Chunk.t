@@ -24,14 +24,16 @@
 # @(#) $Id$
 
 use strict;
-use Test::More tests => 22;
+use Test::More tests => 27;
 
 use_ok( 'Config::Setting::Chunk' );
 
 my $chunk = Config::Setting::Chunk->new;
 isa_ok( $chunk, 'Config::Setting::Chunk' );
-can_ok( $chunk,
-        qw( add_section sections section_keys set_item get_item get to_string )
+can_ok(
+        $chunk,
+        qw( add_section sections has_section section_keys ),
+        qw( set_item get_item get to_string )
 );
 
 test_add_section();
@@ -39,6 +41,8 @@ test_set_item();
 test_to_string();
 test_get();
 test_section_keys();
+test_has_section();
+test_autovivification_prevention();
 
 sub test_add_section {
         my $chunk = Config::Setting::Chunk->new;
@@ -102,6 +106,23 @@ sub test_section_keys {
                 [],
                 'section_keys() notpresent',
         );
+}
+
+sub test_has_section {
+        my $chunk = Config::Setting::Chunk->new;
+        $chunk->set_item( foo => bar => 42 );
+        ok( $chunk->has_section( 'foo' ), 'has_section(foo)' );
+        ok( !$chunk->has_section( 'notpresent' ), 'has_section(notpresent)' );
+}
+
+# Sometimes Perl will automatically create hashes for you.  We don't
+# want that to happen.
+sub test_autovivification_prevention {
+        my $chunk = Config::Setting::Chunk->new;
+        is( $chunk->section_keys( 'fish' ), undef, 'no section fish' );
+        ok( !$chunk->has_section( 'fish' ), 'still no section fish' );
+        is( $chunk->get_item( 'ping', 'pong' ), undef, 'no item ping/pong' );
+        ok( !$chunk->has_section( 'ping' ), 'still no section ping' );
 }
 
 # vim: set ai et sw=8 syntax=perl :
