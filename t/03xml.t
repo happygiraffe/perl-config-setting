@@ -3,12 +3,7 @@
 # under the same terms as Perl itself.
 
 use strict;
-use Test;
-use Data::Dumper;
-
-BEGIN {
-	plan tests => 6;
-}
+use Test::Simple tests => 6;
 
 # Override the default file layout, by sub classing.
 package TestSetting;
@@ -25,24 +20,21 @@ use Config::Setting::XMLParser;
 sub provider {
         my $self = shift;
         return Config::Setting::FileProvider->new(
-               Env => "TEST_SETTINGS",
+               Env   => "TEST_SETTINGS_XML",
                Paths => [ "t/test.xml" ],
               );
 }
 
 sub parser {
         my $self = shift;
-        return Config::Setting::XMLParser->new(@_);
+        return Config::Setting::XMLParser->new( @_ );
 }
 
 package main;
 
 # Test 1: Can we subclass ok?
-my $stg = eval {
-        TestSetting->new;
-};
-warn $@ if $@;
-$stg ? ok(1) : ok(0);
+my $stg = TestSetting->new;
+ok( $stg, "Object creation" );
 
 #---------------------------------------------------------------------
 # From perlfaq4
@@ -59,27 +51,23 @@ sub compare_arrays {
 
 #---------------------------------------------------------------------
 
-# Test 2: Do we have the correct list of sections?
 my @expected_sections = ( 'settings', 'other stuff' );
-my @sections = $stg->sections();
-ok( compare_arrays(\@expected_sections, \@sections) );
+my @sections          = $stg->sections();
+ok( compare_arrays(\@expected_sections, \@sections),
+    "Correct list of sections." );
 
-# Test 3: Do we have the correct list of keys?
 my @expected_keys = sort qw(foo baz Ivor combined);
 my @keys = sort $stg->keylist('settings');
-ok( compare_arrays(\@expected_keys, \@keys) );
+ok( compare_arrays(\@expected_keys, \@keys), "Correct list of keys" );
 
-# Test 4: Does the baz key have the right value?
 my $v = $stg->get("settings", "baz");
-ok($v eq "quux");
+ok( $v eq "quux", "'baz' key has the right value" );
 
-# Test 5: Does the foo key have the right value?
 $v = $stg->get("settings", "foo");
-ok($v eq "bar, The Engine");
+ok( $v eq "bar, The Engine", "'foo' key has the right value" );
 
-# Test 6: Does the combined key have the right value?
 $v = $stg->get("settings", "combined");
-ok($v eq "bar, The Engine quux ");
+ok( $v eq "bar, The Engine quux ", "'combined' key has the right value");
 
 # Local Variables:
 # mode: cperl
