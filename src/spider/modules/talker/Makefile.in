@@ -1,0 +1,106 @@
+# -*- makefile -*-
+#
+# Makefile for talker module
+#
+
+@SET_MAKE@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+mandir = @mandir@
+includedir = @includedir@
+top_srcdir = @top_srcdir@
+
+pkglibexecdir = $(libexecdir)/spider
+pkgspooldir = $(libdir)/spider
+
+CC	 = @CC@
+CFLAGS   = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+ALL_CFLAGS = -I@srcdir@ $(CFLAGS)
+LDFLAGS = -L../../lib -lmod
+
+#-----------------------------------------------------------------------
+
+OBJS = command.o error.o main.o parse.o talker.o util.o
+
+INSTFILES =			\
+	$(pkglibexecdir)/talker
+
+#-----------------------------------------------------------------------
+
+.c.o:
+	$(CC) -o $@ $(CPPFLAGS) $(ALL_CFLAGS) -c $<
+
+#-----------------------------------------------------------------------
+
+all: talker
+
+install: $(pkglibexecdir) $(pkgspooldir) $(INSTFILES)
+
+clean:
+	-rm -f talker *.o *~
+
+#-----------------------------------------------------------------------
+
+$(LIBMOD):
+	@cd ../../lib && echo "===> Making all in lib" && make all
+
+talker: $(OBJS) $(LIBMOD)
+	$(CC) -o $@ $(OBJS) $(LDFLAGS)
+
+#-----------------------------------------------------------------------
+# Must explicitly list dependencies...
+
+command.o: $(srcdir)/command.c
+
+$(srcdir)/command.c: $(srcdir)/command.h
+
+error.o: $(srcdir)/error.c
+
+main.o: $(srcdir)/main.c
+
+$(srcdir)/main.c: $(srcdir)/command.h $(srcdir)/main.h
+
+parse.o: parse.c
+
+$(srcdir)/parse.c: $(srcdir)/command.h
+
+talker.o: $(srcdir)/talker.c
+
+$(srcdir)/talker.c: $(srcdir)/command.h $(srcdir)/config.h $(srcdir)/replies.h $(srcdir)/talker.h
+
+util.o: $(srcdir)/util.c
+
+$(srcdir)/util.c: $(srcdir)/command.h
+
+#-----------------------------------------------------------------------
+
+$(pkglibexecdir):
+	@$(mkinstalldirs) $@
+
+$(pkgspooldir):
+	@$(mkinstalldirs) $@
+
+$(pkglibexecdir)/talker: talker
+	$(INSTALL_PROGRAM) $? $@
+
+#-----------------------------------------------------------------------
+
+.PHONY: clean all dummy install

@@ -1,0 +1,3 @@
+This is a sample Message Of The Day.
+Please edit and replace with your
+own copy in the spool/motd directory.

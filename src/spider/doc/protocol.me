@@ -1,0 +1,296 @@
+.\" 
+.\" This defines the protocol used by Spider
+.\" 
+ \" Here's a nice centered page number at the bottom:
+.fo ''%''
+.\" 
+ \" $Id: protocol.me,v 1.1 1999/03/11 15:39:49 dom Exp $
+ \" 
+.\" $Log: protocol.me,v $
+.\" Revision 1.1  1999/03/11 15:39:49  dom
+.\" Initial revision
+.\"
+.\" Revision 1.0  1996/05/06 16:43:38  dom
+.\" Initial revision
+.\"
+.\" 
+.(l C
+.sz +8
+Protocol Definition
+for Spider V1.0
+by Dominic Mitchell
+.sz -4
+(\fCdom@myrddin.demon.co.uk\fP)
+.sz -4
+.)l 
+.sp 1i
+.\" 
+.\" Prerequisite definitions
+.\" 
+.sh 1 "Prerequisite definitions"
+.lp
+The Spider protocol is based on messages passed over a network, from a
+client, to Spider.  Spider will then send a reply message.  Each
+message consists of one or more lines of text, followed by a full stop
+(".") on a line of it's own (which shall be known as an END-OF-DATA
+sequence).  There is no built-in limit on line-length.
+.pp
+Note that to transmit an END-OF-DATA sequence, the sender of the
+message must convert it to two full stops on a line of their own.
+.pp
+Normally, the client will transmit one message and wait for a reply.
+However, there is provision made for unsolicited messages to be
+received at any time.  This means that a client must check the
+communications channel occasionally to see if any new messages have
+arrived.  Unsolicited messages are marked by a special code (see
+section 5 for details).
+.pp
+Normally, when the client connects to a predetermined port, the first
+line that it will see is "Spider vX.Y", where X and Y are version
+numbers.  If the client does not receive this line, then it must
+disconnect immediately, as it has connected to something which it
+shouldn't have.
+.pp
+The client-sent messages may have any format, but in practice, they
+will be determined by the definitions given in section 3.  The reply
+has a special format: It is a 3-digit code, which indicates the status
+of the last command given.  It is also followed on the same line by a
+textual explanation, which may be useful to humans who are debugging a
+connection.  There is one exception to this last sentence - The
+"unsolicited message" reply code is followed by a one word tag
+indicating which command sent the message.
+.\" 
+.\" Client Design Notes
+.\" 
+.sh 1 "Client Design Notes"
+.lp
+The client must wait for the reply to a command it has sent, before it
+may send another command.  During this time, it may receive
+unsolicited messages, though.
+.\" 
+.\" Command to module mappings
+.\" 
+.sh 1 "Command to module mappings"
+.lp
+This information is not necessary to work with the spider protocol,
+but can be useful in trying to debug problems.
+.bu 
+Spider provides "HELP", "LOGIN", "QUIT" and "WHO".
+.bu 
+Module "motd" provides "MOTD".
+.bu 
+Module "test" provides "DATE" and "QOTD".
+.bu 
+Module "page" provides "PAGE".
+.bu 
+Module "talkermod" provides "BCHAN", "CLIST", "JOIN" and "SYNOFF".
+.bu 
+Module "msgmod" provides "GETARS", "GETHED", "GETMSG" and "PUTMSG".
+.\" 
+.\" Command definitions
+.\" 
+.sh 1 "Command definitions"
+.ip "HELP     "
+
+Help lists all the commands available from Spider.
+
+Help returns a list of commands, one per line.
+.\" 
+.ip "LOGIN username password"
+
+Login acknowledges the existence of a user at the other end of a
+connection.  It must be the first command issued in a session.  It can
+only be issued as the first command in a session.
+
+Login returns only a reply code.
+.\" 
+.ip "WHO     "
+
+Who provides a list of all users who are currently connected to
+Spider.
+
+Who returns a message in the following format: Line 1 is a header,
+with several keywords separated by spaces.  At present, there are only
+four: Name, Login_Time, Idle_Time and Host.  These should be used by
+the client to display any following lines, which will have one field
+for each of the above headers.  Again, the following lines will also
+have their fields separated by spaces.
+.\" 
+.ip "QUIT     "
+
+Quit removes the user from the Spider system and breaks his/her
+connection.
+
+Quit only returns a reply code.
+.\" 
+.ip "MOTD     "
+
+Motd returns a "Message of the day", which contains system-wide news
+from the administrator.  It is intended that this will be one of the
+first commands executed by a client, which will then display it for
+the user.
+.\" 
+.ip "DATE     "
+
+Date shows the current date and time on the server (which might not be
+the same as the local time). The time is presented on a the first line
+of the record in ANSI standard format, ie:
+
+.in +0.5i
+"%3s %3s %2d %2d:%2d:%2d %4d", dayname, monthname, date,
+hour, minutes, seconds, year.
+.in -0.5i
+.\" 
+.ip "QOTD     "
+
+Returns a random quote from the systems collection of fortune cookies.
+The output is usually frivulous, but can sometimes be enlightening.
+.\" 
+.ip "PAGE cmd arg1"
+
+Page can be used to send a message to another user and accept or
+disallow pages for yourself.
+
+The response will depend upon the value of cmd.  The value of arg1
+need not be present for all commands.  Cmd is case-independent.
+
+When cmd is "on", then you are stating that he/she is willing to
+receive unsolicited pager messages (see "page to", below).  The
+response consists of a single word, which is the tag that will be used
+when unsolicited pager messages are sent out.  By default it is
+"page".
+
+When cmd is "off", then pages will no longer be sent to you.
+
+When cmd is "to", then arg1 must be the name of a user who is
+accepting pages.  The first line following the command must be the
+message to be sent to the user named as arg1.  The originator of this
+command will be sent an "OK" reply, while an unsolicited response will
+be sent to the user named in arg1.
+
+The format of the unsolicited response is standard (see section 5),
+with the tag "page".  The remainder of the message consists of two
+lines.  The first line contains a single word, the name of the person
+who sent the page.  The second line contains the message itself.
+.\" 
+.ip "JOIN chan#"
+
+Enters you into the talker system and will let you receive messages on
+channel chan#.  Chan# is a number from 0 to 255.
+.\" 
+.ip "SYNOFF chan#"
+
+"Signs off" channel chan#, so that you will no longer receive messages
+from that channel.  Chan# is a number from 0 to 255.
+.\" 
+.ip "BCHAN chan# mesg..."
+
+Broadcasts mesg over chan#.  Chan# is a number from 0 to 255, and mesg
+is all text after chan# to the end of the line.
+
+You will be sent an "OK" reply, but an unsolicited message will also
+be generated and sent to all users who are currently on this channel.
+
+The unsolicited message will have the tag "tmesg", and the following
+format: line 1 will be the channel number, line 2 will be the name of
+the user that the message originated from and line 3 will be the
+message.
+.\" 
+.ip "CLIST chan#"
+
+Returns a list of all users currently on a channel, one per line.
+Chan# is a number from 0 to 255.
+.\" 
+.ip "GETARS   "
+
+Returns a list of areas of discussion, one on each line of the reply.
+.\" 
+.ip "GETHED type area last_msgid"
+
+Returns a list of the headers of the specified messages.  To specify a
+message, you must have the arguments set correctly.  Type must be one
+of either "post" or "email", for public message boards or private
+email.  Area should be the discussion group area for post or the
+username for email.  Last_msgid is an 8 digit number (padded with
+zeroes if necessary), of the Id of the last known message in that
+area.
+
+The list consists of several lines of headers from one message,
+followed by a blank line, followed by headers from another message,
+followed by another blank line and so forth until the end of the
+reply.
+
+So far, the only headers produced are:
+
+.(l
+ID: (The number of the message, in 8 digit format)
+From: (The name of the user who wrote it)
+Subject: (The title of the topic that we are talking about)
+Area: (The area of conversation)
+.)l
+
+For email, the "Area:" header will be replaced by a "To:" header,
+saying who the message is going to.
+.\" 
+.ip "GETMSG type area msgid"
+
+Gets a message from the system.  The message is specified using the
+three arguments.  The first two arguments are identical to those in
+the "PUTMSG" command.  The last is merely the id of the article that
+you want to see.
+
+The reply is the full text of the article, including all headers.
+.\" 
+.ip "PUTMSG type area subject..."
+
+Enters a message into the system.  The message is specified using the
+three arguments and the remaining body of the command.  The type and
+area are as for the "GETHED" command.  The subject starts as the third
+argument and continues until the end of the line.  The message need
+not have any headers in it.  If there are any, they will be ignored.
+The reply is just an "OK".
+.\" 
+.\" Reply Code Definitions
+.\" 
+.sh 1 "Reply Code Definitions"
+.lp
+.TS
+center,box,tab(@);
+lb | lb | lb
+c  | l  | l.
+Code@Message@Define
+=
+110@Known commands are:@INF_HELP
+_
+211@Command Accepted:@OK_CMD
+220@Welcome to Spider.@OK_HELLO
+221@Goodbye.  Have a nice day.@OK_BYE
+280@Unsolicited message@OK_UNSOLIC
+_
+420@Try Again Later@ERR_TRYLATER
+_
+500@Not a valid command@ERR_NOTCMD
+501@Bad syntax in command@ERR_SYNTAX
+502@Invalid characters in name@ERR_BADNAME
+510@Command already defined@ERR_PREVDEF
+511@Not a member@ERR_NOTJOIN
+520@Bad Username@ERR_BADUSR
+521@Bad password@ERR_BADPWD
+522@Already logged on@ERR_TOOMANY
+523@LOGIN must be initial cmd@ERR_ILOGIN
+524@LOGIN can only be first cmd@ERR_LOGIN
+.TE
+.lp
+NB: Unsolicited messages have a special format - the usual "code
+reply" is replaced by "code tag reply", where tag is a one-word
+identifier which indicates which command sent the unsolicited message.
+.lp
+NB: for each define, there is another define, the same but postfixed
+with "_MSG", which contains a suitable error text.
+.\" 
+.\" The following is for emacs to behave correctly.
+.\" 
+.\" Local variables:
+.\" mode: nroff
+.\" End:
+.\" 

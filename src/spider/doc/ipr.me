@@ -1,0 +1,286 @@
+.\" ############################################################
+.\" 
+.\" $Id: ipr.me,v 1.1 1999/03/11 15:39:49 dom Exp $
+.\" 
+.\" $Log: ipr.me,v $
+.\" Revision 1.1  1999/03/11 15:39:49  dom
+.\" Initial revision
+.\"
+.\" Revision 1.0  1996/05/12 19:38:54  dom
+.\" Initial revision
+.\"
+.\" 
+.\" ############################################################
+.\" 
+.\" TODO:
+.\"
+.\" o Mention impossibility of having really dynamic clients, save using
+.\"   extreme technology like Java.
+.\" 
+.\" o Modules: Messaging, talker, email, finger
+.\"   (maybe): Backgammon, Coke machine
+.\" 
+.\" o How does the client know which command it is receiving response
+ \"   from? 
+.\" 
+.\" Set up a nice footer
+.fo ''%''
+.\" 
+.\" Here starteth the main text
+.\" 
+.(l C
+.sz +6
+Individual Progress Report
+by
+Dominic Mitchell
+.sz -4
+(\fCdom@myrddin.demon.co.uk\fP)
+.sz -2
+.)l
+.sp 1i
+.uh "What we are doing"
+.pp
+Our group's project this year has been to create a multi-user,
+client/server Bulletin Board System.  The server portion would run on
+a Unix style system, while we would try to make clients available for
+MS Windows and Unix (character mode).  The server of the Bulletin
+Board would be extremely modular, enabling nearly all functionality to
+be encoded as separate Unix programs which would then speak to the
+main server to provide various aspects of the BBS.  The transport
+selected was the TCP/IP protocol.
+.pp
+Eventually, we hope to achieve a basic BBS package which will provide
+a framework for easy expansion as required by the user.  For example,
+a user may wish to add a special module to interface with a weather
+reporting device.  Within the framework of the BBS, the server side of
+this can easily be added by specifying it in a configuration file, and
+the client side should not be too hard as it will have the source code
+available.
+.uh "Why we are doing it"
+.pp
+While many BBS products already exist, we felt that none really met
+our definition of a really good BBS.  In particular, all of these
+BBS's required that a user must log on via a terminal to the computer
+on which the system was hosted.  This in itself necessitated the use
+of a client/server system.  We also thought that for ease of
+programming, the modular aspect would prove to be very useful.
+.pp
+The reason for using TCP/IP was that most of the group was familiar
+with it. Also, we felt that it was widely available and easy to
+program around.
+.uh "What I have done"
+.pp
+Early on, I decided to take the job of coding the main server (ie: the
+program which sits in the middle of everything and passes messages
+between clients and modules), as this was the area which interested me
+the most.  The basic design was formalized fairly quickly and looks
+like this:
+.so ipr-spider.pic
+.pp
+Soon afterwards, I chose the name of the main server to be "Spider",
+as it looked like one.
+.pp
+There are two ways of implementing a server in Unix.  A process can
+either be invoked by the inetd(8), service a request and terminate, or
+it can remain constantly in memory as a long lived process (daemon).
+As spider needs to hold various state information to process a request
+from a client, a daemon was the only option.  Once loaded, it would
+need to listen on the network for any connection requests and accept
+them.
+.pp
+Spider has a dynamically extensible protocol, for a number of reasons.
+.bu
+Given the flexible nature of the modules, the easiest way to implement
+the protocol is dynamically because you do not know at compile time
+what modules (and hence what parts of the protocol) will be available.
+.bu
+An administrator might need to remove or add a module during the life
+of the spider process.  This would involve changing the protocol.
+.bu
+It makes spider as extensible as possible.
+.pp
+The use of modules is controlled through the use of a configuration
+file, which is specified at compile time.  This configuration file
+lists various parameters which Spider will need to execute.  The main
+parameters are of course, a list of modules to load.  The parameters
+shall be specified on a simple keyword basis, ie: X=Y.  In full, the
+parameters are:
+.ip "Module_Dir"
+A directory in which modules may be found.  There may be more than one
+of these parameters, in which case, they will all be searched, in the
+order specified.
+.ip "Module"
+The name of a module.  There may be more than one "Module" parameter,
+but the same module may not be specified more than once.
+.ip "PID_File"
+This will specify the location of a file containing the PID of the
+Spider process.  This is useful for sending signals to spider
+automatically from a shell script on the server host.  It may not be
+specified more than once.
+.ip "User_File"
+This lets Spider know where to find out all the information about it's
+users.  It is a file containing information such username, password,
+fullname and email address.
+.lp
+The keywords to the left of the '=' will be treated case
+independently, as someone is bound to make a mistake typing them in.
+.pp
+The spider process contains the following sequence of procedures
+(simplified).
+.so ipr-spider-seq.pic
+.pp
+Reading and parsing the configuration file is simple - the values will merely
+be read into variables for later use.  The next step is more
+interesting.  Although at first sight, initializing the modules and
+the protocols might appear to be very different operations, they are
+in fact fundamentally linked.  What happens is that a pipe is created
+and one end passed to the newly executed module as its stdin, stdout
+and stderr.  The other end of the pipe will be stored in a structure
+containing the pipe and the name of the module.
+.pp
+Next, the protocol is enhanced by the new module.  For each command it
+wishes to add to the protocol, it prints a line of the form "\fCCMD
+long_inp long_outp\fP", where long_inp and long_outp are flags (a
+textual '1' or '0') indicating whether or not that command requires
+more than 1 line of input or output, respectively.  The multiplexer
+will respond with a response of either CMD_OK or CMD_NOTOK\**
+.(f
+\**The error response codes will be a numeric string followed on the same
+line by a textual explanation.  They have not been fully defined yet,
+so they are not included here.  In the code, they will be used as
+symbolic values, anyway.
+.)f
+depending on whether or not the command was acceptable.  The module
+will then continue this procedure until it receives a line containing
+a single '.' on its own, when it will move on to the next module in
+the list.  Eventually, there will be a complete protocol description
+in memory and each keyword in the protocol will have a module
+associated with it.
+.pp
+This portion of the configuration may happen any number of times
+during the execution of Spider.  This is made possible by tying the
+protocol initialization subroutine into a handler for the HUP signal.
+So, when a HUP signal is received, at the next available opportunity
+the configuration file will re-read and re-parsed, maybe adding new
+modules or removing existing ones.
+.pp
+After this, the file pointed to by User_File will be read into memory
+for speedy access.
+.pp
+Finally, the main server loop is begun.  The server uses the system
+call select(2) (called poll(2) on some systems) to wait for any
+activity on either
+.(l
+.b "1) " "A new connection from the listening socket"
+.b "2) " "Something to be read & processed from a client"
+.b "3) " "A rely to be returned from a module"
+.)l
+If a new connection is received, then the server will accept it and
+proceed to log the client onto the system, using the LOGIN keyword of
+the protocol, described below.  Then, the server will return to it's
+waiting loop.
+.pp
+When something is ready to be read from either the client or a module,
+then the process is quite similar.  In the case of a client, the
+message is received and passed on to the module, with the username
+prepended to the first line.  If the writer is a module instead then
+the server will remove the name from the first line of the response
+and use it to determine who to send it to.
+.pp
+There is no order to the requests produced by the clients (obviously),
+but it is also true that there is no order to the responses produced
+by the server.  In fact, there is no equation between client input and
+module output.  This allows for a module to accept a single command
+from one user and produce a variety of responses to different users
+(eg: in a multi-user game situation).  While desirable in many ways,
+this does bring one major disadvantage with it, in that it requires
+the client to poll its end of the network connection for incoming
+data.  This could easily mean that too much CPU time is used in the
+client if it is not written very carefully.  I am still not sure
+whether or not this is a bug or a feature.
+.pp
+It must be noted that any reads that the server performs are
+"complete".  That is to say that the server will not read less than
+one full command, from either the module or the client.  However, a
+read on a client connection may well time out if the connection is too
+slow.  Experimentation will be needed to determine the correct value
+for optimal performance.  On the other hand, a module connection will
+never time out.  It is assumed that because the module process is on
+the same machine as the server, that the module will not die without
+the server (eg: because of complete power failure).  This assumption
+may become incorrect in the future if the server was extended to allow
+modules to execute on remote machines (a distributed server system).
+.uh "Protocol Specification"
+.pp
+The protocol is based as much as possible on existing Internet
+protocols, such as SMTP, FTP, NNTP, etc.  Particular ways in which it
+is close include:
+.(l
+.b "1)" " Simple textual format"
+.b "2)" " Handling of blocks of data using a '.' marker"
+.b "3)" " Meaningful error codes."
+.)l
+The block of data is basically defined as everything that is read
+until a line with a single '.' arrives.  If the client wishes to
+transmit a line beginning with a single '.', then it must prepend the
+line with \fIanother\fP '.', which will be removed by the module upon
+receipt of the data.  
+.pp
+The error codes are simply a 3 digit code, with the first digit
+indicating the type of action required by this response and the second
+and third digits filling in the details.  Fuller details of the idea
+behind the scheme can be found in RFC821 (SMTP), available by Internet
+FTP from rs.internic.net.
+.pp
+.\" .i "Goes on to discuss bits of protocol inside server."
+Several commands of the protocol are handled internally by Spider, as
+the information they require cannot be obtained elsewhere.  These
+commands must be kept down in number as otherwise Spider will spend
+too much time processing these commands and not enough time processing
+other requests/replies.
+.ip "HELP"
+This will produce a list of all the commands that Spider knows about.
+The list will be in the same format as the modules handed their
+protocol lists to Spider, ie: "\fCCOMMAND long_inp long_outp\fP".
+.ip "LOGIN"
+This is the command that the client \fImust\fP use upon initial
+connection.  It basically identifies the connection with a user.  The
+final details of how this command works have not yet been finalized as
+I was unsure of how to make the password transfer secure.
+.ip
+The client will have it's connection severed if it does not perform a
+correct LOGIN command.
+.ip "WHO  "
+Shows a list of all users who are currently logged into the system and
+when they logged in.  Times will be given in the format "YYYYMMDD
+HHMMSS", for easy parsing by the client.
+.ip "DESC "
+Describes a user in more detail.  This command accepts a user name and
+produces two lines, the first with the Full Name of the user and the
+second contains the email address of the user.
+.ip "QUIT "
+When this is received, a clients connection will be closed and the
+user associated with the connection shall be removed from the list of
+logged in users.
+.uh "Limitations"
+.bu
+As there are usually a maximum of 256 open file descriptors per
+process in Unix, that means that there will be a maximum simultaneous
+user limit of (256 - #modules).  This should not be a large problem
+immediately. 
+.bu
+Because the username is used inside the server to identify the
+connections, a user may only be logged in once.
+.bu
+Overall, it feels as though even though the server is \fIvery\fP
+extensible, the client will have more of a problem.  It is much harder
+to dynamically extend a client, based on what might be available on
+the server.  For this reason, the source code to the client will be
+provided so that any extensions can be written as appropriate for the
+situation in which the BBS will be used.
+.\" 
+.\" Please ignore the following - they are for the editor.
+.\" 
+.\" Local Variables:
+.\" Mode: nroff
+.\" End:

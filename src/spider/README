@@ -1,0 +1,71 @@
+# -*- indented-text -*-
+
+                             Spider v1.0
+			    (BETA VERSION)
+
+1) Compiling
+
+   Edit Makefile for your configuration; all configurable items are
+   marked so in there.
+
+   CONF_FILE
+
+     Where you would like Spider to retrieve it's configuration from.
+     Install it there, before you make Spider and then edit it as
+     required.
+
+   SPIDER_FACIL
+
+     This specifies what class of syslog output should be generated.
+     See man 3 openlog for full details.  Then, you may find it
+     necessary to edit /etc/syslog.conf to set up the log files for
+     Spider somewhere convenient.
+
+   DEFINES
+
+     DEBUG: Creates a user called "debug" on the terminal that it is
+     run from.  You can enter commands from here.  For modules, then
+     if this is defined, they can be run from a terminal.
+
+     DAEMON: If defined, Spider will automatically background itself.
+
+     LOG_CMDS: Spider will log every command sent through it.
+
+   NB: At the moment, you must also configure the messaging module
+   manually.  You must edit the file ./modules/alex/msg/config.h to
+   have the messaging work correctly.
+
+   Just type in "make".  After this, you should have bin/*,
+   lib/libmod.a and modules/{motd,test,page}.
+
+   NB: You *must* do make from the spider directory, not any
+   subdirectories.  This is because a lot of make variables (eg:
+   CFLAGS) are inherited from there.
+
+2) Installing
+
+   Recommended file layout:
+
+   /home/spider/bin     - Binaries & shell scripts
+                etc     - Configuration files
+                lib     - Home for libmod.a
+                log     - Syslog output (if you want it)
+                modules - Source & binaries for the modules
+                spool   - Directories for the modules to run in
+                src     - Source for Spider (& include files)
+
+   Copy the file etc/spider.conf into the place you specified above
+   (if different), and change it so that it's correct for your system.
+   Instructions are contained within the file.
+
+   Note that you can include more than one Module_Dir in the config
+   file.  So, if you are developing you own modules, you can just
+   point it at the development directory.
+
+3) Running
+
+   Just type in bin/spider (or bin/spider &, if you didn't compile
+   with DAEMON defined).  Then, you can run bin/debug_client to
+   connect to the port that was defined in the spider.conf file.
+   However, it is better to run a real client, but we don't have any
+   yet.

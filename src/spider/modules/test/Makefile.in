@@ -1,0 +1,85 @@
+# -*- makefile -*-
+#
+# Makefile for test module
+#
+
+@SET_MAKE@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+mandir = @mandir@
+includedir = @includedir@
+top_srcdir = @top_srcdir@
+
+pkglibexecdir = $(libexecdir)/spider
+pkgspooldir = $(libdir)/spider
+
+CC	 = @CC@
+CFLAGS   = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+ALL_CFLAGS = -I@top_srcdir@/lib -I@top_srcdir@/src -I../.. $(CFLAGS)
+LDFLAGS = -L../../lib -lmod
+
+#-----------------------------------------------------------------------
+
+OBJS = test.o
+
+INSTFILES =			\
+	$(pkglibexecdir)/test
+
+#-----------------------------------------------------------------------
+
+.c.o:
+	$(CC) -o $@ $(CPPFLAGS) $(ALL_CFLAGS) -c $<
+
+#-----------------------------------------------------------------------
+
+all: test
+
+install: $(pkglibexecdir) $(pkgspooldir) $(INSTFILES)
+
+clean:
+	-rm -f test *.o *~
+
+#-----------------------------------------------------------------------
+
+$(LIBMOD):
+	@cd ../../lib && echo "===> Making all in lib" && make all
+
+test: $(OBJS) $(LIBMOD)
+	$(CC) -o $@ $(OBJS) $(LDFLAGS)
+
+#-----------------------------------------------------------------------
+
+test.o: $(srcdir)/test.c
+
+#-----------------------------------------------------------------------
+
+$(pkglibexecdir):
+	@$(mkinstalldirs) $@
+
+$(pkgspooldir):
+	@$(mkinstalldirs) $@
+
+$(pkglibexecdir)/test: test
+	$(INSTALL_PROGRAM) $? $@
+
+#-----------------------------------------------------------------------
+
+.PHONY: clean all dummy install

@@ -1,0 +1,5 @@
+#define H_OK "OK"
+#define H_FAIL "FAIL"
+#define H_BAD_PARAM "Bad parameters"
+#define H_BAD_MSGID "Bad msgid"
+#define H_AREA_NOT_EXIST "Area doesn't exist"

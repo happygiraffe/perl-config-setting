@@ -1,0 +1,852 @@
+.\" ############################################################
+.\" This is the main project report, converted from MS-Write format.
+.\" 
+.\" ############################################################
+.\" 
+ \" Here's a nice centered page number at the bottom:
+.fo ''%''
+.\" 
+.\" $Id: report.me,v 1.1 1999/03/11 15:39:49 dom Exp $
+.\" 
+.\" $Log: report.me,v $
+.\" Revision 1.1  1999/03/11 15:39:49  dom
+.\" Initial revision
+.\"
+.\" Revision 1.0  1996/05/12 19:36:05  dom
+.\" Initial revision
+.\"
+.\" 
+.\" ############################################################
+.\" 
+.(l C
+.sz +8
+HND II Project Report
+by
+Matt Davidson
+.sz -4
+(\fCmndavidson@area51.upsu.plym.ac.uk\fP)
+.sz +4
+Alex McLean
+.sz -4
+(\fCalex@area51.upsu.plym.ac.uk\fP)
+.sz +4
+Dominic Mitchell
+.sz -4
+(\fCdom@myrddin.demon.co.uk\fP)
+.sz +4
+Zeth Ward
+.sz -4
+(\fCmoosie@area51.upsu.plym.ac.uk\fP)
+.sz -4
+.)l 
+.sp 1i
+.\" 
+.\" ############################################################
+.\" 
+.sh 1 "Abstract"
+.lp
+We have created a multi-user client/server Bulletin Board System for
+our project.  The server is multi-threaded and runs under Unix.  The
+clients connect to the server via TCP/IP.  We have created two clients
+so far; one for MS Windows and one for X windows.  We have fulfilled
+nearly all of the tasks that we set out to do.
+.\" 
+.\" ############################################################
+.\" 
+.bp
+.sh 1 "What we wanted to do"
+.lp
+Our group's project this year has been to create a multi-user,
+client/server Bulletin Board System (BBS).  The server portion would
+run on a Unix style system, while we would try to make clients
+available for MS Windows and Unix.  The transport selected was the
+TCP/IP protocol.
+.pp
+The server of the BBS would be extremely modular, enabling nearly all
+functionality to be encoded as separate Unix programs which would then
+speak to the main server to provide various aspects of the BBS.  We
+wanted to make the design of the BBS dynamic as well, so that by
+sending it a signal, it would re-read it's configuration file and
+start up new modules for any commands that the administrator wished to
+add.
+.pp
+We aimed to provide a client for at least two platforms, so that the
+BBS would be accessible from anywhere, no matter what computer or
+Operating System (OS) was in use.  Each client would take advantage of
+the available features of it's hosting OS, while still providing a
+functionally consistent interface.
+.pp
+It was decided that we would only build the User Facilities into our
+BBS, and enable all administration to occur through a Unix shell
+account.  While this is not as friendly as one might like, it turns
+out to be a very powerful method of control, as well as providing a
+reasonable method of security.
+.pp
+We hoped to achieve a product which was little more than a basic BBS,
+but one which was able to be expanded as needs be by any competent
+administrator.  For example, extensions could easily be incorporated
+to provide up to the minute stock quotes.
+.\" 
+.\" ############################################################
+.\" 
+.sh 1 "Why we wanted to do it"
+.lp
+Initially, we looked for an idea for a project which interested all of
+us.  There were several areas in which we were all interested, mainly
+being Communications and Networking, and User Interfaces.  One of our
+members, Alex, already runs a BBS on a Student Union sponsored
+machine.  He suggested that we should write an improved BBS, which
+would enable the existing one (called "flux") to support many more
+users than at present and be more user-friendly.
+.pp
+While many BBS products already exist, we felt that none really met
+our definition of a really good BBS.  In particular, all of these
+BBS's required that a user must log on via a terminal to the computer
+on which the system was hosted.  To provide an alternative to this
+necessitated the use of a client/server system.  We also thought that
+for ease of programming, the modular idea would prove to be very
+useful.
+.pp
+The choice of Client/Server was also necessary to support the idea of
+enabling more simultaneous users.  By using Client/Server ideas we
+could offload a good deal of the processing onto the client machine.
+.pp
+The reason for using TCP/IP was that most of the group was familiar
+with it.  Also, we felt that it was widely available, easy to program
+with, and as it was used by the entire Internet our product would have
+a wide user base.
+.\" 
+.\" ############################################################
+.\" 
+.bp
+.sh 1 "What we actually achieved"
+.lp
+At the end of the project, we have largely achieved what we set out to
+do.  We have a completely working server, and clients for the two
+platforms that we set out to support.  Both clients and server work
+correctly over a TCP/IP network.  There are several features which are
+not present which we thought we would be able to include originally.
+.pp
+In particular the client at the moment has no private email
+facilities, even though the facilities exist to do this in the server.
+The reason for this is mainly down to lack of time, we felt it more
+important to get what we had up and running smoothly rather than be
+left with drastically bugged code.
+.pp
+Also, the server is not dynamically extensible, as had been envisaged.
+It has the ability to cope with a module which dies, but it cannot add
+modules once it has started.  It turned out that the exact details of
+how to handle this with regards to informing client software about new
+commands were exceedingly difficult to decide and needed a lot more
+thought and research.
+.pp
+However, we did succeed in providing a well documented interface to
+our product so that it can be extended.  There are guides on how to do
+this contained in the Appendices.
+.pp
+At the end of the day, we felt that the choice of project was both
+interesting personally and had the potential to be useful to many
+other people.
+.\" 
+.\" ############################################################
+.\" 
+.sh 1 "Why this was different"
+.lp
+The main reason for the lack of the above features is that they were
+either semantically very awkward or deemed to take too much time to
+implement correctly.  Also, problems with the server took enough time
+that there was less effort available to make a complete client.
+.\" 
+.\" ############################################################
+.\" 
+.bp
+.sh 1 "How we did it"
+.lp
+.\" 
+.\" ############################################################
+.\" 
+.sh 2 "The Server Part 1: Spider"
+.lp
+The central portion of the server was based around an idea from a Unix
+program called "inetd" (Internet Daemon).  This is a program which
+listens on TCP/IP sockets and spawns different programs depending
+where the connection came from.  In essence, it is a multiplexer of
+connections.
+.pp
+The central portion of the server would be a multiplexer for protocol
+commands.  It would accept commands from a network facing connection,
+and pass them on to a subprogram for real processing.  Hence, the
+central portion of the server would also be little more than a message
+switching mechanism.  Eventually, the server would look something like
+this:
+.\" XXX fill in a piccy!
+.pp
+Hopefully, this diagram shows why I decided to call this portion of
+the project "Spider".
+.pp
+Programs of this sort, which need to wait on many connections at once
+are particularly easy to create under Unix, thanks to the provision of
+a system call called select(2).  This was the reason for my (Dom)
+attempting to create the server program under Unix.  Also, it would be
+particularly easy to set up the layout above with regards to modules,
+thanks to Unix's excellent handling of processes and communication
+pipes between them.
+.pp
+Thanks to the availability of several free (for the cost of a CD-ROM,
+anyway) versions of Unix, such as Linux or FreeBSD, writing for Unix
+is not restricting who can use your application in the same way in
+which it used to, 5 years ago.
+.pp
+The basic design was very simple: call one function to configure the
+process, and then enter the main server loop.  The configuration
+function had to:
+.(l
+1) Start up as a Daemon.
+2) Read in a configuration file to see what modules to start.
+3) Start the modules & Initialise the protocol.
+4) Read the user file into memory.
+5) Set up any signal handlers that might be needed.
+.)l
+.pp
+The main server loop had to wait for any message to arrive from either
+a client (user) or a module.  If it arrived from a client, it would
+look up what function had been requested and pass the message on to
+the module that was providing that command.  The name of the user
+would be tacked on the front of the message so that the module could
+identify who it came from and who to send a reply to.  If a message
+arrived from a module, then Spider would remove the username from the
+front of the message and look up that user in it's list of
+connections.  The message (usually a reply to a command) would be sent
+to the user.
+.pp
+By this time, I had defined as one line long, with an optional (on a
+per-command basis) arbitrary length piece of data following it.  The
+same applied to the reply.
+.pp
+Because there was no association between a command and a reply inside
+Spider, this lead to the idea that there could in fact be unsolicited
+messages sent to a client.  This later proved invaluable for
+implementing certain features, such as the talker and the pager.
+.pp
+Initially, I attempted to create the Spider process in Perl, a
+commonly found extension language for Unix.  It offered the necessary
+facilities (sockets, pipes, select, etc.) and a rich command syntax.
+To start with, it seemed very promising, but only a couple of weeks
+afterwards, it turned out that it was extremely hard to represent data
+structures of the necessary complexity within the language.  This is
+mainly because Perl has only three data types: String, Array and Hash.
+While this is sufficient for many tasks, it wasn't for what I needed.
+.pp
+At this point, I looked around for another language in which to
+attempt to create Spider, but found that others (such as TCL or
+Python) lacked several significant features, which were needed.
+Reluctantly, I turned to C.  I had avoided doing this initially, as I
+had thought that I could make a significant saving in programming time
+by using a higher level language than C.  Once again, the old adage of
+"It's old and mature for a reason" stood very true.
+.pp
+Once I started using C, I found that I was frequently getting bogged
+down in minor details, even though I would always be able to do what I
+wanted, eventually.  A good deal of the initial work was merely
+creating a set of functions which could easily handle data structures
+and token parsing in the way in which I wanted.
+.pp
+After a while, however, I started getting up to speed and with a good
+set of functions to rely on, progress was much quicker.  Another shock
+later on was just how much of the code was devoted to initialising the
+environment!  Once I realised that this was the case and having
+finished that work, I had a lot of code behind me, I felt much
+happier.
+.pp
+It was now that it dawned on me, that my earlier definitions for
+commands were absolutely useless because I had absolutely no way of
+knowing to which command a reply had come from.  This meant that I had
+to generalise the concepts of commands and replies into "messages",
+which are defined in Appendix A to be simply a series of lines
+terminated by a full stop on a line of it's own.  This was taken from
+the Internet standard for electronic mail transmission - SMTP.
+Changing to a messages based system also had the pleasant effect of
+making my code significantly simpler.
+.pp
+After I had finished the main loop as well as the initialisation, I
+could enter commands on the terminal that Spider was running on, and
+have the (correct!) reply returned to me, I was over a great
+milestone.  All that remained to be added now would be the feature to
+enable multi-user access - Networking.  Thankfully after perusal of
+several example programs from the paper "An Introductory 4.4BSD
+InterProcess Communication Tutorial", I realised that adding
+networking to my code was practically trivial.  It took about 20 lines
+of code to setup my process listening on the network, and all that was
+called for in the main loop was an extra test and function call if
+this test evaluated to true.
+.pp
+At this point, I had a working version of Spider, which I delivered to
+the other group members.  Now, I went back over my code trying to make
+it more robust.  I managed to find several places which might
+initially have caused the server to crash, if a NULL pointer were
+passed to a function, and made them safe.  There was also one
+long-standing bug involving memory allocation which I fixed.  In a
+portion of the LOGIN command, some dynamically allocated memory was
+being freed two times, which it turned out was being overly generous
+to the allocator functions.
+.pp
+Right now, we have a fairly stable working version.  There are several
+features which could be improved upon, but the importance of a
+deadline must be recognised.
+.pp
+The main improvement for Spider at the moment would be a way to handle
+messages which arrive back-to-back.  At present, Spider can only
+handle a single message per read; any others will be lost.  The best
+way to do this would be to eliminate stdio from the server completely
+and use only the low-level read(2) and write(2) system calls.
+However, this would introduce the matter of having to take care of our
+own buffering, completely.  It also would mean changing almost all the
+source code.
+.pp
+Since finishing the code (for this project, at least), I have also
+found one behaviour which I very much wish to change: when a module
+dies, it's commands are removed from the system, which might cause
+some clients to crash if they suddenly receive an unexpected error
+message.  It would be better to mark these commands as merely
+unavailable for present and try to restart them later.  This would be
+one step towards a truly dynamic server.
+.pp
+Another idea would be to have a separate communications channel
+(somehow) for an administrator to perform functions which would
+ordinarily be unavailable to users, such as terminating a user's
+connection involuntarily.
+.pp
+Finally, profiling the server over a period of time may also be a good
+idea, so as to get a good idea of where to optimise the code for
+speed.
+.\" 
+.\" ############################################################
+.\" 
+.bp
+.sh 2 "The Server Part 2: Modules"
+.lp
+The main work on modules was done by Alex, but Dom decided that he
+needed a couple of "test cases" while developing Spider, so there are
+two sets of modules in the standard distribution of Spider.
+.\" 
+.sh 3 "The Simple Modules"
+.lp
+Even though these modules were developed as test cases, some of them
+now serve rather more useful purposes.  For example, the module which
+was for testing unsolicited messages was rather easily transformed
+into a simple pager for contacting other logged on users.  The module
+which was testing passing long replies through Spider became the
+Message-of-The-Day module, used to inform users with news about the
+system.
+.pp
+On the other hand, the module which provided the commands "foo", "bar"
+and "date" is still practically useless.
+.pp
+One very good thing to come out these simple modules, though is a
+library that was written to simplify the code for them significantly.
+For example, the code for the "motd" module contains only three
+functions, and the main function has little over three library calls
+in it.  The library is described in full in Appendix B.3.
+.\" 
+.sh 3 "Messaging Module"
+.lp
+The messaging module was designed to allow users to communicate
+without having to be connected to the server at the same time.  To do
+this, it provides two fairly distinct services - User Mailboxes and
+Message Areas.
+.pp
+Messages are posted to certain areas, and retrieved at a later
+date by the other users.  Subsequently, they are replied to if the
+message is interesting enough - and the discussion slowly progresses.
+The best "real-world" equivalent to this is a set of notice boards.
+Each "message area" is given a particular topic.  For example, all the
+messages in an area called "cooking" would invite messages about
+making nice food.
+.pp
+Mailboxes are basically stored and handled in the same way as Message
+Areas.  The difference is that each user is given their own mailbox,
+which anyone can write to, but only that one user can read from.  The
+result is a local electronic mail system, where users can leave
+private messages for each other.  This feature has not yet been
+implemented by either of the clients.
+.pp
+The original protocol specification has undergone much simplification.
+The protocol specification was designed at first to allow the maximum
+amount of flexibility in retrieving messages.  For example, allowance
+for "threading" - sorting into subject rather than date order - was
+possible.  Writing the database code for this was quickly ruled out -
+it was beyond to scope of our project to write a relational database
+system.  An alternative was to use a freely available SQL server, mSQL
+was downloaded from the Internet as a possibility (available from
+\fChttp://Hughes.com.au/product/msql/\fP).
+.pp
+mSQL was found to be too heavy on system resources, and therefore
+against the aims behind the project.  A more practical solution was
+found - keep it simple.  The protocol was rewritten into it's current
+form, so that the client was able to get all the information that it
+needed and nothing more.  If the data was to be manipulated or sorted,
+it could be arranged from within the client.
+.pp
+Once the messaging module appeared to fit the specification fairly
+well, development moved on to the talker module.
+.\" 
+.sh 3 "Talker Module"
+.lp
+The talker module gives users a real-time chat facility, so logged-in
+users can talk to many other users at the same time.  For example,
+using the Delphi WinClient:
+.pp
+The talker system provides a fixed number of "channels", currently
+numbered from 0 to 255.  Channel 0 should be the default channel for
+the clients, so users can meet there and move to another channel if
+they wish to break off from the main conversation.  Messages sent to
+the channels are not stored on the server, so are lost as soon as they
+are sent out to the other users on the channel.  The talker system is
+therefore a place for instant, multi-user chat/conferencing, where as
+the messaging system allows more detailed discussion over a long
+period of time.
+.pp
+As the messaging system was coded first, the first task was to split
+out the parts from that module for re-use in the Talker module.
+Merely copy and pasting functions would have been a bad idea, as
+future modifications to these function would have had to be repeated
+for each module, allowing for bugs to creep in.  Instead a the
+"shared" functions were organised into separate source code files, and
+a separate directory.  Then, a single Unix "Makefile" was written to
+automate the compilation of the shared and separate module code,
+producing two executables, one for each module.
+.pp
+The majority of the talker module code was devoted to efficiently
+organising a linked list of the users and channels.  Surprisingly,
+this did not throw up any major problems, although special attention
+had to be given to efficiency - through dynamic memory
+allocation/deallocation.
+.\" 
+.\" ############################################################
+.\" 
+.bp
+.sh 2 "X Windows Client"
+.lp
+Initially, we (Matt and Dom) had set out to create a Unix client,
+which was text mode based, rather than graphically oriented.  However,
+after a short period of research, it was envisaged that this would
+take a rather long time to do, because the only standard way to create
+screen oriented (rather than line-oriented) programs under Unix is
+using the C language and the Curses library.  While both are excellent
+facilities, the development time would be far too long.
+.pp
+At this point, we decided to do an X Windows client, instead. There
+are several tools for X Windows which make life easier for the
+programmer, but most of them are extremely slow and clunky and are not
+always free.  We looked at several toolkits (such as wxWindows and
+InterViews), but they all required that we learn C++, which we felt to
+be well out of our reach for this timescale.
+.pp
+Eventually, we came across the TCL language and its associated
+graphics toolkit, TK.  This provided an extremely simple language,
+together with a toolkit for building graphical applications which was
+easy to learn, even if the interface was not visually developed like
+in (say) Visual Basic.  After a very short period (about a day), we
+were able to come up with a simple client mock up, which looked like
+this:
+.pp
+The file menu contains options to Connect and Exit.  The Options menu
+contains an entry point for a dialog box which prompts for details
+such as LoginName, Password, and BBS Host.  It also contains entries
+to turn on and off paging and save these options to a file.  The help
+menu contained only an "about" box.
+.pp
+Tcl/Tk made everything seem very simple; the language itself bears a
+marked similarity to Unix Shell Scripting, but is much more
+regular. It is also an interpreted language, meaning that development
+was extremely fast as their was no waiting for a C compiler to finish
+its tricks.  Best of all, the language is freely available.  This
+makes it an excellent platform on which to base software, since anyone
+who needs it can have it without having to pay for run-time licenses.
+.pp
+Another feature of the language also turned out to make life
+incredibly easy for our development: There is a command in the
+language called "fileevent", which allows an arbitrary procedure to be
+executed when a file (which includes both pipes and network sockets)
+becomes ready for reading or writing.  This tied in directly to our
+implementation of paging using unsolicited messages.  When we had to
+support the talker as well, the mechanism was generalised so that any
+procedure could be called based on the tag associated with an
+unsolicited message.  This was dubbed the AsyncHandler.
+.pp
+The AsyncHandler turned out to be such a useful concept, that it was
+used in several other areas in the client as well.  We have also
+implemented InitHandlers, which are used to initialise arbitrary code
+at the beginning of the program, just after the User Interface is
+created.  More useful however were the ConnectHandlers and
+DisConnectHandlers, which meant that, for example, the message of the
+day could be automatically displayed to a user as soon as a connection
+is established.  Ditto for turning on pager messages.
+.pp
+Tcl/Tk turned out to be under very active development; In the last 4
+weeks, the author at Sun ported the code to both MS Windows and
+Macintosh.  We installed the new version of the language on a PC and
+to our great delight, the code worked first time with an identical
+interface to that found under X Windows!  While it is too late to
+replace the windows client which the others are developing, it is nice
+to know that it is possible to do this.
+.pp
+Once we had found a direction, with Tcl/Tk then developing the client
+was relatively easy, allowing us time to concentrate on other aspects
+of our coursework.  We now have a client which is not only stable, but
+exceedingly easy to modify in case there are any problems.
+.pp
+There is still room for improvement, however.  The main improvement
+right now would simply be a period of use by a number of people who
+could comment on how the interface works for them.  Naturally, we
+designed the interface as we saw fit, for our own usage, but it may
+well need to be "smoothed off" a bit in places.
+.pp
+One interesting extension, which became apparent during development
+was the idea of using the talker or a similar Spider Module to
+broadcast Tcl scripts to users.  Naturally, these would have to be
+carefully examined before execution, but Tcl offers such facilities.
+The reason for doing this would be to transmit graphical Tk commands,
+so that in effect, you could have a multi-user white board.  This
+would truly be taking advantage of the graphical interface, whereas at
+the moment, we only providing a polished interface over something that
+is essentially still textual in nature.
+.pp
+Finally, it would be nice to provide those facilities which did not
+make it in time for the main project deadline, such as private email.
+.\" 
+.\" ############################################################
+.\" 
+.bp
+.sh 2 "Windows Client"
+.lp
+.\" 
+.\" ############################################################
+.\" 
+.sh 3 "Research"
+.lp
+First of all we set about researching the feasibility of a Windows
+based client, we set about this in several ways.  Firstly we looked at
+what resources there where giving information on Client - Server based
+systems.  After studying several books such as BBS's for Dummies and
+Client - Server LAN programming to help us understand more of what a
+client is expected to do.
+.pp
+After a group meeting where it was decided what sort of operations our
+client(s) where going to be expected to perform, we set about mapping
+out the client.  Once we had this idea mapped out, even though it was
+only a rough idea, we could then proceed with the feasibility of a
+Windows client and move on to the possibility of producing this client
+in one of the following languages - Visual Basic, Visual C++ & Delphi.
+.pp
+The language we finally chose was Microsoft's Visual Basic.  This was
+because of several factors, the first of which was accessibility.
+Visual Basic was found on a large number of the computers within the
+university and some of have personal copies of the package at home.
+Another was the time span in which we had to complete the client
+coding, all of use come from a BASIC coding background so the language
+was fairly familiar to us.
+.pp
+The others where rejected for the following reasons :-
+.bu
+Visual C++: Learning Object Oriented C and how to program in Windows
+Protected Mode looked such a mammoth task and made things seem
+unnecessarily complicated.
+.bu
+Delphi : This seemed the initially most promising of all the
+languages.  It was a true object oriented coding environment, unlike
+Visual Basic.  Unfortunately we knew little about it and where made
+aware that the university could not provide a copy, so this was also
+shelved.
+.pp
+In producing the Windows client it was decided that using Winsock
+would probably be the best thing to do as it afforded us the qualities
+we needed and is an aid to socket coding.  We ordered a book on it
+from the library called Programming Winsock to use for my research.
+While we waited for this to arrive (it took about a month or so) we
+decided that a Windows client was definitely possible and that we
+could now look in to the Visual Basic side of things.  We also tried
+to examine the Universities usage of Winsock with regard to the
+Computing Services machines, which use it for Netscape, Ftp and Telnet
+access.
+.\" 
+.sh 3 "Visual Basic"
+.lp
+None of us had more than a passing knowledge of Visual Basic, but all
+of us were weaned on BASIC in some form or other.  Matt & Zeth set
+about learning the rudiments of Visual Basic and found it to be an
+ideal tool for the computer literate business person who wants to
+knock themselves up a crude data base or address catalogue.  It was
+found that the screen designing was wonderfully easy to do, and the
+programming was simple enough, it was just vanilla BASIC but with
+knobs on. So apart from the fact it all seemed a tad over simplified
+it seemed an advanced version of BASIC, but then I started thinking
+'Client'.  This is where the trouble started.
+.pp
+Visual Basic was originally put forward as the programming language for
+the Windows client as it would make producing the Windows screen
+presentation much easier and save us learning a lot about programming
+Windows in the different modes (e.g. enhanced mode, protected mode).
+It would have made the actual socket code coding a whole lot easier if
+we had used C as it is simply a matter of opening a sort of pipe to
+the socket.
+.pp
+After looking at some sample socket code it all looked complicated,
+but on closer inspection (and a little 'brute force & ignorance') it
+was possible to understand what was happening.  I then thought about
+it BASIC wise.  This is when the nightmare fully set in.  Some of the
+things that needed to be done were way out of the scope of our current
+Visual Basic skills and as far as I could see out of the scope of
+Visual Basic itself.  The skills where fixable but asking Bill Gates
+for a better version of Visual Basic seemed a trifle cheeky !
+.pp
+So our situation was thus :-
+.bu
+Windows Client - Feasible (especially using Winsock)
+.bu
+Winsock - A must.  Complicated at first but can be worked on.
+.bu
+Visual Basic  -  Useful, but communication with Winsock a big, big headache.
+.pp
+We then discussed a couple of ideas about how we could go about
+getting around these problems.  One was that we code the Windows
+client interface in Visual Basic and then write all the socket code in
+C and get them to pass the information from one to another.  This was
+dismissed though in favour of the next suggestion, and also because
+the task would be very difficult and time consuming to undertake.  The
+other suggestion was that we find some sort of communications 'patch'
+that would enable us to communicate with Winsock easier using Visual
+Basic.
+.pp
+We set about the task by doing three things.  Zeth subscribed and
+wrote to the Winsock and Winsock Programming news groups and asked
+them with help on this dilemma but no one had any suggestions and many
+said it was practically impossible to use Visual Basic for this.  We
+also looked for other reference material on the subject but this
+turned up nothing.  At this stage we had begun to shelve the idea of a
+Windows client for now in favour of producing the X-Windows one and we
+had made a request for a copy of the programming language Delphi .  We
+believed this was what we needed to produce the Windows client.  After
+discussion with our project co-ordinator Mr D Rowe it was decided that
+while he looked into the possibility of getting us access to Delphi we
+should continue to look at ways of using Visual Basic for our project.
+.pp
+Alex & Zeth then found and printed a information sheet on Winsock
+which contained information on using Visual Basic.  The document
+stated that it was indeed possible to use sockets through Visual Basic
+but alas said that most of the commands and functions where not
+supported.  There seemed to be no utilities to get around this in the
+public domain and there were only experimental ones in use by
+commercial companies.  But, a few days later Matt & Zeth discovered a
+shareware product called VBSock which apparently supported full
+Winsock socket code and is suited for Client - Server communications.
+So it seemed as though we had found the ideal solution to our
+problems.
+.pp
+Zeth & Matt where assigned to code the Windows client.  The early
+stages simply consisted of drafting a rough screen layout using the
+parameters drawn-up in the earlier meeting.  We then requested a
+project machine.  We needed a fairly powerful PC running Windows 3.x,
+Visual Basic Professional and had a TCP/IP Internet connection.  This
+machine was to be the one on which we coded the Visual Basic client
+and tested that the whole system worked.  It took several weeks as
+Babbage was undergoing a facelift at the time and the technicians
+where fully stretched.  In that time a basic interface had been
+constructed with some sample socket code ready to test.
+.pp
+The sample code simply fetched the date from the server but at least
+it proved that the socket coding was possible and working.  The server
+code had run into serious trouble . Dom had needed to do several
+re-writes so there was nothing really to test the code on.  We went
+ahead and did some more sample code namely password protection and
+fingering a user on the server.
+.pp
+Over the Easter break the client was worked on by Zeth.  He set about
+setting-up the screens for the talker and the messaging system.
+Keeping close contact with the other members it was decided that the
+messages would be read into a sort of database ready for reading from
+there.  This was a problem as the database functions in Visual Basic
+didn't seem to like this idea very much.  Another snag was that Visual
+Basic is not strictly a proper object orientated language so some of
+the operations needing to be carried out where becoming a serious
+headache.  Thinking about the multi-channel chat program was one of
+the worst and the VBSock patch we had found did not seem up to this
+level of usage.  So a test messaging system was coded by Zeth and
+after further group discussions Alex looked into Delphi once more.  It
+was decided that Alex should produce a sample version of the client
+without any socket coding for us to evaluate.
+.pp
+On return from the Easter break we had a situation.  The Server was
+finished and up.  We had a Visual Basic client which could
+communicated with it and perform some of the basic functions, and a
+Delphi client which was looking aesthetically much better, had
+multiple (MDI) windows and the database functions where much easier
+and in place.  We then had to make a decisions as to which client to
+pursue.
+.pp
+After much discussion we decided upon the Delphi client.  The main
+reason being that the database was a major headache on Visual Basic
+and the usage of multiple windows was also a bonus.  Another was the
+fact that the VBSock patch seemed very limited now that we had started
+to exploit it more.  Also a consideration was that VBSock was
+shareware and displayed a shareware message when used which became
+annoying.  We were also going to release the system into the GNU
+Public License which means that all components needed to be free of
+restrictions (FreeWare).
+.pp
+It was then decided that Alex and Zeth would join together to finish
+the Delphi client, as they had the relevant experiences for this
+operation.
+.\" 
+.sh 3 "Windows Client Development - Delphi"
+.lp
+The Delphi language is based on the Pascal programming language.  It
+is a true object orientated programming language and the programming
+interface forces a object orientated approach to coding.  Delphi
+produces much faster code than Visual Basic mainly because it produces
+fully optimised, compiled code rather than Visual Basics
+semi-interpreted approach.
+.\" 
+.sh 3 "Connecting to Spider using the Delphi WinClient"
+.lp
+The most challenging task was how to incorporate the socket code into
+the Delphi client.  Several 'freeware' Delphi WinSock components were
+downloaded and tested by Alex McLean, which allowed easy access
+Windows Internet sockets.  'DWinsock' was chosen for it's ease of use,
+and quality coding.  As it is freeware, it comes with full source
+code, making bug-tracking considerably easier.  It also allows the
+code to be redistributed freely, as long as no profit is made.
+.pp
+The first step in incorporating the socket code into the client was
+writing a simple test routine to connect to the server.  It returned
+the name and version number of the Spider server successfully.  We
+then progressed into sending a 'login' command and receiving the
+response. This helped familiarise ourselves with the DWinsock
+component, but it was clear that a less simplistic approach to socket
+programming was needed.
+.pp
+Every time something was read from the server, it needed to be split
+into it's individual lines, with each line being stored in a Pascal
+string and being pointed to by an array of pointers.  It would then be
+in a form easily read by other functions.  However, there are no
+guarantees that the whole message will be read in one go, or that one
+message will be read at a time..  So input buffering had to be
+employed, as no freeware code could be found to do this for us.
+.pp
+Once messages could be reliably received and buffered by the client,
+unsolicited messages, such as pages and talker messages, had to be
+dealt with.  Although only one command could be sent at a time,
+unsolicited messages could be received at any time, even when the
+client is expecting a reply to a command.  This was fairly trivial to
+deal with, as unsolicited messages can be easily identified by their
+return codes.
+.pp
+With that problem solved we moved on to a simple commands,
+implementing the Who and Message of the day commands successfully.
+The Talker code was slightly more complex, but with the necessary
+unsolicited message code in place, was not a major problem.  The
+Messaging system and remaining features were simply a case of
+designing user-friendly forms, handling lists of strings, and
+downloading messages - throwing up no new problems.
+.pp
+We consider the MicroSoft Windows client to be at a working beta-test
+stage.  We have plenty more ideas to expand both the client and server
+in the future, for example by adding multi-media features.
+Development of the client definitely does not stop here, but we have a
+good, working base to grow on.
+.\" 
+.\" ############################################################
+.\" 
+.bp
+.sh 1 "Summary"
+.lp
+Now, at the end of the project, with time to reflect on what we have
+done, we feel very pleased.  We have achieved what we set out to do,
+but we have not finished by any means.  There still remain plenty of
+things to do, as described in earlier sections.
+.pp
+In particular, whatever we might say and experience with our software,
+it still needs thorough Beta testing, as there is no way in which we
+could possibly eliminate all bugs from it on our own.
+.pp
+We have had some outside interest in our project from many places.
+Several University societies and clubs have approached us about
+testing and running our system.  One of these such societies is Dublin
+City University Computing Society, who currently have about 300 users,
+wished to test it as a replacement for their current BBS and seem very
+enthusiastic about the potential of the system.
+.pp
+Overall, we feel that this project has been a tremendous learning
+experience.  We have had to discover ways to do things and ways to
+work around other things.  We have found out the need to keep
+organised to stay ahead of the game.  We have learned many interesting
+techniques, which might be valuable to future employers.  We also feel
+that we have created something useful, worthwhile and relatively
+novel.
+.\" 
+.\" ############################################################
+.\" 
+.bp
+.sh 1 "Bibliography"
+.lp
+Advanced Visual Basic : a developer's guide / Mark S.  Burgess.
+Covers release 3.0.  1994
+
+Advanced Visual Basic : a developer's guide / by Mark S. Burgess.
+1994 [computer software]
+
+The beginner's guide to Visual Basic / Peter Wright.  1994
+
+Crash course in Visual Basic 3 / by Ken Miller, Allen Wyatt and Mike
+Shinkel.  1994
+
+Database developer's guide with Visual Basic 3 / Roger Jennings.  1994
+
+How to create real-world applications with Visual Basic / Ori Gurewich
+& Nathan Gurewich.  1994
+
+Microsoft Visual Basic : the programmer's companion / J.  W. Penfold.
+1993
+
+PC magazine visual basic programmer's guide to the Windows API / by
+Daniel Appleman.  1993
+
+Teach yourself more Visual Basic 3 in 21 days / Paul J.  Perry.  c1994
+
+Teach yourself visual basic for applications in 21 days / by Matthew
+Harris.  1994
+
+Teach yourself...Visual Basic 3.0 / John Socha and Devra Hall.  1994
+
+Teach yourself Visual Basic in 21 days / Nathan Gurewich and Ori
+Gurewich.  1993
+
+Visual Basic superBible / Bill Potter, Taylor Maxwell, Bryon Scott.
+2nd ed.  1993
+
+Delphi programming unleashed / Charles Calvert.  1995
+
+Delphi programming unleashed / Charles Calvert.  1995 [CD - Software]
+
+A guide to the TCP/IP protocol suite / Floyd Wilder.  1993
+
+Internetworking with TCP/IP : principles, protocols, and architecture.
+c1988
+
+Practical internetworking with TCP/IP and UNIX / Smoot Carl-Mitchell,
+John S. Quarterman 1993
+
+Programming WinSock / Arthur Dumas.  1995
+
+The C Programming Language / Kernighan, B & Ritchie, D Prentice Hall
+1989
+
+Advanced programming in the Unix environment / Stephens, W R
+Addison-Wesley 1992
+
+TCL and the Tk toolkit/ Ousterhout, J O Addison-Wesley 1994
+
+An Introductory 4.4BSD IPC Tutorial (PSD:20) / Sechrest, S CSRG, UCB
+1994
+
+RFC821 - Simple Mail Transfer Protocol / Postel, J 1982

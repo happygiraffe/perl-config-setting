@@ -1,0 +1,128 @@
+# -*- makefile -*-
+#
+# Main Makefile for Spider
+#
+# $Id: Makefile.in,v 1.1 1999/03/11 15:39:49 dom Exp $
+#
+
+@SET_MAKE@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+mandir = @mandir@
+includedir = @includedir@
+top_srcdir = @top_srcdir@
+
+pkglibexecdir = $(libexecdir)/spider
+pkgspooldir = $(libdir)/spider
+pkgetcdir = $(sysconfdir)/spider
+
+AWK = @AWK@
+CC = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+LDFLAGS= @LDFLAGS@
+LIBS = @LIBS@
+ALL_CFLAGS = -I.. $(CFLAGS) -DCONFIG_FILE=\"$(pkgetcdir)/spider.conf\"
+RM=/bin/rm -f
+
+#-----------------------------------------------------------------------
+
+OBJECTS	= cmds.o ds.o init.o io.o spider.o term.o utils.o
+SCRIPTS = kill_spider debug_client trace_spider
+
+# C-\ in Emacs for backslashes.  :-)
+INSTFILES =					\
+	$(bindir)/spider			\
+	$(bindir)/debug_client			\
+	$(bindir)/kill_spider			\
+	$(bindir)/trace_spider
+
+#-----------------------------------------------------------------------
+
+.c.o:
+	$(CC) -o $@ $(CPPFLAGS) $(ALL_CFLAGS) -c $<
+
+#-----------------------------------------------------------------------
+
+all: spider $(SCRIPTS)
+
+install: $(bindir) $(INSTFILES)
+
+#-----------------------------------------------------------------------
+
+spider: $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS) $(LDFLAGS) $(LIBS)
+
+$(OBJECTS): spider.h codes.h ../config.h
+
+# Solaris make doesn't search VPATH for suffix dependencies, so this
+# must be explicitly specified.  :-(
+
+cmds.o: cmds.c
+
+ds.o: ds.c
+
+init.o: init.c
+
+io.o: io.c
+
+spider.o: spider.c
+
+term.o: term.c
+
+utils.o: utils.c
+
+debug_client: debug_client.sh
+	sed -e "s#!CONFIG!#$(pkgetcdir)/spider.conf#" $? > $@
+	chmod a+x $@
+
+kill_spider: kill_spider.sh
+	sed -e "s#!CONFIG!#$(pkgetcdir)/spider.conf#" $? > $@
+	chmod a+x $@
+
+trace_spider: trace_spider.sh
+	sed -e "s#!CONFIG!#$(pkgetcdir)/spider.conf#" $? > $@
+	chmod a+x $@
+
+#-----------------------------------------------------------------------
+
+$(bindir):
+	@$(mkinstalldirs) $@
+
+$(prefix)/bin/spider: spider
+	$(INSTALL_PROGRAM) $? $@
+
+$(prefix)/bin/debug_client: debug_client
+	$(INSTALL_PROGRAM) $? $@
+
+$(prefix)/bin/kill_spider: kill_spider
+	$(INSTALL_PROGRAM) $? $@
+
+$(prefix)/bin/trace_spider: trace_spider
+	$(INSTALL_PROGRAM) $? $@
+
+#-----------------------------------------------------------------------
+
+.PHONY: all clean dummy
+
+dummy:
+
+clean:
+	-$(RM) core spider $(SCRIPTS) *.o *~

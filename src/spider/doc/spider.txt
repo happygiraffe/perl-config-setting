@@ -1,0 +1,232 @@
+# For emacs: -*- mode: indented-text -*-
+######################################################################
+#
+# The contents of this file is currently out of date, but it is the
+# design of the original project before most of the coding was done.
+#
+######################################################################
+
+SPIDER
+
+The multiplexer shall henceforth be known as spider, because it looks
+like it has a lot of legs coming out of it (whereas in fact they are
+mouths, but lets not quibble).
+
+What needs to be done:
+
+0) Initialize 
+
+   Close all fds, fork. setsid. cd /. (daemonize)
+
+   Set up signal handlers.
+
+   Set up exit handler to remove pidfile.
+
+1) Read & parse config file.
+
+   The location of the config file will be an install-time option.
+   The name of the config file wil probably be spider.conf, though.
+   It will contain values of the form X=Y.  The parsing of keywords
+   will be case independent for those of us who don't know what a
+   shift key is.  The keywords will be:
+
+   o Module_Dir
+
+     This will specify a directory in which modules may be found.
+     There may be multiple entries. These will be searched in the
+     order in which they appear in the Config File.  A typical value
+     might be "/usr/lib/spider".
+
+   o Module
+
+     This will specify a module, which must be contained within one of
+     the Module-Dir's.  A module may not be specified more than once.
+     A typical value might be "talker".
+
+   o PID_File
+
+     This will say where the file containing the PID of the server to
+     be is to be stored.  Usually on a Linux system, this will be
+     "/var/run/spider.pid".
+
+   o User_File
+
+     This file will contain all the user information for the BBS. eg:
+     username, password, fullname, email address, favorite frog, etc.
+     It will probably be "/var/lib/spider/users".
+
+2) Initialize modules from the config file.
+
+   Each module listed in the config file will have a stream pipe
+   opened and one end copied to STDIN, STDOUT & STDERR before the
+   module is exec'd.  This means that the module must do all
+   communication with spider through STDIN/STDOUT, although of course
+   it may open other files for it's own purposes.
+
+   This means that the module MUST set line buffering on STDOUT, STDIN
+   & STDERR before reading or writing from them.  In addition, it
+   would be a good idea if the module checked that it's standard input
+   is *not* a terminal before proceeding.  Of course, this might well
+   be disabled for debugging purposes.
+
+   Then the protocol will be set up as required.  The module will be
+   required to list all the keywords of it's protocol onto STDOUT upon
+   initialization, as well as whether or not that keywords input or
+   output will require more than one line to be transmitted.
+
+   The protocol will, upon initialization, output lines in the
+   following format: "NAME long_input long_output", where name is a
+   command that it wishes to register with the multiplexer and
+   long_input and long_output are either 1 or 0 to indicate that this
+   option will be required or not required, respectively.  The
+   multiplexer will reply with a CMD_OK or CMD_NOTOK response (to be
+   defined later).  The module will continue this procedure, until it
+   issues a line containing a single '.', which will tell the
+   multiplexer that it is done and may go on to the next module.
+
+   These details will be read into a list maintained by the multiplexer.
+   Each module's filehandle will be stored in the global filehandle
+   array.  In a parallel array, the type will be stored as either
+   module or user.
+
+3) Initialize the user database.  Just read it all into memory, so
+   that all details are available as required.
+
+   The fields that will be stored (intially) will be: The username (8
+   chars, [A-Za-z0-9]), password (encrypted), the full name (32 Chars,
+   0x37-0x7f).  Other information will be handled by a module
+   (eg: finger, groups).
+
+4) Enter the main server loop.  This will be a select(2) loop, for
+   each of the open file descriptors, and a listening socket.
+
+   o A new connection may appear.  In that case, the server will
+     accept accept the connection and print up a welcome message,
+     terminated by a '.' on a line of it's own.  The client will then
+     be expected to send a line of the form LOGON name passwd.  For
+     the moment, passwd will be in cleartext.  A more sophisticated
+     form of authentication may come later.
+
+     Once authenticated, the user will be registered as logged on, and
+     the open file descriptor will be added to the list of open fd's
+     being select'd on.  A line saying "LOGON OK" will be returned to
+     the client.
+
+     If the user is unknown, then the response will be "New user;
+     please use NEW command.".  The client will then be expected to
+     issue a "NEW user passwd" command, which will be dealt with in
+     the same way as "LOGON", except that the username will be added
+     to the list of users in memory and on disk.
+
+   o If a client connection is ready for reading, then it will be
+     read from for one line only, unless it is indicated that data
+     will be following by the protocol description array.  In all
+     cases, there will be a 1 second timeout on the read (may need to
+     be increased).
+
+     Ordinarily, when a client request is recieved, it is passed onto
+     the relevant module with the first (command) line prepended with
+     the user name.  The server should *always* be in a ready state to
+     receive the request, as reads from the modules are complete, ie:
+     they all happen at once, not split into n pieces.
+
+     The reads from the client are also complete.
+
+     Once the request has been read, the server will return to it's
+     select(2).  The response will only come when the module provides
+     it, when it will be routed back to the correct client.
+
+   o If a server connection is ready, then it will have one line read
+     from it unless the protocol description array says otherwise.  In
+     that case, there will be read a lot of lines until one is a
+     single '.' on it's own.
+
+     Then this response will have the username stripped off the front
+     of the first (response) line and will be sent to the appropriate
+     user.
+
+     This has two implications:
+
+     1) The order of responses by the module is independent of the
+     order *and* *quantity* of commands given to it by clients.  This
+     may be useful in order to perform optimizations within certain
+     modules.  It also means that a module may generate more than one
+     response for a given command.
+
+     2) Each user may be logged in only once to the server.  This
+     should not be a serious limitation, but only time & testing will
+     tell.
+
+   o If the server receives a special command, it will parse & respond
+     to that itself, and not involve a module.  These special commands
+     are mostly for enquiring about the state if the BBS itself.  They
+     are listed later.
+
+   o When a client breaks the connection, the fd will be removed from
+     the list of open fd's to select on and the user removed from the
+     list of logged on users.
+
+ADDITIONAL REQUIREMENTS
+
+1) Must decide on some form of numeric response code, a la FTP, SMTP,
+   &c so that clients do not have to depend on strings.
+
+   1yz - Informative message.
+   2yz - OK.
+   3yz - cmd OK, send remaining portion.
+   4yz - NOTOK right now.  Try later.
+   5yz - NOTOK.
+
+   x0z - Syntax errors
+   x1z - Informational message
+   x2z - Connection oriented
+   x3z - Authentication message
+   x4z - 
+   x5z - 
+   x6z - 
+   x7z - 
+   x8z - Unsolicited response
+   x9z - Debugging output
+
+   NB: When an unsolicited response is produced by a module, the first
+   word (where word is /[A-Za-z0-9_]+/) MUST be an identifier,
+   identifying which command or module produced the response.
+
+   NB: Multi-line responses, as defined in RFC821 are disallowed
+   here. 
+
+2) Timeouts should also be incorporated for the length of time which a
+   user is allowed to remain on the system while idle.  Probably no
+   more than 1/2 hour.  Could depend on existing #users?
+
+3) Because the modules are known to be on the same machine, timeouts
+   have not been incorporated into the module communications.  If they
+   were, at a later stage, moved to a network connection, it would be
+   necessary to implement them.
+
+NOTES
+
+   The protocol has had many features "borrowed" from the Internet
+   protocol SMTP.  These features include:
+
+   1) Simple textual format
+
+      Makes implementation and debugging extremely straightforward.
+
+   2) Handling of blocks of data
+
+      The convention of using a single '.' (full stop) on a line of
+      it's own to signify the end of a large block of data.  Also, the
+      convention that if a full stop begins a line, but is followed by
+      something, then an additional full stop will be inserted before
+      transmission.  This extra full stop will be deleted upon
+      receipt.
+
+   3) Error codes
+
+      An attempt has been made to follow the guidelines for SMTP as
+      these seemed simple and easy to use.  The same guidelines are
+      also promoted in RFC 959 (for FTP) and RFC 977 (for NNTP).
+
+   Full documentation of SMTP is available in RFC 821, available via
+   ftp from rs.internic.net.

@@ -1,0 +1,102 @@
+# -*- makefile -*-
+#
+# Main Makefile for Spider.
+#
+
+#-----------------------------------------------------------------------
+
+@SET_MAKE@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+mandir = @mandir@
+includedir = @includedir@
+top_srcdir = @top_srcdir@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+SHELL = /bin/sh
+RM=	/bin/rm -f
+
+pkgetcdir = $(sysconfdir)/spider
+pkglibexecdir = $(libexecdir)/spider
+pkgspooldir = $(libdir)/spider
+
+#-----------------------------------------------------------------------
+
+# Order is important; lib must be before modules.
+SUBDIRS= src lib modules etc doc
+
+DISTFILES= 					\
+	Makefile.in				\
+	README					\
+	TODO					\
+	acconfig.h				\
+	config.h.in				\
+	configure				\
+	configure.in				\
+	install-sh				\
+	mkinstalldirs
+
+NEWFILES=					\
+	Makefile				\
+	config.cache				\
+	config.h				\
+	config.log				\
+	config.status				\
+	doc/Makefile				\
+	etc/Makefile				\
+	lib/Makefile				\
+	modules/Makefile			\
+	modules/message/Makefile		\
+	modules/motd/Makefile			\
+	modules/page/Makefile			\
+	modules/talker/Makefile			\
+	modules/test/Makefile			\
+	src/Makefile
+
+MAKE_SUBDIR = for dir in $(SUBDIRS); do (echo "===> Making $@ in $$dir" ; cd $$dir; $(MAKE) $@) || exit 1 ; done
+
+all:
+	@$(MAKE_SUBDIR)
+
+install:
+	@$(MAKE_SUBDIR)
+
+# Because only the maintainer should run this, it doesn't matter that
+# we use a couple of non standard things...
+dist:
+	@ \
+	NAME=`sed -n 's/[^0-9]*\([0-9]\.[0-9]\.[0-9]*\).*/spider-\1/p' \
+		config.h.in` ; \
+	if [ -d $$NAME ] ; then rm -rf $$NAME ; fi ; \
+	mkdir $$NAME ; \
+	find $(DISTFILES) $(SUBDIRS) -depth -print | \
+	egrep -v 'CVS|RCS' | \
+	cpio -pmd $$NAME ; \
+	echo "creating tarchive $$NAME.tar.gz..." ; \
+	tar czf $$NAME.tar.gz $$NAME ; \
+	rm -rf $$NAME
+
+clean:
+	@$(MAKE_SUBDIR)
+
+distclean: clean
+	-$(RM) $(NEWFILES)
+
+
+.PHONY: all clean install

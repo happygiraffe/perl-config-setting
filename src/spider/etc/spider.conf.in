@@ -1,0 +1,46 @@
+######################################################################
+# Main BBS Server configuration file
+#
+# WARNING: All dirs must be full pathnames, otherwise they will be
+#          relative to Spool_Dir.
+#
+
+######################################################################
+# There may be more than one of these.
+#
+Module_Dir !libexecdir!/spider
+
+######################################################################
+# These must be executable to be recognised by Spider.
+#
+Module  motd
+Module  page
+Module  test
+Module  talker
+Module  message
+
+######################################################################
+# Really, this should be in /var/run, to be normal.
+#
+PID_File        !pkgetcdir!/spider.pid
+
+######################################################################
+# This is the BBS passwd file.
+#
+User_File       !pkgetcdir!/users
+
+######################################################################
+# This is the TCP socket that Spider will listen(2) on.
+#
+Port    4321
+
+######################################################################
+# This is where the running modules will each have their current
+# working directories.
+#
+Spool_Dir       !libdir!/spider
+
+######################################################################
+# If uncommented, every single command by every user will be logged.
+#
+# Log_All_Cmds

@@ -1,0 +1,18 @@
+Mon Apr 22 09:56:17 1996  Dominic Mitchell  <dom@myrddin.demon.co.uk>
+
+        * mod.c: Ensured that a sleep occurs between writing multiple
+        replies.  This ensures that Spider can use select(2) on a
+        per-message basis.
+
+        * mod.c: Also add provision for error-handling through a
+        callback.  At present, the only error which is handled (by the
+        callback) is ERR_BADUSR.
+
+Fri Apr 19 14:58:49 1996  Dominic Mitchell  <dom@myrddin.demon.co.uk>
+
+        * Changed the return type of cmd functions to return a type Reply,
+        which can contain more than one reply.  Added a new function to
+        help, "new_reply", and a macro, "CUR_REP".
+
+        * mod.c: Made modules *much* more resilient against bad input.
+

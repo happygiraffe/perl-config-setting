@@ -1,0 +1,13 @@
+Mon Apr 22 09:55:53 1996  Dominic Mitchell  <dom@myrddin.demon.co.uk>
+
+        * page.c: New module, pages people.
+
+Fri Apr 19 14:30:05 1996  Dominic Mitchell  <dom@myrddin.demon.co.uk>
+
+        * motd.c: Now reads in motd.txt again if it has changed on disk.
+
+Mon Apr 15 00:18:36 1996  Dominic Mitchell  <dom@mordred>
+
+	* test.c: Changed reply format of FOO, BAR and DATE commands to be
+	a little more standard.
+

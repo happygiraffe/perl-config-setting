@@ -1,0 +1,61 @@
+# -*- makefile -*-
+#
+# Makefile for Spider Documentation
+#
+@SET_MAKE@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+mandir = @mandir@
+includedir = @includedir@
+top_srcdir = @top_srcdir@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+SHELL = /bin/sh
+RM =	/bin/rm -f
+
+NROFF = nroff
+TROFF = groff
+TBL   = tbl
+
+.SUFFIXES:      .me .ps .txt
+
+.me.txt:
+	$(TBL) $< | $(NROFF) -me > $@
+
+.me.ps:
+	$(TBL) $< | $(TROFF) -me > $@
+
+all: text
+
+text: extend.txt ipr.txt protocol.txt
+
+ps: extend.ps ipr.ps protocol.ps
+
+install:
+
+extend.txt: extend.me
+
+ipr.txt: ipr.me
+
+protocol.txt: protocol.me
+
+clean: 
+	$(RM) extend.txt ipr.txt protocol.txt
+	$(RM) extend.ps ipr.ps protocol.ps
+
+.DUMMY: all clean ps text 

@@ -1,0 +1,56 @@
+# -*- makefile -*-
+#
+# Makefile for all the Spider Modules
+#
+
+@SET_MAKE@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+mandir = @mandir@
+includedir = @includedir@
+top_srcdir = @top_srcdir@
+
+pkglibexecdir = $(libexecdir)/spider
+pkgspooldir = $(libdir)/spider
+
+CC	 = @CC@
+CFLAGS   = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+
+#-----------------------------------------------------------------------
+
+SUBDIRS=	motd page test talker message
+
+MAKE_SUBDIR = for dir in $(SUBDIRS); do (echo "===> Making $@ in modules/$$dir" ; cd $$dir; $(MAKE) $@) || exit 1 ; done
+
+#-----------------------------------------------------------------------
+
+all:
+	@$(MAKE_SUBDIR)
+
+install:
+	@$(MAKE_SUBDIR)
+
+clean:
+	@$(MAKE_SUBDIR)
+
+#-----------------------------------------------------------------------
+
+.PHONY: clean all install

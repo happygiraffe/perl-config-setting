@@ -1,0 +1,73 @@
+# -*- makefile -*-
+#
+# Makefile for etc, misc spider files.
+#
+
+@SET_MAKE@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+mandir = @mandir@
+includedir = @includedir@
+top_srcdir = @top_srcdir@
+
+CC	 = @CC@
+CFLAGS   = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+ALL_CFLAGS = -I.. -I@top_srcdir@/src $(CFLAGS)
+RANLIB   = @RANLIB@
+
+pkglibexecdir = $(libexecdir)/spider
+pkgspooldir = $(libdir)/spider
+pkgetcdir = $(sysconfdir)/spider
+
+#-----------------------------------------------------------------------
+
+INSTFILES =				\
+	$(pkgetcdir)/spider.conf	\
+	$(pkgetcdir)/users
+
+#-----------------------------------------------------------------------
+
+all: spider.conf
+
+install: $(pkgetcdir) $(INSTFILES)
+
+spider.conf: spider.conf.in
+	sed -e 's#!pkgetcdir!#$(pkgetcdir)#g' \
+	    -e 's#!libexecdir!#$(libexecdir)#g' \
+	    -e 's#!libdir!#$(libdir)#g' $? > $@
+
+#-----------------------------------------------------------------------
+
+$(pkgetcdir):
+	@$(mkinstalldirs) $@
+
+$(pkgetcdir)/spider.conf: spider.conf
+	$(INSTALL_DATA) $? $@
+
+$(pkgetcdir)/users: users
+	$(INSTALL_DATA) $? $@
+
+#-----------------------------------------------------------------------
+
+.PHONY: clean all install
+
+clean:
+	-rm -f spider.conf
