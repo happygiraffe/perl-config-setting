@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.4 1999/04/14 22:14:38 dom Exp $
+ * @(#) $Id: spider.h,v 1.1 2000/01/06 21:55:39 dom Exp $
  */
 
 #ifndef _SPIDER_H_
