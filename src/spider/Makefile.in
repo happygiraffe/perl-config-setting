@@ -3,7 +3,7 @@
 # instead.  Some make programs appear to have problems with my use of
 # VPATHs.
 #
-# @(#) $Id: Makefile.in,v 1.7 2000/01/12 21:38:47 dom Exp $
+# @(#) $Id: Makefile.in,v 1.8 2000/01/12 21:40:28 dom Exp $
 #
 
 #-----------------------------------------------------------------------
@@ -79,7 +79,7 @@ ALL_BINS	=				\
 ALL_LIBS	=				\
 	lib/ds/libds.a				\
 	lib/mod/libmod.a			\
-	lib/mod/libnev.a
+	lib/nev/libnev.a
 
 ALL_MODS	=				\
 	modules/message/message			\
@@ -470,7 +470,7 @@ $(libdir)/libds.a: lib/ds/libds.a
 $(libdir)/libmod.a: lib/mod/libmod.a
 	$(INSTALL_DATA) $? $@
 
-$(libdir)/libnev.a: lib/mod/libnev.a
+$(libdir)/libnev.a: lib/nev/libnev.a
 	$(INSTALL_DATA) $? $@
 
 $(mandir)/man1/debug_client.1: doc/debug_client.1
