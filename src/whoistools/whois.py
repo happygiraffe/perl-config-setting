@@ -32,8 +32,8 @@ Server(domain)	- Return an appropriate whois server for a domain.
 Whois(domain, server=None)	- Return whois output for domain.
 """
 
-__rcs_id__='$Id: whois.py,v 1.6 2000/09/05 20:41:47 dom Exp $'
-__version__='$Revision: 1.6 $'[11:-2]
+__rcs_id__='$Id: whois.py,v 1.7 2000/09/05 21:25:11 dom Exp $'
+__version__='$Revision: 1.7 $'[11:-2]
 
 import os
 import sys
@@ -109,7 +109,8 @@ def _init():
 
     try:
         # To create this module, run listmgr.py
-        from whoislist import servers
+        import whoislist
+        servers = whoislist.servers
     except ImportError:
         servers = defaultservers
 
