@@ -100,7 +100,7 @@ use Carp;
 use Config::Setting::IniParser;
 use Config::Setting::FileProvider;
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 $rcsid = '@(#) $Id: Setting.pm,v 1.4 2002/02/04 08:41:09 dom Exp $ ';
 
 sub new {
