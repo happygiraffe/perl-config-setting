@@ -28,7 +28,7 @@
  */
 
 #ifndef lint
-static const char rcsid[] = "@(#) $Id: mod_sed.c,v 1.4 2001/06/15 11:51:23 dom Exp $";
+static const char rcsid[] = "@(#) $Id: mod_sed.c,v 1.5 2001/06/22 21:05:00 dom Exp $";
 #endif /* lint */
 
 #include <sys/types.h>
@@ -251,8 +251,6 @@ sed_reinit(void)
 	cu_nextp = &script;
 
 	/* Restart mf_fgets() */
-	if (curfile)
-		fclose(curfile);
 	curfile = NULL;
 	lastline = 0;
 }
