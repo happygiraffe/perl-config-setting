@@ -1,0 +1,92 @@
+.\" @(#) $Id: libnev.man,v 1.1 2000/01/12 21:21:28 dom Exp $
+.TH libnev 3 "12 Jan 2000" "Local Software"
+.SH NAME
+nev_listen, nev_watch, nev_main_loop, nev_unwatch \- Network Events Library (NEV)
+.SH SYNOPSIS
+.LP
+.B
+#include <nev.h>
+.LP
+.\" I don't like the way of doing this, but I'm copying from the Sun example...
+.IB "int " "nev_listen" "(char\ *addr, char\ *port, nev_cbfn\ newconn_fn,\ void *data);"
+.LP
+.IB "int " "nev_watch" "(int\ fd, nev_cbfn\ read_fn, nev_cbfn\ close_fn);"
+.LP
+.IB "void " "nev_main_loop" "(void);"
+.LP
+.IB "void " "nev_unwatch" "(int\ fd);"
+.SH DESCRIPTION
+.LP
+The NEV library provides a simple interface to managing multiple
+network connections.  It does this by setting up a listening socket on
+the specified network interface and registering a callback function
+for new connections.  In turn, this callback function can register
+further file descriptors to be watched for input, again with an
+appropriate callback function.
+.LP
+All functions which are callbacks are called with a piece of data
+specified by the initial listening function.  In this manner,
+variables can be passed through to callbacks from the main program.
+.LP
+The
+.B nev_listen
+function arranges to set up a listening TCP socket on IP address
+.I addr
+(or IPADDR_ANY if given NULL) and port
+.IR port .
+The
+.I newconn_fn
+function will be called when a new connection is accepted.  It will be
+called with the value of data passed to 
+.B nev_listen
+initially, as well as the new file descriptor.
+.LP
+.B nev_watch
+arranges for input on file descriptor
+.I fd
+to be watched for input.  If there is any, then 
+.I read_fn 
+will be called with the
+.I fd
+which has input waiting to be read.  If the remote end closes the
+connection, then
+.I close_fn
+will be called in a similiar manner.  In such an instance,
+.B new_unwatch
+will be called automatically after the callback has executed.
+.LP
+.B nev_main_loop
+should be called to start listening on any sockets which have been set
+up as listeners.
+.LP
+.B nev_unwatch
+arranges that
+.I fd
+is no longer watched for input.  In addition,
+.I fd
+will be closed.
+.SH RETURN VALUES
+.LP
+The functions
+.B nev_listen
+and
+.B nev_watch
+return a file descriptor, or -1 for an error.  In the case of
+.BR nev_listen,
+it will be the newly created listening socket.
+.LP
+Both
+.B nev_main_loop
+and
+.B nev_unwatch
+do not return a value.
+.SH SEE ALSO
+.BR bind (2),
+.BR listen (2),
+.BR poll (2),
+.BR select (2),
+.BR socket (2).
+.SH AUTHOR
+.LP
+Dominic Mitchell,
+.I <dom@myrddin.demon.co.uk>

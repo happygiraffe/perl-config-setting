@@ -1,0 +1,18 @@
+#
+# Dummy Makefile.
+#
+# @(#) $Id: Makefile.in,v 1.1 2000/01/12 21:22:12 dom Exp $
+#
+
+@SET_MAKE@
+
+MAKEINPARENT	= cd .. && $(MAKE)
+
+all:
+	@$(MAKEINPARENT) $@
+
+clean:
+	@$(MAKEINPARENT) $@
+
+# Remind some make's that these are not real targets.
+.PHONY: all clean
