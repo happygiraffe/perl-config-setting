@@ -123,10 +123,10 @@ sub _init {
 
         my $txt;
         if ($self->{Filename}) {
-                open F, $self->{Filename}
+                open my $fh, $self->{Filename}
                         or croak "open($self->{Filename}): $!";
-                $self->{String} = join('', <F>);
-                close F;
+                $self->{String} = do { local $/ ; <$fh> };
+                close $fh;
         }
 
         return $self;

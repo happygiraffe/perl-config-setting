@@ -141,11 +141,10 @@ sub provide {
                 }
                 $first = 0;
                 next unless -f $f;
-                open F, $f
+                open my $fh, $f
                         or croak "open($f): $!";
-                my $txt = join "", <F>;
-                close F;
-                push @texts, $txt;
+                push @texts, do { local $/; <$fh> };
+                close $fh;
         }
         return @texts;
 }
