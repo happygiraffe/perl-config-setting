@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.2 1999/03/17 07:43:54 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <stdio.h>
@@ -79,7 +79,12 @@ get_line(FILE * fp)
     if (fp != NULL) {
         size = LARGE_BUF;
         start = 0;
-        c = calloc(1, size);
+        c = malloc(size);
+        if (c == NULL) {
+            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+                   __FILE__);
+            exit(1);
+        }
         input = fgets(c, size, fp);
         if (input == NULL) {
             if (!feof(fp)) {

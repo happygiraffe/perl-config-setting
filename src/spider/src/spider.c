@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.2 1999/03/17 07:43:54 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -248,7 +248,12 @@ new_conn(int l_sock)
         }
     }
     if (ok) {
-        SENDER_CONN = calloc(1, sizeof(Conn));
+        SENDER_CONN = malloc(sizeof(Conn));
+        if (open_conns == NULL) {
+            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+                   __FILE__);
+            exit(1);
+        }
         SENDER_CHAN = fdopen(sender, "r+");
 #ifdef SETVBUF_REVERSED
         setvbuf(SENDER_CHAN, _IOLBF, NULL, 0);
@@ -397,7 +402,12 @@ add_username(char ** msg)
 
     if (msg != NULL) {
         i = strlen(SENDER_NAME) + 1 + strlen(msg[0]) + 1;
-        c = calloc(1, i);
+        c = malloc((size_t)i);
+        if (c == NULL) {
+            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+                   __FILE__);
+            exit(1);
+        }
         c = strcpy(c, SENDER_NAME);
         c = strcat(c, " ");
         c = strcat(c, msg[0]);
@@ -421,7 +431,12 @@ del_username(char ** msg)
 
     if (msg != NULL) {
         d = find_token(msg[0], 1);
-        c = calloc(1, strlen(d) + 1);
+        c = malloc(strlen(d) + 1);
+        if (c == NULL) {
+            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+                   __FILE__);
+            exit(1);
+        }
         c = strcpy(c, d);
         free(msg[0]);
         msg[0] = c;

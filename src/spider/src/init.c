@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.2 1999/03/17 07:43:53 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/stat.h>		/* umask, stat */
@@ -328,14 +328,19 @@ write_pid_file(void)
  * init_data
  *
  * Sets up the array of Connections, which are indexed by low-level
- * file descriptor.  Neat, huh?  Also inits the fd array used by
- * select.
+ * file descriptor.  Also inits the fd array used by select.
  */
 void
 init_data(void)
 {
     maxfd = get_max_fds();
-    open_conns = calloc(maxfd, sizeof(Connp));
+    open_conns = malloc(maxfd * sizeof(Connp));
+    if (open_conns == NULL) {
+	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	       __FILE__);
+	exit(1);
+    }
+    (void)memset(open_conns, '\0', (size_t)(maxfd * sizeof(Connp)));
     Usr_init();
     Cmd_init();
     FD_ZERO(&wait_on);
@@ -354,25 +359,45 @@ init_internal_cmds(void)
 {
     Cmdp	tmp;
 
-    tmp = calloc(1, sizeof(Cmd));
+    tmp = malloc(sizeof(Cmd));
+    if (tmp == NULL) {
+	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	       __FILE__);
+	exit(1);
+    }
     tmp->name = "LOGIN";
     tmp->type = internal;
     tmp->det.in.fn = cmd_login;
     Cmd_add(tmp->name, tmp);
 
-    tmp = calloc(1, sizeof(Cmd));
+    tmp = malloc(sizeof(Cmd));
+    if (tmp == NULL) {
+	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	       __FILE__);
+	exit(1);
+    }
     tmp->name = "HELP";
     tmp->type = internal;
     tmp->det.in.fn = cmd_help;
     Cmd_add(tmp->name, tmp);
 
-    tmp = calloc(1, sizeof(Cmd));
+    tmp = malloc(sizeof(Cmd));
+    if (tmp == NULL) {
+	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	       __FILE__);
+	exit(1);
+    }
     tmp->name = "WHO";
     tmp->type = internal;
     tmp->det.in.fn = cmd_who;
     Cmd_add(tmp->name, tmp);
 
-    tmp = calloc(1, sizeof(Cmd));
+    tmp = malloc(sizeof(Cmd));
+    if (tmp == NULL) {
+	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+	       __FILE__);
+	exit(1);
+    }
     tmp->name = "QUIT";
     tmp->type = internal;
     tmp->det.in.fn = cmd_quit;
@@ -396,7 +421,12 @@ find_module(char * name)
 	for (i = 0 ; module_path[i] != (char*)NULL; i++)
 	{
 	    len = strlen(module_path[i]) + 1 + strlen(name) + 1;
-	    abs_name = calloc(1, (size_t)len);
+	    abs_name = malloc((size_t)len);
+	    if (abs_name == NULL) {
+		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		       __FILE__);
+		exit(1);
+	    }
 	    strcpy(abs_name, module_path[i]);
 	    strcat(abs_name, "/");
 	    strcat(abs_name, name);
@@ -475,7 +505,12 @@ activate_module(char * path)
 	} else {
 	    /* Parent */
 	    close(fd[1]);
-	    thisone = calloc(1, sizeof(Conn));
+	    thisone = malloc(sizeof(Conn));
+	    if (thisone == NULL) {
+		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		       __FILE__);
+		exit(1);
+	    }
 	    thisone->chan = fdopen(fd[0], "r+");
 	    thisone->name = basename(path);
 	    thisone->type = module;
@@ -517,7 +552,12 @@ neg_cmd(char * buf, Connp mod)
 
     if ((buf != NULL) && (mod != NULL)) {
 	/* Setup a new command structure */
-	cmd = calloc(1, sizeof(Cmd));
+	cmd = malloc(sizeof(Cmd));
+	if (cmd == NULL) {
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		   __FILE__);
+	    exit(1);
+	}
 	cmd->name = NULL;
 	cmd->type = external;
 	cmd->det.ex.mod = mod;
@@ -660,7 +700,12 @@ init_users(void)
 	    lineno++;
 	    continue;
 	}
-	usr = calloc(1, sizeof(Conn));
+	usr = malloc(sizeof(Conn));
+	if (usr == NULL) {
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		   __FILE__);
+	    exit(1);
+	}
 	/* Assume that name has already been scanned for valid
 	   entries, before being entered into this file. */
 	usr->chan = NULL;

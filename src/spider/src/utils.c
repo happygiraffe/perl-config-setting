@@ -6,11 +6,11 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: utils.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[]="@(#) $Id: utils.c,v 1.2 1999/03/17 07:43:54 dom Exp $";
 
 #include <config.h>
 #include <ctype.h>
-#include <stdlib.h>             /* calloc */
+#include <stdlib.h>             /* malloc */
 /* This ugliness recommended by autoconf for portability */
 #if STDC_HEADERS
 # include <string.h>
@@ -25,6 +25,7 @@ static const char rcsid[]="@(#) $Id: utils.c,v 1.1 1999/03/11 15:39:49 dom Exp $
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
 # endif
 #endif
+#include <syslog.h>
 #include <unistd.h>             /* sysconf */
 #include "spider.h"
 
@@ -58,7 +59,7 @@ mk_a_dir(char * name, int mode)
 /*********************************************************************
  * strdup
  *
- * Create a copy of a string.
+ * Create a copy of a string.  Return NULL if no memory.
  */
 char *
 strdup(char * s)
@@ -66,7 +67,8 @@ strdup(char * s)
     char * new;
 
     new = malloc(strlen(s) + 1);
-    strcpy(new, s);
+    if (new != NULL)
+	    strcpy(new, s);
     return new;
 }
 #endif
@@ -200,7 +202,8 @@ get_max_fds(void)
 /*********************************************************************
  * make_repline
  *
- * Make up a reply line.  Returns a pointer to a calloc'd string.
+ * Make up a reply line.  Returns a pointer to a malloc'd  and zeroed 
+ * string.
  */
 char *
 make_repline(int code, char * msg)
@@ -210,7 +213,12 @@ make_repline(int code, char * msg)
 
     if (msg!= NULL) {
         i = REPLY_CODE_LEN + strlen(msg) + 1;
-        c = calloc(1, i);
+        c = malloc((size_t)i);
+        if (c == NULL) {
+            syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+                   __FILE__);
+            exit(1);
+        }
         sprintf(c, REPLY_FMT, code, msg);
     }
     return c;
@@ -369,8 +377,14 @@ copy_token(char * buf, int n)
 	if (num_tokens(buf) > n) { /* num_tokens retval is +1 */
 	    c = find_token(buf, n);
 	    len = len_token(c);
-	    word = calloc(1, len+1);
-	    strncpy(word, c, len); /* Already NULL-terminated */
+	    word = malloc((size_t)len+1);
+	    if (word == NULL) {
+		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		       __FILE__);
+		exit(1);
+	    }
+	    strncpy(word, c, len);
+	    word[len]='\0';
 	} else {
 	    word = NULL;
 	}

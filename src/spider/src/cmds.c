@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: cmds.c,v 1.1 1999/03/11 15:39:49 dom Exp $";
+static const char rcsid[]="@(#) $Id: cmds.c,v 1.2 1999/03/17 07:43:53 dom Exp $";
 
 /*
  * The following commands are implemented here:
@@ -234,9 +234,24 @@ who_helper(Connp usr)
     int		mins;
 
     time(&now);
-    login_time = calloc(1, 6);	/* HH:MM\0 */
-    idle_time = calloc(1, 6);	/* HH:MM\0 */
-    reply = calloc(1, line_len+1);
+    login_time = malloc(6);	/* HH:MM\0 */
+    if (login_time == NULL) {
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		   __FILE__);
+	    exit(1);
+    }
+    idle_time = malloc(6);	/* HH:MM\0 */
+    if (idle_time == NULL) {
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		   __FILE__);
+	    exit(1);
+    }
+    reply = malloc((size_t)line_len+1);
+    if (reply == NULL) {
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		   __FILE__);
+	    exit(1);
+    }
 
     tmp = localtime(&usr->det.usr.login_time);
     sprintf(login_time, "%02d:%02d", tmp->tm_hour, tmp->tm_min);

@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: ds.c,v 1.1 1999/03/11 15:39:48 dom Exp $";
+static const char rcsid[]="@(#) $Id: ds.c,v 1.2 1999/03/17 07:43:53 dom Exp $";
 
 /*
 
@@ -176,7 +176,12 @@ arr_add(char ** arr, char * str)
 
     if (str != NULL) {
 	if (arr == NULL) {
-	    tmp_arr = calloc(2, sizeof(char *));
+	    tmp_arr = malloc(2 * sizeof(char *));
+	    if (tmp_arr == NULL) {
+		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		       __FILE__);
+		exit(1);
+	    }
 	    tmp_arr[0] = str;
 	    tmp_arr[1] = NULL;
 	} else {
@@ -313,7 +318,12 @@ hash_insert(char * name, void * data, Hashp h)
         if (np == NULL)
         {
             /* This entry doesn't already exist */
-            np = calloc(1, sizeof(Node));
+            np = malloc(sizeof(Node));
+	    if (np == NULL) {
+		syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		       __FILE__);
+		exit(1);
+	    }
             np->name = copy_token(name, 0);
 	    if (h->ignore_case)
 	    {
