@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: io.c,v 1.7 2000/01/06 22:01:14 dom Exp $";
+static const char rcsid[]="@(#) $Id: io.c,v 1.8 2000/01/13 01:30:54 dom Exp $";
 
 #include <config.h>             /* autoconf */
 
@@ -50,7 +50,6 @@ get_mesg(FILE *fp)
 
     while (ok) {
         c = get_line(fp);
-	debug_log("[%d] <- %s", fileno(fp), c);
         if (c == NULL) {
             /* EOF */
             arr_del(tmp);
@@ -58,6 +57,7 @@ get_mesg(FILE *fp)
             ok = false;
             break;
         }
+	debug_log("[%d] <- %s", fileno(fp), c);
         tmp = arr_add(tmp, c);
         if (eot(c)) {
             ok = false;
