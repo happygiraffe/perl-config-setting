@@ -38,7 +38,7 @@ pkgspooldir = $(libdir)/spider
 
 #-----------------------------------------------------------------------
 
-OBJECTS	= mod_ds.o mod_utils.o mod_io.o mod_mod.o
+OBJECTS	= mod_ds.o mod_utils.o mod_io.o mod.o
 
 INSTFILES =			\
 	$(includedir)/mod.h	\
