@@ -5,14 +5,15 @@
  *
  * Copyright 2000 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: nev.c,v 1.1 2000/01/12 21:36:08 dom Exp $
+ * @(#) $Id: nev.c,v 1.2 2000/01/12 21:41:32 dom Exp $
  */
 
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "nev.h"
 
-static const char rcsid[]="@(#) $Id: nev.c,v 1.1 2000/01/12 21:36:08 dom Exp $";
+static const char rcsid[]="@(#) $Id: nev.c,v 1.2 2000/01/12 21:41:32 dom Exp $";
 
 int
 nev_listen(char *addr, char *port, nev_cbfn newconn_fn, void *data)
