@@ -1,0 +1,21 @@
+pgen --- a procmail generating tool.
+
+pgen is a simple set of macros and a command to apply them.  They can
+make generating a procmailrc file much simpler for basic cases.
+
+To install:
+
+	% ./configure
+	% make
+	% make install
+
+See the pgen(1) page for full details.
+
+The basic macros have been in use for over 4 years, I've only just
+gotten around to releasing them.  :-(
+
+-Dom (dom@happygiraffe.net)
+
+# ----------------------------------------------------------------------
+# vim: ai sw=4 et
+# @(#) $Id: README,v 1.1 2001/05/26 17:28:03 dom Exp $
