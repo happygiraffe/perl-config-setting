@@ -1,7 +1,7 @@
 ########################################################################
 # procmail-defn.m4 - definitions for building a procmailrc file.
 #
-# $Id: procmail-defn.m4,v 1.3 1997/06/30 01:13:09 dom Exp $
+# $Id: procmail-defn.m4,v 1.4 2001/05/26 17:43:38 dom Exp $
 ########################################################################
 
 `# This procmail.rc was built on' syscmd(date)dnl
@@ -46,6 +46,17 @@ ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
 define(FROM,
 `ifdef(`INABLOCK',`	'):0: ifdef(MH-USER,$2/.lock)
 ifdef(`INABLOCK',`	')* ^(From|Sender):.*$1
+ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
+				$3, `RCVSTORE', `| rcvstore +$2',
+				$3, `MH', `$2/.',
+				$3, `MBOX', `$2',
+				ifdef(`MH-USER', `| rcvstore +')$2)'
+)dnl
+
+# ARG(arg, folder [, type]) ; foldername w/o the "+".
+define(ARG,
+`ifdef(`INABLOCK',`	'):0: ifdef(MH-USER,$2/.lock)
+ifdef(`INABLOCK',`	')* `$ARG' ?? $1
 ifdef(`INABLOCK',`	')ifelse($3,`JUNK',`/dev/null',
 				$3, `RCVSTORE', `| rcvstore +$2',
 				$3, `MH', `$2/.',
