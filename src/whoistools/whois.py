@@ -60,7 +60,9 @@ def Whois(domain, server=None):
         if not newdata: break
         data = data + newdata
     sock.close()
-
+    # Zap any CR's we see.
+    if string.find(data, '\r') >= 0:
+        data = string.join(string.split(data, '\r'), '')
     return data
 
 def WhoisList(domain, server=None):
