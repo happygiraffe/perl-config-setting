@@ -2,6 +2,7 @@ Changes
 LICENSE
 MANIFEST
 Makefile
+Makefile.tmpl
 README
 TODO
 compile.c
