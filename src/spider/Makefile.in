@@ -3,7 +3,7 @@
 # instead.  Some make programs appear to have problems with my use of
 # VPATHs.
 #
-# @(#) $Id: Makefile.in,v 1.6 2000/01/12 21:25:11 dom Exp $
+# @(#) $Id: Makefile.in,v 1.7 2000/01/12 21:38:47 dom Exp $
 #
 
 #-----------------------------------------------------------------------
@@ -78,7 +78,8 @@ ALL_BINS	=				\
 
 ALL_LIBS	=				\
 	lib/ds/libds.a				\
-	lib/mod/libmod.a
+	lib/mod/libmod.a			\
+	lib/mod/libnev.a
 
 ALL_MODS	=				\
 	modules/message/message			\
@@ -103,8 +104,10 @@ INSTFILES	=				\
 	$(includedir)/codes.h			\
 	$(includedir)/ds.h			\
 	$(includedir)/mod.h			\
+	$(includedir)/nev.h			\
 	$(libdir)/libds.a			\
 	$(libdir)/libmod.a			\
+	$(libdir)/libnev.a			\
 	$(mandir)/man1/debug_client.1		\
 	$(mandir)/man3/libnev.3			\
 	$(mandir)/man8/kill_spider.8		\
@@ -298,6 +301,21 @@ lib/mod/libmod.a: $(LIBMOD_OBJS)
 	$(AR) rcv $@ $(LIBMOD_OBJS)
 	$(RANLIB) $@
 
+#---------------------------------------
+## libnev.a
+
+LIBNEV_OBJS	=				\
+	lib/nev/nev.o
+LIBNEV_SRCS	= $(LIBNEV_OBJS:.o=.c)
+LIBNEV_INCLUDES	= include/nev.h
+
+$(LIBNEV_OBJS): include/nev.h
+
+lib/nev/libnev.a: $(LIBNEV_OBJS)
+	$(RM) $@
+	$(AR) rcv $@ $(LIBNEV_OBJS)
+	$(RANLIB) $@
+
 #---------------------------------------------------------------
 ### Binaries
 
@@ -443,10 +461,16 @@ $(includedir)/ds.h: include/ds.h
 $(includedir)/mod.h: include/mod.h
 	$(INSTALL_DATA) $? $@
 
+$(includedir)/nev.h: include/nev.h
+	$(INSTALL_DATA) $? $@
+
 $(libdir)/libds.a: lib/ds/libds.a
 	$(INSTALL_DATA) $? $@
 
 $(libdir)/libmod.a: lib/mod/libmod.a
+	$(INSTALL_DATA) $? $@
+
+$(libdir)/libnev.a: lib/mod/libnev.a
 	$(INSTALL_DATA) $? $@
 
 $(mandir)/man1/debug_client.1: doc/debug_client.1
