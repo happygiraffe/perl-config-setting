@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: utils.c,v 1.2 1999/03/17 07:43:54 dom Exp $";
+static const char rcsid[]="@(#) $Id: utils.c,v 1.3 1999/03/18 23:44:45 dom Exp $";
 
 #include <config.h>
 #include <ctype.h>
@@ -25,6 +25,7 @@ static const char rcsid[]="@(#) $Id: utils.c,v 1.2 1999/03/17 07:43:54 dom Exp $
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
 # endif
 #endif
+#include <stdarg.h>
 #include <syslog.h>
 #include <unistd.h>             /* sysconf */
 #include "spider.h"
@@ -443,6 +444,23 @@ cmp_token(char * buf, int n, char * s)
 	}
     }
     return ok;
+}
+
+/*********************************************************************
+ * debug_log
+ *
+ * Log a message if in debugging mode.
+ */
+void
+debug_log(char *msg, ...)
+{
+    va_list args;
+
+    if (debug) {
+	va_start (args, msg);
+	(void)vsyslog (LOG_DEBUG, msg, args);
+	va_end (args);
+    }
 }
 
 /*

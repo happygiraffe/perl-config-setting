@@ -5,7 +5,7 @@
  *
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  *
- * @(#) $Id: spider.h,v 1.1 1999/03/11 15:39:49 dom Exp $
+ * @(#) $Id: spider.h,v 1.2 1999/03/18 23:44:45 dom Exp $
  */
 
 #ifndef _SPIDER_H_
@@ -111,8 +111,6 @@ typedef struct conn_struct *Connp;
 typedef enum {module, user} Conntype;
 typedef enum {s_not, s_init, s_conn} Connstate;
 typedef struct conn_struct {
-    Connp 	left;
-    Connp 	right;
     FILE *	chan;		/* stdio channel; lowlev is arr index */
     char * 	name;
     Conntype 	type;		/* Type of connection */
@@ -138,8 +136,6 @@ typedef struct conn_struct {
 typedef struct cmd_struct * Cmdp;
 typedef enum {internal, external} Cmdtype;
 typedef struct cmd_struct {
-    Cmdp 	left;
-    Cmdp 	right;
     char *	name;		/* Nearly forgot this one! */
     Cmdtype	type;
     union {
@@ -161,6 +157,7 @@ typedef struct cmd_struct {
 /* spider.c */
 /* A pointer to argv[0] */
 extern char * 	fullname;
+extern Bool	debug;
 /* filedesc of where the msg came from */
 extern int 	sender;
 extern int	receiver;
@@ -292,6 +289,7 @@ char * 	find_token(char * buf, int n);
 char * 	copy_token(char * buf, int n);
 int 	num_tokens(char * buf);
 Bool	cmp_token(char * buf, int n, char * s);
+void	debug_log(char * msg, ...);
 
 #endif /* _SPIDER_H_ */
 

@@ -7,7 +7,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: init.c,v 1.2 1999/03/17 07:43:53 dom Exp $";
+static const char rcsid[]="@(#) $Id: init.c,v 1.3 1999/03/18 23:44:45 dom Exp $";
 
 #include <config.h>             /* autoconf */
 #include <sys/stat.h>		/* umask, stat */
@@ -201,6 +201,7 @@ parse_cfg_file(void)
     FILE *	cfg;
     char *	keyw;
     char * 	buf;
+    char *	name;
     int 	i,
     		lineno = 1;
 
@@ -209,6 +210,9 @@ parse_cfg_file(void)
     user_file = NULL;
     module_path = NULL;
     modules = NULL;
+    port = NULL;
+    spool_dir = NULL;
+    log_all_cmds = false;
 
     cfg = fopen(conf_file, "r");
     if(cfg == NULL) {
@@ -236,32 +240,47 @@ parse_cfg_file(void)
          * value.
          */
 
+	/* Please excuse the horrid indentation. */
+
 	/* MODULE_PATH: */
-	if(cmp_token(buf, 0, "Module_Dir") == true) {
-	    module_path = arr_add(module_path, copy_token(buf, 1));
+	if (cmp_token(buf, 0, "Module_Dir") == true) {
+	    name = copy_token(buf, 1);
+	    debug_log("Module_Dir %s", name);
+	    module_path = arr_add(module_path, name);
 	} else 
 	/* MODULE: */
-	if(cmp_token(buf, 0, "Module") == true) {
-	    modules = arr_add(modules, copy_token(buf, 1));
+	if (cmp_token(buf, 0, "Module") == true) {
+	    name = copy_token(buf, 1);
+	    debug_log("Module %s", name);
+	    modules = arr_add(modules, name);
 	} else 
 	/* PID_FILE: */
-	if(cmp_token(buf, 0, "Pid_File") == true) {
-	    pid_file = copy_token(buf, 1);
+	if (cmp_token(buf, 0, "Pid_File") == true) {
+	    name = copy_token(buf, 1);
+	    debug_log("Pid_File %s", name);
+	    pid_file = name;
 	} else 
 	/* USER_FILE: */
-	if(cmp_token(buf, 0, "User_File") == true) {
-	    user_file = copy_token(buf, 1);
+	if (cmp_token(buf, 0, "User_File") == true) {
+	    name = copy_token(buf, 1);
+	    debug_log("User_File %s", name);
+	    user_file = name;
 	} else
 	/* PORT: */
-        if(cmp_token(buf, 0, "Port") == true) {
-	    port = atoi(find_token(buf, 1));
+        if (cmp_token(buf, 0, "Port") == true) {
+	    name = find_token(buf, 1);
+	    debug_log("Port %s", name);
+	    port = atoi(name);
 	} else
 	/* SPOOL_DIR: */
         if(cmp_token(buf, 0, "Spool_Dir") == true) {
-	    spool_dir = copy_token(buf, 1);
+	    name = copy_token(buf, 1);
+	    debug_log("Spool_Dir %s", name);
+	    spool_dir = name;
 	} else
 	/* LOG_ALL_CMDS: */
         if(cmp_token(buf, 0, "Log_All_Cmds") == true) {
+	    debug_log("Log_All_Cmds");
 	    log_all_cmds = true;
 	} else
 	/* ERROR */
@@ -359,6 +378,8 @@ init_internal_cmds(void)
 {
     Cmdp	tmp;
 
+    debug_log("start init internal_commands");
+
     tmp = malloc(sizeof(Cmd));
     if (tmp == NULL) {
 	syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
@@ -369,6 +390,7 @@ init_internal_cmds(void)
     tmp->type = internal;
     tmp->det.in.fn = cmd_login;
     Cmd_add(tmp->name, tmp);
+    debug_log("cmd %s ok", tmp->name);
 
     tmp = malloc(sizeof(Cmd));
     if (tmp == NULL) {
@@ -380,6 +402,7 @@ init_internal_cmds(void)
     tmp->type = internal;
     tmp->det.in.fn = cmd_help;
     Cmd_add(tmp->name, tmp);
+    debug_log("cmd %s ok", tmp->name);
 
     tmp = malloc(sizeof(Cmd));
     if (tmp == NULL) {
@@ -391,6 +414,7 @@ init_internal_cmds(void)
     tmp->type = internal;
     tmp->det.in.fn = cmd_who;
     Cmd_add(tmp->name, tmp);
+    debug_log("cmd %s ok", tmp->name);
 
     tmp = malloc(sizeof(Cmd));
     if (tmp == NULL) {
@@ -402,6 +426,9 @@ init_internal_cmds(void)
     tmp->type = internal;
     tmp->det.in.fn = cmd_quit;
     Cmd_add(tmp->name, tmp);
+    debug_log("cmd %s ok", tmp->name);
+
+    debug_log("end init internal_commands");
 }
 
 /*********************************************************************
@@ -468,24 +495,30 @@ activate_module(char * path)
 	name = basename(path);
 
 	i = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
-	if (i == -1)
-	{
-	    syslog(LOG_DEBUG, "socketpair failed; module %s not loaded",
+	if (i == -1) {
+	    syslog(LOG_WARNING, "socketpair failed; module %s not loaded",
 		   path);
 	    return;
 	}
 
-	if ( (pid = fork()) == -1)
-	{
-	    syslog(LOG_DEBUG, "fork failed; reason %m; module %s not loaded",
+	if ( (pid = fork()) == -1) {
+	    syslog(LOG_WARNING, "fork failed; reason %m; module %s not loaded",
 		   path);
 	    return;
 	} else if ( pid == 0 ) {
 	    /* Child */
 	    signal(SIGTRAP, SIG_IGN);
 	    close(fd[0]);
-	    dup2(fd[1], 0);
-	    dup2(fd[1], 1);
+	    i = dup2(fd[1], STDIN_FILENO);
+	    if (i != STDIN_FILENO) {
+		syslog(LOG_WARNING, "dup2(,stdin) failed");
+		exit(1);
+	    }
+	    i = dup2(fd[1], 1);
+	    if (i != STDOUT_FILENO) {
+		syslog(LOG_WARNING, "dup2(,stdout) failed");
+		exit(1);
+	    }
 	    /* Make sure that the child gets it's own directory */
 	    i = stat(name, &s);
 	    if (i == -1) {
@@ -500,6 +533,9 @@ activate_module(char * path)
 		    chdir(name);
 		}
 	    }
+	    /* Activate debugging if we are debugging */
+	    if (debug)
+		putenv("DEBUG=1");
 	    execl(path, basename(path), NULL);
 	    syslog(LOG_WARNING, "exec failed; reason %m");
 	} else {
@@ -530,7 +566,7 @@ activate_module(char * path)
             FD_SET(fd[0], &wait_on);
             SET_WAIT_MAX(fd[0]);
 	    
-	    syslog(LOG_DEBUG, "Started module %s[%d]", thisone->name,
+	    syslog(LOG_INFO, "module %s is pid %d", thisone->name,
 		   thisone->det.mod.pid);
 	}
     }
@@ -547,6 +583,7 @@ neg_cmd(char * buf, Connp mod)
 {
     Cmdp	cmd;
     Bool	ok = true;
+    char *	tmp;
     char *	reason = ERR_SYNTAX_MSG;
     int		code = ERR_SYNTAX;
 
@@ -593,10 +630,20 @@ neg_cmd(char * buf, Connp mod)
 	}
 	if (ok)
 	{
-	    fprintf(mod->chan, REPLY_FMT "\n", OK_CMD, OK_CMD_MSG);
-	} else {
-	    fprintf(mod->chan, REPLY_FMT "\n", code, reason);
+	    code = OK_CMD;
+	    reason = OK_CMD_MSG;
 	}
+	tmp = malloc(strlen(REPLY_FMT)+strlen(reason)+5);
+	if (tmp == NULL) {
+	    syslog(LOG_ERR, "malloc failed at line %d, file %s", __LINE__,
+		   __FILE__);
+	    exit(1);
+	}
+	(void)sprintf(tmp, REPLY_FMT, code, reason);
+	fputs(tmp, mod->chan);
+	fputs("\n", mod->chan);
+	debug_log("-> %s", tmp);
+	free(tmp);
     }
 }
 
@@ -615,6 +662,7 @@ proc_new_cmds(char *modname)
     if (modname != NULL) {
 	/* Find out whom we're dealing with */
 	mod = carr_find(modname, module);
+	debug_log("proc_new_cmds(%s) starting", modname);
 
 	/* I/O with the module */
 	do {
@@ -622,6 +670,7 @@ proc_new_cmds(char *modname)
                 free(buf);
             }
             buf = get_line(mod->chan);
+	    debug_log("<- %s", buf);
 	    if ((buf == NULL) || ((buf[0] == '.') && (strlen(buf) == 1)))
 		ok = false;
 	    else
@@ -652,8 +701,10 @@ init_modules(void)
 		   modules[i]);
 	    continue;		/* XXX Should we exit(1) here? */
 	}
+	debug_log("start init module %s", modules[i]);
 	activate_module(mod);
 	proc_new_cmds(basename(mod));
+	debug_log("end init module %s", modules[i]);
     }
 }
 

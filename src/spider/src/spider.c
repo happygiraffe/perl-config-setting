@@ -6,7 +6,7 @@
  * Copyright 1996 Dominic Mitchell (dom@myrddin.demon.co.uk)
  */
 
-static const char rcsid[]="@(#) $Id: spider.c,v 1.2 1999/03/17 07:43:54 dom Exp $";
+static const char rcsid[]="@(#) $Id: spider.c,v 1.3 1999/03/18 23:44:45 dom Exp $";
 
 #include <config.h>             /* autoconf */
 /* This ugliness recommended by autoconf for portability */
@@ -52,6 +52,7 @@ static const char rcsid[]="@(#) $Id: spider.c,v 1.2 1999/03/17 07:43:54 dom Exp 
 /* GLOBALS */
 /* argv[0], basically. */
 char *	fullname;
+Bool	debug;
 /* File descriptor of where the msg came from & is going to.  Can
  *  obtain name from open_conns[sender]->name XXX This is most
  * un-thread-safe. */
@@ -86,14 +87,18 @@ main(int argc, char **argv)
     fullname = argv[0];
     conf_file = CONFIG_FILE;
     want_to_fork = true;
+    debug = false;
 
     /* Parse options */
-    while((opt = getopt(argc, argv, "c:n")) != -1)
+    while((opt = getopt(argc, argv, "c:dn")) != -1)
     {
 	switch(opt)
 	{
 	case 'c':
 	    conf_file = strdup(optarg);
+	    break;
+	case 'd':
+	    debug = true;
 	    break;
 	case 'n':
 	    want_to_fork = false;
