@@ -134,7 +134,11 @@ main (void)
   /* Main loop */
   do
     {
-      getcmd (buf);
+      if (getcmd (buf) == 0)
+	{
+	  /* problem with input; most likely EOF */
+	  exit(1);
+	}
       /* A command? */
       if (!isdigit ((int)buf[0]))
 	{
