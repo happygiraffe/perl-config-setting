@@ -96,7 +96,7 @@ L<XML::Parser>.
 
 =head1 AUTHOR
 
-Dominic Mitchell, E<lt>cpan@happygiraffe.netE<gt>.
+Dominic Mitchell, E<lt>cpan (at) happygiraffe.netE<gt>.
 
 =cut
 

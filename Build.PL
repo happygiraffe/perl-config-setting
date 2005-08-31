@@ -9,5 +9,8 @@ Module::Build->new(
     requires    => {
         'Test::More' => 0,
     },
+    recommends  => {
+        'Test::Pod' => 1.00,
+    },
     create_makefile_pl => 'passthrough',
 )->create_build_script;

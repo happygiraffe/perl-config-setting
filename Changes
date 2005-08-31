@@ -1,5 +1,9 @@
 Revision history for Perl extension Config::Setting.
 
+0.04  Wed Aug 31 20:58:25 BST 2005
+	- Add tests for correct POD.
+	- Despam email address.
+
 0.03  Tue Feb 22 12:46:02 GMT 2005
 	- Don't blow up if the first file asked for isn't there.
 	  Instead, check the is_configured() method of the main

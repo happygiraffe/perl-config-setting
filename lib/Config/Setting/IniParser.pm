@@ -93,7 +93,7 @@ perl(1).
 
 =head1 AUTHOR
 
-Dominic Mitchell, E<lt>cpan@happygiraffe.netE<gt>.
+Dominic Mitchell, E<lt>cpan (at) happygiraffe.netE<gt>.
 
 =head1 BUGS
 

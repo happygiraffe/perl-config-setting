@@ -111,7 +111,7 @@ help debugging.
 
 =head1 AUTHOR
 
-Dominic Mitchell, E<lt>cpan@happygiraffe.netE<gt>
+Dominic Mitchell, E<lt>cpan (at) happygiraffe.netE<gt>
 
 =head1 SEE ALSO
 
@@ -130,7 +130,7 @@ use Carp;
 use Config::Setting::IniParser;
 use Config::Setting::FileProvider;
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 $rcsid = '@(#) $Id$ ';
 
 sub new {
